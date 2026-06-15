@@ -1,0 +1,24 @@
+# Grand Website
+
+Static landing-page wireframe for Grand.
+
+## Status
+
+- Added a first-pass one-page wireframe for the public landing page.
+- Positioning is companion-first for the older person, with family reassurance as the buyer story.
+- The wireframe uses the existing Grand product language: warm surfaces, sage/clay accents, editorial type moments, privacy by default, and no surveillance framing.
+- Added an optimized hero image from the selected Pexels option: Moe Magners photo `pexels-moe-magners-5335290.jpg`, resized to 2400px wide at `assets/hero-pexels-moe-magners-5335290.jpg`.
+
+## Open Locally
+
+Open `index.html` in a browser. No build step is required.
+
+## Current Sections
+
+- Hero promise and waitlist CTA.
+- Grace value proposition for the person at home.
+- Family reassurance cards.
+- Plain-language use cases.
+- Product preview placeholders for the home voice experience and family app.
+- Trust and privacy close.
+- Waitlist form placeholder.

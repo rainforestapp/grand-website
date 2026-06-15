@@ -102,7 +102,7 @@ a {
 .hero-media {
   background:
     var(--surface-sage-soft)
-    url("assets/hero-pexels-moe-magners-5335290.jpg")
+    url("/assets/hero-pexels-moe-magners-5335290.jpg")
     center center / cover
     no-repeat;
   min-height: 620px;

@@ -1,6 +1,6 @@
 # Grand Website
 
-Static landing-page wireframe for Grand.
+Deployable landing-page wireframe for Grand, packaged as a Sites/vinext app.
 
 ## Status
 
@@ -8,10 +8,24 @@ Static landing-page wireframe for Grand.
 - Positioning is companion-first for the older person, with family reassurance as the buyer story.
 - The wireframe uses the existing Grand product language: warm surfaces, sage/clay accents, editorial type moments, privacy by default, and no surveillance framing.
 - Added an optimized hero image from the selected Pexels option: Moe Magners photo `pexels-moe-magners-5335290.jpg`, resized to 2400px wide at `assets/hero-pexels-moe-magners-5335290.jpg`.
+- Added a Sites-compatible vinext app scaffold for deployment. The deployable app source lives in `app/`, with static assets in `public/`.
 
 ## Open Locally
 
-Open `index.html` in a browser. No build step is required.
+For the static preview, open `index.html` in a browser.
+
+For the deployable app:
+
+```bash
+npm install
+npm run dev
+```
+
+For a production build:
+
+```bash
+npm run build
+```
 
 ## Current Sections
 

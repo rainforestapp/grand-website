@@ -9,7 +9,7 @@ Static landing-page wireframe for Grand.
 - The wireframe uses the existing Grand product language: warm surfaces, sage/clay accents, editorial type moments, privacy by default, and no surveillance framing.
 - Added an optimized hero image from the selected Pexels option: Moe Magners photo `pexels-moe-magners-5335290.jpg`, resized to 2400px wide at `assets/hero-pexels-moe-magners-5335290.jpg`.
 - Deployed the static page with GitHub Pages from the `gh-pages` branch.
-- Configured GitHub Pages for the custom domain `www.grandeldercare.com`; DNS still needs a `CNAME` record from `www` to `fredsterss.github.io`. The apex domain `grandeldercare.com` can also be pointed at GitHub Pages so it redirects to `www`.
+- Configured GitHub Pages for the custom domain `www.grandeldercare.com`, with DNSimple records pointing `www` to `fredsterss.github.io` and the apex domain to GitHub Pages A/AAAA records. HTTP is live; HTTPS enforcement is pending GitHub certificate issuance.
 - Refined the landing-page copy after review feedback, including more specific music examples, clearer reminder language, and replacing the abstract product preview with concrete Grace app ideas.
 
 ## Open Locally

@@ -9,6 +9,7 @@ Static landing-page wireframe for Grand.
 - The wireframe uses the existing Grand product language: warm surfaces, sage/clay accents, editorial type moments, privacy by default, and no surveillance framing.
 - Added an optimized hero image from the selected Pexels option: Moe Magners photo `pexels-moe-magners-5335290.jpg`, resized to 2400px wide at `assets/hero-pexels-moe-magners-5335290.jpg`.
 - Deployed the static page with GitHub Pages from the `gh-pages` branch: https://fredsterss.github.io/grand-website/
+- Refined the landing-page copy after review feedback, including more specific music examples, clearer reminder language, and replacing the abstract product preview with concrete Grace app ideas.
 
 ## Open Locally
 
@@ -20,6 +21,6 @@ Open `index.html` in a browser. No build step is required.
 - Grace value proposition for the person at home.
 - Family reassurance cards.
 - Plain-language use cases.
-- Product preview placeholders for the home voice experience and family app.
+- Grace app ideas for music, reading, reminders, and family messages.
 - Trust and privacy close.
 - Waitlist form placeholder.

@@ -8,8 +8,8 @@ Static landing-page wireframe for Grand.
 - Positioning is companion-first for the older person, with family reassurance as the buyer story.
 - The wireframe uses the existing Grand product language: warm surfaces, sage/clay accents, editorial type moments, privacy by default, and no surveillance framing.
 - Added an optimized hero image from the selected Pexels option: Moe Magners photo `pexels-moe-magners-5335290.jpg`, resized to 2400px wide at `assets/hero-pexels-moe-magners-5335290.jpg`.
-- Deployed the static page with GitHub Pages from the `gh-pages` branch.
-- Configured GitHub Pages for the canonical custom domain `www.grandeldercare.com`, with DNSimple records pointing `www` to `fredsterss.github.io` and the apex domain to GitHub Pages A/AAAA records. GitHub is issuing a certificate for both `www.grandeldercare.com` and `grandeldercare.com`.
+- Deployed the static page with GitHub Pages from the `gh-pages` branch under `rainforestapp/grand-website`.
+- Configured GitHub Pages for the canonical custom domain `www.grandeldercare.com`, with DNSimple records pointing `www` to `rainforestapp.github.io` and the apex domain to GitHub Pages A/AAAA records. GitHub is issuing a certificate for both `www.grandeldercare.com` and `grandeldercare.com`.
 - Refined the landing-page copy after review feedback, including more specific music examples, clearer reminder language, and replacing the abstract product preview with concrete Grace app ideas.
 
 ## Open Locally

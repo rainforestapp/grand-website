@@ -18,6 +18,12 @@ Static landing-page wireframe for Grand.
 - Replaced the abstract satellite floor-plan with resized real Grand iOS app screenshots from `../grand-ios/docs/screenshots`: `ios-home.png` and `pr1-settings-index.png`.
 - Simplified the hero headline and strapline so first-time readers understand the promise without needing prior context for Grand, Grace, or satellites.
 - Wired the waitlist form for a Google Sheets backend via Google Apps Script, including client-side email validation, status messaging, and browser/user-agent metadata capture.
+- Repositioned the entire page from companion-first to peace-of-mind / dignity-first, aimed squarely at the adult child (the buyer). This supersedes the companion-first framing above. **Why:** the product's MVP is a quiet, passive sensor system (a hub + sensors) that lets an adult child know their parent is okay without cameras, wearables, or anything that announces "you're old" — not a voice companion. The "Grace" companion concept and all companion features (music, reading aloud, trivia, conversation, family-message dictation) were removed because they describe a different product and were not in the MVP spec.
+  - "Grand satellites" renamed to "Grand sensors"; the device story is now simply "the Grand hub + Grand sensors."
+  - Hero now leads with the fear→relief promise: "She keeps her independence. You stop worrying."
+  - Added a "Why not a wearable, button, or camera?" comparison block (the spec's strongest selling argument against existing options).
+  - Trust close ties privacy directly to dignity and drops conversation-era rules; no pricing and no public mention of human-in-the-loop alert review, per product decision.
+  - Reused the existing iOS screenshots (`assets/grand-ios-home.png`, `assets/grand-ios-settings.png`) — they already show the passive-sensing view with no "Grace" UI.
 
 ## Open Locally
 
@@ -42,12 +48,12 @@ The client sends email, source, page URL, referrer, user agent, user-agent clien
 
 ## Current Sections
 
-- Hero promise and waitlist CTA.
-- Grand system overview for the base station, Grace, and optional satellites.
-- Grace value proposition for the person at home, now framed as included with every Grand base station.
-- Grand satellites/home-tracking value proposition with tangible iOS app screens.
-- Family reassurance cards combining Grace engagement and Grand home-pattern summaries.
-- Plain-language use cases split between "Ask Grace" and "Grand notices."
-- Grace app ideas for music, reading, reminders, and family messages.
-- Trust and privacy close.
+- Hero promise (independence for the parent, peace of mind for the child) and waitlist CTA.
+- "How Grand works" overview of the Grand hub + Grand sensors, with a "nothing to wear / charge / no cameras" note.
+- "What Grand pays attention to": everyday activity, the kitchen (meals), and a call for help.
+- "Caregiver experience": the daily "she's okay" app view with real iOS app screens, plus a parent-perspective dignity note.
+- Family reassurance cards grounded in sensing (activity, meals, urgent stillness alert).
+- Dignity-contrast use cases: "What you see" vs. "What she notices."
+- "Why not a wearable, button, or camera?" comparison block.
+- Trust and privacy close (no cameras, no live feed, no audio to the cloud, nothing to wear or charge).
 - Waitlist form with validation and Google Sheets handoff.

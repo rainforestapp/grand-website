@@ -413,6 +413,14 @@ h3 {
   margin-bottom: 0;
 }
 
+.tracking-aside {
+  border-left: 3px solid var(--status-sage);
+  color: var(--ink-soft);
+  font-style: italic;
+  margin-top: 28px;
+  padding-left: 16px;
+}
+
 .screen-showcase {
   align-items: center;
   display: grid;
@@ -571,6 +579,15 @@ h3 {
   border-radius: var(--radius-large);
   min-height: 270px;
   padding: clamp(20px, 4vw, 38px);
+}
+
+.app-idea--grand {
+  background: rgba(143, 163, 142, 0.18);
+  border-color: rgba(143, 163, 142, 0.6);
+}
+
+.app-idea--grand .app-idea-label {
+  color: var(--status-sage);
 }
 
 .app-idea-label {

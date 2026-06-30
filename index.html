@@ -6,9 +6,10 @@
     <title>Grand &middot; Landing Page Wireframe</title>
     <meta
       name="description"
-      content="Wireframe for Grand, a gentle AI companion for older people and quiet reassurance for their family."
+      content="Wireframe for Grand, a simple home care system that gives older people company and gives family private reassurance."
     >
     <link rel="stylesheet" href="styles.css">
+    <script src="script.js" defer></script>
   </head>
   <body>
     <header class="site-header">
@@ -17,7 +18,9 @@
         <span>care, in service</span>
       </a>
       <nav class="nav" aria-label="Primary navigation">
+        <a href="#system">Grand</a>
         <a href="#grace">Grace</a>
+        <a href="#tracking">Home tracking</a>
         <a href="#family">For family</a>
         <a href="#privacy">Privacy</a>
         <a class="nav-cta" href="#waitlist">Join waitlist</a>
@@ -30,23 +33,52 @@
           <div class="photo-frame"></div>
         </div>
         <div class="hero-copy">
-          <p class="eyebrow">AI companion for later life</p>
-          <h1 id="hero-title">Great company for Mum. Quiet reassurance for you.</h1>
+          <p class="eyebrow">Care at home</p>
+          <h1 id="hero-title">Company for Mum. Peace of mind for you.</h1>
           <p class="hero-intro">
-            Meet Grace: a gentle voice companion who listens, chats, plays favourite
-            tunes, reads aloud, and helps with everyday reminders.
+            A voice companion for chatting, reminders, music, and staying in touch
+            &mdash; with discreet home sensors that flag changes in routine before
+            you&rsquo;d ever notice them yourself.
           </p>
           <div class="hero-actions" aria-label="Primary calls to action">
             <a class="button button-primary" href="#waitlist">Join the waitlist</a>
-            <a class="button button-secondary" href="#grace">See how Grace helps</a>
+            <a class="button button-secondary" href="#system">See how Grand works</a>
           </div>
+        </div>
+      </section>
+
+      <section id="system" class="section system-section">
+        <div class="section-heading section-heading--center">
+          <p class="eyebrow">How Grand works</p>
+          <h2>One familiar companion, with optional awareness around the home.</h2>
+        </div>
+        <div class="system-grid">
+          <article class="system-card system-card--primary">
+            <p class="card-label">Smart speaker</p>
+            <h3>Grace</h3>
+            <p>A patient companion who is useful without feeling clinical, and reassuring without feeling watched.</p>
+          </article>
+          <article class="system-card">
+            <p class="card-label">Optional Grand</p>
+            <h3>Grand satellites</h3>
+            <p>Small additions for home tracking, so families can understand routines and notice important changes.</p>
+          </article>
+        </div>
+        <div class="system-note">
+          <span>Grace is the smart speaker</span>
+          <span>Grand satellites add home tracking</span>
         </div>
       </section>
 
       <section id="grace" class="section section-two-column">
         <div class="section-heading">
-          <p class="eyebrow">For the person at home</p>
+          <p class="eyebrow">Grace in the base station</p>
           <h2>Grace is company first, practical help second.</h2>
+          <p>
+            Every Grand base station includes Grace: a gentle voice companion for
+            the quiet parts of the day, the practical things that slip, and the
+            small pleasures that make home feel more alive.
+          </p>
         </div>
         <div class="wire-card stack-card">
           <div class="quote-block">
@@ -72,10 +104,52 @@
         </div>
       </section>
 
+      <section id="tracking" class="section tracking-section">
+        <div class="tracking-copy">
+          <p class="eyebrow">Grand satellites</p>
+          <h2>Add home tracking when family needs a wider view.</h2>
+          <p>
+            Satellites extend Grand beyond the base station. They are designed for
+            routine and reassurance: room-to-room activity, quieter-than-usual
+            periods, and changes that may deserve a check-in.
+          </p>
+          <div class="tracking-list">
+            <article>
+              <h3>Daily rhythm</h3>
+              <p>Understand whether the day broadly looks like the person&rsquo;s normal routine.</p>
+            </article>
+            <article>
+              <h3>Important changes</h3>
+              <p>Surface unusual inactivity or pattern changes without exposing a live view into the home.</p>
+            </article>
+            <article>
+              <h3>Actionable alerts</h3>
+              <p>Emergency-like moments can be framed clearly, filtered carefully, and sent to family.</p>
+            </article>
+          </div>
+        </div>
+        <div class="screen-showcase" aria-label="Grand iOS app screens">
+          <figure class="phone-shot phone-shot--primary">
+            <img
+              src="assets/grand-ios-home.png"
+              alt="Grand iOS home screen showing Mom is slower today and in the living room."
+            >
+            <figcaption>Home status from Grand</figcaption>
+          </figure>
+          <figure class="phone-shot phone-shot--secondary">
+            <img
+              src="assets/grand-ios-settings.png"
+              alt="Grand iOS settings screen with a row for sensors at mom's home."
+            >
+            <figcaption>Sensors live in the caregiver app</figcaption>
+          </figure>
+        </div>
+      </section>
+
       <section id="family" class="section family-band">
         <div class="section-heading section-heading--center">
           <p class="eyebrow">For the family who buy it</p>
-          <h2>Know Grace is helping, without turning home into a live feed.</h2>
+          <h2>Reassurance from Grace and Grand, without turning home into a live feed.</h2>
         </div>
         <div class="family-grid">
           <article class="wire-card insight-card">
@@ -90,13 +164,13 @@
             </div>
           </article>
           <article class="wire-card insight-card">
-            <p class="card-label">Message</p>
-            <h3>Margaret asked Grace to tell Sarah she will be ready at two.</h3>
-            <p>No transcript. No hidden conversation detail.</p>
+            <p class="card-label">Home pattern</p>
+            <h3>Morning movement looked normal across the rooms with satellites.</h3>
+            <p>A simple summary, not a surveillance stream.</p>
           </article>
           <article class="wire-card insight-card insight-card--urgent">
             <p class="card-label">Urgent</p>
-            <h3>Emergency-like moments can notify family.</h3>
+            <h3>Unusual inactivity can notify family when it needs attention.</h3>
             <p>Clear, filtered, and action-oriented.</p>
           </article>
         </div>
@@ -105,15 +179,27 @@
       <section class="section examples-section">
         <div class="section-heading">
           <p class="eyebrow">Use cases</p>
-          <h2>The page should show real moments, not feature jargon.</h2>
+          <h2>The page should show real moments from both parts of Grand.</h2>
         </div>
-        <div class="example-grid">
-          <div class="example-pill">&ldquo;Read another chapter.&rdquo;</div>
-          <div class="example-pill">&ldquo;Remind me to call Tom tomorrow.&rdquo;</div>
-          <div class="example-pill">&ldquo;What time does the pharmacy close?&rdquo;</div>
-          <div class="example-pill">&ldquo;Tell Sarah I&rsquo;ll be ready at two.&rdquo;</div>
-          <div class="example-pill">&ldquo;Play Beethoven while I make lunch.&rdquo;</div>
-          <div class="example-pill">&ldquo;What day is it today?&rdquo;</div>
+        <div class="example-columns">
+          <div>
+            <h3>Ask Grace</h3>
+            <div class="example-grid">
+              <div class="example-pill">&ldquo;Read another chapter.&rdquo;</div>
+              <div class="example-pill">&ldquo;Remind me to call Tom tomorrow.&rdquo;</div>
+              <div class="example-pill">&ldquo;What time does the pharmacy close?&rdquo;</div>
+              <div class="example-pill">&ldquo;Tell Sarah I&rsquo;ll be ready at two.&rdquo;</div>
+            </div>
+          </div>
+          <div>
+            <h3>Grand notices</h3>
+            <div class="example-grid">
+              <div class="example-pill">Morning activity looks normal.</div>
+              <div class="example-pill">The kitchen has been quieter than usual.</div>
+              <div class="example-pill">No movement has been seen for a while.</div>
+              <div class="example-pill">An urgent-looking change needs a check-in.</div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -151,13 +237,15 @@
           <p class="eyebrow">Trust close</p>
           <h2>Private by default. Honest about limits.</h2>
           <p>
-            Grace is not a replacement for family, carers, clinicians, or emergency
-            services. She is gentle company and practical help at home, with thoughtful
-            support for the people who care.
+            Grand is not a replacement for family, carers, clinicians, or emergency
+            services. Grace offers gentle company and practical help at home. Satellites
+            add thoughtful context for family, without cameras, live feeds, or hidden
+            conversation detail.
           </p>
         </div>
         <div class="trust-rules">
           <div>No raw transcripts for family</div>
+          <div>No cameras in the home</div>
           <div>No live feed</div>
           <div>No medical claims in the headline</div>
           <div>Emergency-like alerts are clearly framed</div>
@@ -166,20 +254,34 @@
 
       <section id="waitlist" class="waitlist-section">
         <p class="eyebrow">Early access</p>
-        <h2>A familiar voice for the quiet parts of the day.</h2>
-        <form class="waitlist-form">
+        <h2>Start with Grace. Add home tracking when you need it.</h2>
+        <form
+          class="waitlist-form"
+          data-waitlist-form
+          data-waitlist-endpoint="https://script.google.com/macros/s/AKfycby7R63eXRm4mBYjvMvkMGkUkbowEMQ8frlkUyLvLLV7SarUBUyxsCpfM3TNk9Vyl37A/exec"
+          novalidate
+        >
           <label for="email">Email</label>
           <div class="form-row">
-            <input id="email" type="email" placeholder="you@example.com">
+            <input
+              id="email"
+              name="email"
+              type="email"
+              autocomplete="email"
+              inputmode="email"
+              placeholder="you@example.com"
+              required
+            >
             <button type="submit">Join waitlist</button>
           </div>
+          <p class="form-status" data-waitlist-status role="status" aria-live="polite"></p>
         </form>
       </section>
     </main>
 
     <footer class="site-footer">
       <span>grand</span>
-      <span>Wireframe v0.1</span>
+      <span>Wireframe v0.2</span>
     </footer>
   </body>
 </html>

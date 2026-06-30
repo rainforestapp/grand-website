@@ -257,6 +257,36 @@ h3 {
   box-shadow: var(--shadow-soft);
 }
 
+.problem-section {
+  background: var(--surface-bone);
+}
+
+.problem-grid {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 44px auto 0;
+  max-width: 1040px;
+}
+
+.problem-card {
+  padding: 28px;
+}
+
+.problem-card p:last-child {
+  color: var(--ink-soft);
+  margin-bottom: 0;
+}
+
+.problem-transition {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(20px, 2.4vw, 30px);
+  line-height: 1.3;
+  margin: clamp(40px, 6vw, 64px) auto 0;
+  max-width: 760px;
+  text-align: center;
+}
+
 .system-section {
   background: var(--surface-clear);
 }
@@ -741,6 +771,7 @@ h3 {
   }
 
   .family-grid,
+  .problem-grid,
   .example-grid {
     grid-template-columns: 1fr;
   }

@@ -303,7 +303,7 @@ h3 {
 
 .card-media {
   align-items: center;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 3 / 4;
   background: rgba(26, 24, 22, 0.04);
   border: 1px dashed var(--hairline);
   border-radius: 12px;

@@ -53,7 +53,4 @@ The client sends email, source, page URL, referrer, user agent, user-agent clien
 - "How Grand works" section titled as such, with a combined lead ("There's a better way to know they're okay. A small hub and a few sensors. No cameras, nothing to wear, nothing to charge.") and two product cards, each showing a real product photo: `assets/grand-sensor.jpg` (sensor in a wall outlet) and `assets/grand-hub.jpg` (hub on a kitchen counter), both optimized to ~120–210KB JPGs. The `.card-media` slot renders a cover-fit image via `:has(img)`, falling back to a dashed placeholder when no image is present.
 - "What Grand pays attention to": everyday activity, the kitchen (meals), and a call for help.
 - "Caregiver experience": the daily "she's okay" app view with real iOS app screens, plus a parent-perspective dignity note.
-- Family reassurance cards grounded in sensing (activity, meals, urgent stillness alert).
-- Dignity-contrast use cases: "What you see" vs. "What she notices."
-- Trust and privacy close (no cameras, no live feed, no audio to the cloud, nothing to wear or charge).
 - Waitlist form with validation and Google Sheets handoff.

@@ -218,7 +218,7 @@ h1 {
 }
 
 .section-heading > p:not(.eyebrow),
-.tracking-copy > p {
+.tracking-copy > p:not(.eyebrow) {
   color: var(--ink-soft);
   font-size: 18px;
 }
@@ -295,7 +295,7 @@ h3 {
   margin-top: auto;
 }
 
-.system-section .section-heading > p {
+.system-section .section-heading > p:not(.eyebrow) {
   color: var(--ink-soft);
   font-size: clamp(19px, 2vw, 23px);
   line-height: 1.45;

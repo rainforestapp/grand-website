@@ -218,7 +218,8 @@ h1 {
 }
 
 .section-heading > p:not(.eyebrow),
-.tracking-copy > p:not(.eyebrow) {
+.tracking-copy > p:not(.eyebrow),
+.response-copy > p:not(.eyebrow) {
   color: var(--ink-soft);
   font-size: 18px;
 }
@@ -231,6 +232,7 @@ h1 {
 
 .section-heading .eyebrow,
 .tracking-copy .eyebrow,
+.response-copy .eyebrow,
 .trust-copy .eyebrow,
 .waitlist-section .eyebrow {
   color: var(--status-clay);
@@ -577,6 +579,84 @@ h3 {
   transform: translateY(34px);
 }
 
+.response-section {
+  align-items: center;
+  background: var(--surface-bone);
+  display: grid;
+  gap: clamp(34px, 7vw, 90px);
+  grid-template-columns: minmax(320px, 0.88fr) minmax(0, 1.12fr);
+}
+
+.response-media {
+  justify-self: end;
+  margin: 0;
+  max-width: 460px;
+  width: 100%;
+}
+
+.response-media img {
+  aspect-ratio: 3 / 4;
+  border-radius: var(--radius-large);
+  box-shadow: var(--shadow-soft);
+  display: block;
+  object-fit: cover;
+  object-position: center;
+  width: 100%;
+}
+
+.response-media:not(:has(img)) {
+  align-items: center;
+  aspect-ratio: 3 / 4;
+  background: rgba(26, 24, 22, 0.04);
+  border: 1px dashed var(--hairline);
+  border-radius: var(--radius-large);
+  color: var(--ink-faint);
+  display: flex;
+  font-size: 12px;
+  justify-content: center;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.response-copy {
+  max-width: 640px;
+}
+
+.response-steps {
+  counter-reset: response-step;
+  display: grid;
+  gap: 18px;
+  margin-top: 34px;
+}
+
+.response-steps article {
+  border-top: 1px solid rgba(26, 24, 22, 0.18);
+  column-gap: 16px;
+  counter-increment: response-step;
+  display: grid;
+  grid-template-columns: 30px 1fr;
+  padding-top: 18px;
+}
+
+.response-steps article::before {
+  color: var(--status-clay);
+  content: counter(response-step);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 26px;
+  grid-row: span 2;
+  line-height: 1;
+}
+
+.response-steps h3,
+.response-steps p {
+  grid-column: 2;
+}
+
+.response-steps p {
+  color: var(--ink-soft);
+  margin-bottom: 0;
+}
+
 .family-band {
   background: var(--surface-bone);
 }
@@ -758,10 +838,15 @@ h3 {
 }
 
 .waitlist-section {
-  margin: 0 auto;
-  max-width: 920px;
+  background: var(--surface-stone);
   padding: clamp(74px, 11vw, 140px) 20px;
   text-align: center;
+}
+
+.waitlist-section > * {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 920px;
 }
 
 .waitlist-form {
@@ -854,11 +939,18 @@ h3 {
 
   .section-two-column,
   .tracking-section,
+  .response-section,
   .trust-section,
   .system-grid,
   .example-columns,
   .app-ideas-grid {
     grid-template-columns: 1fr;
+  }
+
+  .response-media {
+    justify-self: center;
+    max-width: 420px;
+    order: 2;
   }
 
   .family-grid,

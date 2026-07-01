@@ -263,38 +263,102 @@ h3 {
   background: var(--surface-bone);
 }
 
-.problem-grid {
+.worry-timeline {
   display: grid;
-  gap: 40px;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  margin: 44px auto 0;
+  gap: 32px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  list-style: none;
+  margin: 50px auto 0;
   max-width: 1040px;
+  padding: 0;
 }
 
-.problem-card {
+.worry-timeline li {
   border-top: 1px solid var(--hairline);
-  display: flex;
-  flex-direction: column;
-  padding-top: 22px;
+  padding-top: 20px;
+  position: relative;
 }
 
-.problem-card .card-label {
-  align-items: center;
+.worry-timeline li::before {
+  background: var(--status-clay);
+  border-radius: 50%;
+  content: "";
+  height: 9px;
+  left: 0;
+  position: absolute;
+  top: -5px;
+  width: 9px;
+}
+
+.worry-timeline li:last-child::before {
+  background: var(--status-sage);
+}
+
+.worry-time {
   color: var(--status-clay);
-  display: flex;
-  gap: 10px;
-  margin-bottom: 14px;
-}
-
-.problem-card .card-label::before {
-  content: "\2715";
+  font-size: 12px;
   font-weight: 700;
+  margin-bottom: 10px;
+  text-transform: uppercase;
 }
 
-.problem-card p:last-child {
-  color: var(--ink-soft);
+.worry-timeline li:last-child .worry-time {
+  color: var(--status-sage);
+}
+
+.worry-timeline li p:last-child {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(21px, 2.2vw, 27px);
+  line-height: 1.16;
   margin-bottom: 0;
-  margin-top: auto;
+}
+
+.worry-payoff {
+  color: var(--ink-soft);
+  font-size: clamp(19px, 2vw, 23px);
+  line-height: 1.45;
+  margin: 46px auto 0;
+  max-width: 560px;
+  text-align: center;
+}
+
+.worry-tried {
+  border-top: 1px solid var(--hairline);
+  margin: 54px auto 0;
+  max-width: 760px;
+  padding-top: 26px;
+}
+
+.worry-tried-label {
+  color: var(--ink-faint);
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 18px;
+  text-transform: uppercase;
+}
+
+.worry-tried ul {
+  display: grid;
+  gap: 14px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.worry-tried li {
+  column-gap: 16px;
+  display: grid;
+  grid-template-columns: 200px 1fr;
+}
+
+.worry-tried s {
+  color: var(--status-clay);
+  font-weight: 700;
+  text-decoration-thickness: 1.5px;
+}
+
+.worry-tried span {
+  color: var(--ink-soft);
 }
 
 .system-section .section-heading > p:not(.eyebrow) {
@@ -954,9 +1018,18 @@ h3 {
   }
 
   .family-grid,
-  .problem-grid,
   .example-grid {
     grid-template-columns: 1fr;
+  }
+
+  .worry-timeline {
+    gap: 26px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .worry-tried li {
+    grid-template-columns: 1fr;
+    row-gap: 4px;
   }
 
   .app-idea {
@@ -1051,7 +1124,8 @@ h3 {
     flex-direction: column;
   }
 
-  .signal-grid {
+  .signal-grid,
+  .worry-timeline {
     grid-template-columns: 1fr;
   }
 

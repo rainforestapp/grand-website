@@ -263,14 +263,28 @@ h3 {
 
 .problem-grid {
   display: grid;
-  gap: 18px;
+  gap: 40px;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   margin: 44px auto 0;
   max-width: 1040px;
 }
 
 .problem-card {
-  padding: 28px;
+  border-top: 1px solid var(--hairline);
+  padding-top: 22px;
+}
+
+.problem-card .card-label {
+  align-items: center;
+  color: var(--status-clay);
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.problem-card .card-label::before {
+  content: "\2715";
+  font-weight: 700;
 }
 
 .problem-card p:last-child {

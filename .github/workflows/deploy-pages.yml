@@ -1,0 +1,60 @@
+name: Deploy GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out main
+        uses: actions/checkout@v4
+
+      - name: Publish static site to gh-pages
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          staging_dir="$(mktemp -d)"
+          pages_dir="$(mktemp -d)"
+
+          rsync -a --delete \
+            --exclude ".git" \
+            --exclude ".github" \
+            --exclude ".context" \
+            ./ "$staging_dir/"
+
+          echo "www.grandeldercare.com" > "$staging_dir/CNAME"
+          touch "$staging_dir/.nojekyll"
+
+          git fetch origin gh-pages
+          git worktree add "$pages_dir" origin/gh-pages
+
+          rsync -a --delete \
+            --exclude ".git" \
+            "$staging_dir/" "$pages_dir/"
+
+          cd "$pages_dir"
+          git add -A
+
+          if git diff --cached --quiet; then
+            echo "No GitHub Pages changes to publish."
+            exit 0
+          fi
+
+          git commit -m "Deploy ${GITHUB_SHA} to GitHub Pages"
+          git push origin HEAD:gh-pages

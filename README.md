@@ -18,6 +18,14 @@ Static landing-page wireframe for Grand.
 - Replaced the abstract satellite floor-plan with resized real Grand iOS app screenshots from `../grand-ios/docs/screenshots`: `ios-home.png` and `pr1-settings-index.png`.
 - Simplified the hero headline and strapline so first-time readers understand the promise without needing prior context for Grand, Grace, or satellites.
 - Wired the waitlist form for a Google Sheets backend via Google Apps Script, including client-side email validation, status messaging, and browser/user-agent metadata capture.
+- Repositioned the entire page from companion-first to peace-of-mind / dignity-first, aimed squarely at the adult child (the buyer). This supersedes the companion-first framing above. **Why:** the product's MVP is a quiet, passive sensor system (a hub + sensors) that lets an adult child know their parent is okay without cameras, wearables, or anything that announces "you're old" — not a voice companion. The "Grace" companion concept and all companion features (music, reading aloud, trivia, conversation, family-message dictation) were removed because they describe a different product and were not in the MVP spec.
+  - "Grand satellites" renamed to "Grand sensors"; the device story is now simply "the Grand hub + Grand sensors."
+  - Hero now leads with the fear→relief promise: "She keeps her independence. You stop worrying."
+  - Added an upfront "The worry" problem section after the hero that sets up the fear and contrasts pendants/watches, call-for-help buttons, and cameras before presenting the solution. (This replaced a later "Why not a wearable, button, or camera?" comparison block, which said the same thing twice once the problem was framed up front.)
+  - Trust close ties privacy directly to dignity and drops conversation-era rules; no pricing and no public mention of human-in-the-loop alert review, per product decision. *(The human-in-the-loop decision was later reversed — see the Grand Call Center section below.)*
+  - Reused the existing iOS screenshots (`assets/grand-ios-home.png`, `assets/grand-ios-settings.png`) — they already show the passive-sensing view with no "Grace" UI.
+- Added a "Grand Call Center" section (`#response`) between the caregiver experience and the waitlist. **Why:** this reverses the earlier "no public mention of human-in-the-loop alert review" decision — the call center is now a headline differentiator, because "what actually happens in an emergency?" is the buyer's biggest pre-purchase question and the human agent + EMS escalation is the answer. The section presents the emergency flow as a four-step process (a real person calls through the hub/sensors → confirms she's safe → calls EMS if not → the family is notified throughout and can join the call), with a call-center agent photo (`assets/call-center-pexels-tima-miroshnichenko-5455010.jpg`, Pexels, cropped 3:4 around the agent and optimized to ~250KB). The caregiver-experience intro and the urgent signal tile were reworded to hand off to this section instead of implying an automated-only reach-out, and an "Emergency response" nav link was added.
+- Reformatted "The worry" section from a three-card competitor teardown into a narrative "anxiety window" timeline plus a compact "you've probably already thought about…" strikethrough list. **Why:** user research (May–June interviews) showed the problem is emotional, not comparative — the single most vivid finding was the adult child who worries from the moment she wakes until it's socially acceptable to call at 8am, and the failed alternatives land as stories (the pendant on the nightstand during the fall, the button that's "a reminder you're old") rather than spec-sheet dismissals. The old equal-cards format asked visitors to evaluate product categories before feeling understood, and gave competitor categories the same visual weight as the worry itself. The timeline dramatizes a familiar morning (clay dots for the anxious beats, a sage dot for the relief beat), a payoff line bridges into "How Grand works," and the three alternatives survive as demoted one-line dismissals so the content wasn't lost.
 
 ## Open Locally
 
@@ -42,12 +50,12 @@ The client sends email, source, page URL, referrer, user agent, user-agent clien
 
 ## Current Sections
 
-- Hero promise and waitlist CTA.
-- Grand system overview for the base station, Grace, and optional satellites.
-- Grace value proposition for the person at home, now framed as included with every Grand base station.
-- Grand satellites/home-tracking value proposition with tangible iOS app screens.
-- Family reassurance cards combining Grace engagement and Grand home-pattern summaries.
-- Plain-language use cases split between "Ask Grace" and "Grand notices."
-- Grace app ideas for music, reading, reminders, and family messages.
-- Trust and privacy close.
+Every content section leads with a standardized eyebrow (uppercase, 12px, clay `--status-clay`) above its title; the hero eyebrow is light for contrast on the dark photo. The `.eyebrow` is excluded from the `> p` intro-paragraph rules so it always renders at the base 12px.
+
+- Hero promise (independence for the parent, peace of mind for the child) and waitlist CTA.
+- "The worry" problem section: a four-beat "anxiety window" morning timeline (6:45 wake → too early to call → no answer → relief; clay dots for anxious beats, sage for the relief beat), a centered payoff line bridging into Grand, and a compact strikethrough list dismissing pendants/watches, call-for-help buttons, in-home carers, and cameras with one-line stories.
+- "How Grand works" section titled as such, with a combined lead ("There's a better way to know they're okay. A small hub and a few sensors. No cameras, nothing to wear, nothing to charge.") and two product cards, each showing a real product photo: `assets/grand-sensor.jpg` (sensor in a wall outlet) and `assets/grand-hub.jpg` (hub on a kitchen counter), both optimized to ~120–210KB JPGs. The `.card-media` slot renders a cover-fit image via `:has(img)`, falling back to a dashed placeholder when no image is present.
+- "What Grand pays attention to": everyday activity, the kitchen (meals), and a call for help.
+- "Caregiver experience": the daily "she's okay" app view with real iOS app screens, plus a parent-perspective dignity note.
+- "The Grand call center" (`#response`): what happens in an emergency — a mirrored two-column section (photo left, copy right) with a four-step numbered process (real person calls through the hub/sensors, confirms she's safe, calls EMS if not, family stays notified and can join the call). Step numerals are bare clay Georgia counters via CSS `counter()`; the photo slot falls back to the standard dashed placeholder if the image is removed.
 - Waitlist form with validation and Google Sheets handoff.

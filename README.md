@@ -50,7 +50,7 @@ The client sends email, source, page URL, referrer, user agent, user-agent clien
 
 - Hero promise (independence for the parent, peace of mind for the child) and waitlist CTA.
 - "The worry" problem section: sets up the fear before the solution, with callouts on why pendants/watches, call-for-help buttons, and cameras fall short, and a transition line into Grand.
-- "How Grand works" overview of the Grand hub + Grand sensors, with a "nothing to wear / charge / no cameras" note.
+- "How Grand works" section titled as such, with a combined lead ("There's a better way to know they're okay. A small hub and a few sensors. No cameras, nothing to wear, nothing to charge.") and two product cards. The Grand sensors card shows a real product photo (`assets/grand-sensor.jpg`, optimized from ~958KB PNG to ~121KB JPG); the Grand hub card holds a dashed photo placeholder until the hub image is supplied.
 - "What Grand pays attention to": everyday activity, the kitchen (meals), and a call for help.
 - "Caregiver experience": the daily "she's okay" app view with real iOS app screens, plus a parent-perspective dignity note.
 - Family reassurance cards grounded in sensing (activity, meals, urgent stillness alert).

@@ -303,7 +303,7 @@ h3 {
 
 .card-media {
   align-items: center;
-  aspect-ratio: 3 / 4;
+  aspect-ratio: 1 / 1;
   background: rgba(26, 24, 22, 0.04);
   border: 1px dashed var(--hairline);
   border-radius: 12px;
@@ -456,6 +456,54 @@ h3 {
   height: 10px;
   margin-top: 7px;
   width: 10px;
+}
+
+.signal-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.signal-tile {
+  background: rgba(253, 251, 246, 0.52);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius);
+  min-height: 238px;
+  padding: clamp(20px, 3vw, 28px);
+}
+
+.signal-label {
+  color: var(--status-sage);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0;
+  margin-bottom: 34px;
+  text-transform: uppercase;
+}
+
+.signal-tile h3 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(25px, 3vw, 36px);
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.08;
+  margin-bottom: 12px;
+}
+
+.signal-tile p:not(.signal-label) {
+  color: var(--ink-soft);
+  font-size: 17px;
+  margin-bottom: 0;
+}
+
+.signal-tile--urgent {
+  background: rgba(184, 95, 74, 0.09);
+  border-color: rgba(184, 95, 74, 0.46);
+}
+
+.signal-tile--urgent .signal-label,
+.signal-tile--urgent h3 {
+  color: var(--status-clay);
 }
 
 .tracking-section {
@@ -909,6 +957,18 @@ h3 {
   .system-note {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .signal-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .signal-tile {
+    min-height: 0;
+  }
+
+  .signal-label {
+    margin-bottom: 24px;
   }
 
   .screen-showcase {

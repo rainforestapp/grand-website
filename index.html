@@ -3,10 +3,10 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Grand &middot; Landing Page Wireframe</title>
+    <title>Grand &middot; Know your parent is okay</title>
     <meta
       name="description"
-      content="Wireframe for Grand, a simple home care system that gives older people company and gives family private reassurance."
+      content="Grand is a quiet home sensor system that lets you know your parent is okay &mdash; without cameras, wearables, or anything for them to charge, wear, or resent. Peace of mind for you, independence for them."
     >
     <link rel="stylesheet" href="styles.css">
     <script src="script.js" defer></script>
@@ -15,15 +15,13 @@
     <header class="site-header">
       <a class="brand" href="#top" aria-label="Grand home">
         <span>grand</span>
-        <span>care, in service</span>
+        <span>know they&rsquo;re okay</span>
       </a>
       <nav class="nav" aria-label="Primary navigation">
-        <a href="#system">Grand</a>
-        <a href="#grace">Grace</a>
-        <a href="#tracking">Home tracking</a>
-        <a href="#family">For family</a>
-        <a href="#privacy">Privacy</a>
-        <a class="nav-cta" href="#waitlist">Join waitlist</a>
+        <a href="#system">How it works</a>
+        <a href="#tracking">Caregiver experience</a>
+        <a href="#response">Emergency response</a>
+        <a class="nav-cta" href="#waitlist">Become an alpha tester</a>
       </nav>
     </header>
 
@@ -34,227 +32,212 @@
         </div>
         <div class="hero-copy">
           <p class="eyebrow">Care at home</p>
-          <h1 id="hero-title">Company for Mum. Peace of mind for you.</h1>
+          <h1 id="hero-title">She keeps her independence. You stop worrying.</h1>
           <p class="hero-intro">
-            A voice companion for chatting, reminders, music, and staying in touch
-            &mdash; with discreet home sensors that flag changes in routine before
-            you&rsquo;d ever notice them yourself.
+            A small hub and a few discreet sensors to flag when something&rsquo;s
+            off &mdash; no cameras, no wearables, nothing to charge.
           </p>
           <div class="hero-actions" aria-label="Primary calls to action">
-            <a class="button button-primary" href="#waitlist">Join the waitlist</a>
+            <a class="button button-primary" href="#waitlist">Become an alpha tester</a>
             <a class="button button-secondary" href="#system">See how Grand works</a>
           </div>
         </div>
       </section>
 
-      <section id="system" class="section system-section">
+      <section id="problem" class="section problem-section">
         <div class="section-heading section-heading--center">
-          <p class="eyebrow">How Grand works</p>
-          <h2>One familiar companion, with optional awareness around the home.</h2>
+          <p class="eyebrow">The worry</p>
+          <h2>She wants to stay in her home. You just want to know she&rsquo;s okay.</h2>
         </div>
-        <div class="system-grid">
-          <article class="system-card system-card--primary">
-            <p class="card-label">Smart speaker</p>
-            <h3>Grace</h3>
-            <p>A patient companion who is useful without feeling clinical, and reassuring without feeling watched.</p>
-          </article>
-          <article class="system-card">
-            <p class="card-label">Optional Grand</p>
-            <h3>Grand satellites</h3>
-            <p>Small additions for home tracking, so families can understand routines and notice important changes.</p>
-          </article>
-        </div>
-        <div class="system-note">
-          <span>Grace is the smart speaker</span>
-          <span>Grand satellites add home tracking</span>
+        <ol class="worry-timeline" aria-label="A familiar morning">
+          <li>
+            <p class="worry-time">6:45 am</p>
+            <p>You&rsquo;re awake. Is she?</p>
+          </li>
+          <li>
+            <p class="worry-time">7:30 am</p>
+            <p>Still too early to call.</p>
+          </li>
+          <li>
+            <p class="worry-time">8:01 am</p>
+            <p>No answer. Probably in the shower&hellip; right?</p>
+          </li>
+          <li>
+            <p class="worry-time">8:14 am</p>
+            <p>&ldquo;I was out in the garden.&rdquo; You breathe again.</p>
+          </li>
+        </ol>
+        <p class="worry-payoff">
+          That window between waking up and knowing she&rsquo;s fine &mdash;
+          that&rsquo;s the worry Grand was built to end.
+        </p>
+        <div class="worry-tried" aria-label="Solutions families have already tried">
+          <p class="worry-tried-label">You&rsquo;ve probably already thought about&hellip;</p>
+          <ul>
+            <li>
+              <s>A pendant or watch</s>
+              <span>Only works if she remembers to charge it and wears it all the time. Hers was on the nightstand the morning she fell.</span>
+            </li>
+            <li>
+              <s>A call-for-help button</s>
+              <span>If she does fall, it probably won&rsquo;t be within reach when she needs it.</span>
+            </li>
+            <li>
+              <s>An in-home carer</s>
+              <span>It&rsquo;s expensive, and she doesn&rsquo;t want a stranger in her home.</span>
+            </li>
+            <li>
+              <s>A camera</s>
+              <span>She&rsquo;d resent you for even considering it. And you don&rsquo;t want to invade her privacy anyway.</span>
+            </li>
+          </ul>
         </div>
       </section>
 
-      <section id="grace" class="section section-two-column">
+      <section id="system" class="section system-section">
+        <div class="section-heading section-heading--center">
+          <p class="eyebrow">The setup</p>
+          <h2>How Grand works</h2>
+          <p>There&rsquo;s a better way to know they&rsquo;re okay. A small hub and a few sensors. No cameras, nothing to wear, nothing to charge.</p>
+        </div>
+        <div class="system-grid">
+          <article class="system-card system-card--primary">
+            <div class="card-media">
+              <img src="assets/grand-sensor.jpg" alt="A Grand sensor plugged into a wall outlet at home.">
+            </div>
+            <p class="card-label">The sensors</p>
+            <h3>Grand sensors</h3>
+            <p>A few small sensors that plug into any outlet and connect to the hub over Wi&#8209;Fi. They use motion and audio detection to make sure your loved one is safe and healthy.</p>
+          </article>
+          <article class="system-card">
+            <div class="card-media">
+              <img src="assets/grand-hub.jpg" alt="The Grand hub, a small fabric-covered device, on a kitchen counter.">
+            </div>
+            <p class="card-label">The hub</p>
+            <h3>Grand hub</h3>
+            <p>Processes the data the sensors send and pings you if something is off. No audio is ever sent to the cloud, so your parent won&rsquo;t feel like their privacy is being compromised.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="attention" class="section section-two-column">
         <div class="section-heading">
-          <p class="eyebrow">Grace in the base station</p>
-          <h2>Grace is company first, practical help second.</h2>
+          <p class="eyebrow">How it works</p>
+          <h2>Grand learns what an ordinary day looks like and flags when something seems off.</h2>
           <p>
-            Every Grand base station includes Grace: a gentle voice companion for
-            the quiet parts of the day, the practical things that slip, and the
-            small pleasures that make home feel more alive.
+            Grand uses motion and audio signals to build a picture of your
+            parent&rsquo;s normal routine, then watches for changes that might mean
+            it&rsquo;s time to check in. Grand can also notify you if something more
+            serious may be happening, so you have peace of mind without putting
+            a camera in the home.
           </p>
         </div>
-        <div class="wire-card stack-card">
-          <div class="quote-block">
-            <span>&ldquo;Grace, play Beethoven&rsquo;s Moonlight Sonata.&rdquo;</span>
-          </div>
-          <div class="feature-list">
-            <article>
-              <span class="feature-mark"></span>
-              <h3>Patient conversation</h3>
-              <p>Grace waits through pauses, repeats herself patiently, and never makes a person feel tested.</p>
-            </article>
-            <article>
-              <span class="feature-mark"></span>
-              <h3>Small pleasures</h3>
-              <p>Music, books, local information, weather, trivia, and familiar topics.</p>
-            </article>
-            <article>
-              <span class="feature-mark"></span>
-              <h3>Everyday support</h3>
-              <p>Reminders, messages to family, and help keeping track of dates, names, and plans.</p>
-            </article>
-          </div>
+        <div class="signal-grid" aria-label="Examples of routine signals Grand can understand">
+          <article class="signal-tile">
+            <p class="signal-label">Morning routine</p>
+            <h3>Getting up in the morning</h3>
+            <p>Grand can recognize when a wakeup time seems significantly different from the usual routine.</p>
+          </article>
+          <article class="signal-tile">
+            <p class="signal-label">Kitchen use</p>
+            <h3>Mealtimes</h3>
+            <p>Grand can identify the audio and motion signals that typically accompany meal time.</p>
+          </article>
+          <article class="signal-tile">
+            <p class="signal-label">Restroom routine</p>
+            <h3>Trips to the bathroom</h3>
+            <p>Grand can keep tabs on trips to the restroom without invading privacy with a camera.</p>
+          </article>
+          <article class="signal-tile signal-tile--urgent">
+            <p class="signal-label">Emergency indicators</p>
+            <h3>Indicators of a potential fall</h3>
+            <p>Most importantly, Grand can notice sudden changes in motion or audio activity that may indicate an emergency. When that happens, a real person from Grand reaches out to confirm they&rsquo;re okay.</p>
+          </article>
         </div>
       </section>
 
       <section id="tracking" class="section tracking-section">
         <div class="tracking-copy">
-          <p class="eyebrow">Grand satellites</p>
-          <h2>Add home tracking when family needs a wider view.</h2>
+          <p class="eyebrow">Caregiver experience</p>
+          <h2>Feel secure knowing she&rsquo;s okay</h2>
           <p>
-            Satellites extend Grand beyond the base station. They are designed for
-            routine and reassurance: room-to-room activity, quieter-than-usual
-            periods, and changes that may deserve a check-in.
+            Open the app and you see today at a glance: is the day broadly normal,
+            or is there something worth a check&#8209;in? And in the worst&#8209;case
+            scenario, we do more than ping you &mdash; a real person from Grand
+            checks on her directly.
           </p>
           <div class="tracking-list">
             <article>
               <h3>Daily rhythm</h3>
-              <p>Understand whether the day broadly looks like the person&rsquo;s normal routine.</p>
+              <p>See at a glance whether the day broadly looks like your parent&rsquo;s normal routine.</p>
             </article>
             <article>
               <h3>Important changes</h3>
-              <p>Surface unusual inactivity or pattern changes without exposing a live view into the home.</p>
+              <p>Unusual inactivity or a shift in the pattern is surfaced &mdash; without exposing a live view into the home.</p>
             </article>
             <article>
               <h3>Actionable alerts</h3>
-              <p>Emergency-like moments can be framed clearly, filtered carefully, and sent to family.</p>
+              <p>The moments that matter are framed clearly and sent to you, tuned to avoid false alarms.</p>
             </article>
           </div>
         </div>
         <div class="screen-showcase" aria-label="Grand iOS app screens">
           <figure class="phone-shot phone-shot--primary">
             <img
-              src="assets/grand-ios-home.png"
-              alt="Grand iOS home screen showing Mom is slower today and in the living room."
+              src="assets/grand-ios-normal-day.png"
+              alt="Grand iOS home screen showing a normal day for Mom."
             >
-            <figcaption>Home status from Grand</figcaption>
+            <figcaption>Today at a glance</figcaption>
           </figure>
           <figure class="phone-shot phone-shot--secondary">
             <img
-              src="assets/grand-ios-settings.png"
-              alt="Grand iOS settings screen with a row for sensors at mom's home."
+              src="assets/grand-ios-alert-lockscreen.png"
+              alt="iPhone lock screen showing a Grand alert that Mom may need help."
             >
-            <figcaption>Sensors live in the caregiver app</figcaption>
+            <figcaption>Alert when something is wrong</figcaption>
           </figure>
         </div>
       </section>
 
-      <section id="family" class="section family-band">
-        <div class="section-heading section-heading--center">
-          <p class="eyebrow">For the family who buy it</p>
-          <h2>Reassurance from Grace and Grand, without turning home into a live feed.</h2>
-        </div>
-        <div class="family-grid">
-          <article class="wire-card insight-card">
-            <p class="card-label">Engagement</p>
-            <h3>Mum has spoken with Grace most days this week.</h3>
-            <div class="metric-row" aria-hidden="true">
-              <span></span>
-              <span></span>
-              <span></span>
-              <span></span>
-              <span></span>
-            </div>
-          </article>
-          <article class="wire-card insight-card">
-            <p class="card-label">Home pattern</p>
-            <h3>Morning movement looked normal across the rooms with satellites.</h3>
-            <p>A simple summary, not a surveillance stream.</p>
-          </article>
-          <article class="wire-card insight-card insight-card--urgent">
-            <p class="card-label">Urgent</p>
-            <h3>Unusual inactivity can notify family when it needs attention.</h3>
-            <p>Clear, filtered, and action-oriented.</p>
-          </article>
-        </div>
-      </section>
-
-      <section class="section examples-section">
-        <div class="section-heading">
-          <p class="eyebrow">Use cases</p>
-          <h2>The page should show real moments from both parts of Grand.</h2>
-        </div>
-        <div class="example-columns">
-          <div>
-            <h3>Ask Grace</h3>
-            <div class="example-grid">
-              <div class="example-pill">&ldquo;Read another chapter.&rdquo;</div>
-              <div class="example-pill">&ldquo;Remind me to call Tom tomorrow.&rdquo;</div>
-              <div class="example-pill">&ldquo;What time does the pharmacy close?&rdquo;</div>
-              <div class="example-pill">&ldquo;Tell Sarah I&rsquo;ll be ready at two.&rdquo;</div>
-            </div>
-          </div>
-          <div>
-            <h3>Grand notices</h3>
-            <div class="example-grid">
-              <div class="example-pill">Morning activity looks normal.</div>
-              <div class="example-pill">The kitchen has been quieter than usual.</div>
-              <div class="example-pill">No movement has been seen for a while.</div>
-              <div class="example-pill">An urgent-looking change needs a check-in.</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section id="apps" class="section product-preview">
-        <div class="section-heading section-heading--center">
-          <p class="eyebrow">Grace apps</p>
-          <h2>Small app ideas, grounded in ordinary days.</h2>
-        </div>
-        <div class="app-ideas-grid">
-          <article class="app-idea">
-            <p class="app-idea-label">Music</p>
-            <h3>A record shelf she can talk to.</h3>
-            <p>Beethoven, Nina Simone, Radio 4, a favourite hymn, or whatever she actually likes.</p>
-          </article>
-          <article class="app-idea">
-            <p class="app-idea-label">Reading</p>
-            <h3>Books aloud, without making a production of it.</h3>
-            <p>Grace can read a chapter, pause, recap, or pick up where they left off.</p>
-          </article>
-          <article class="app-idea">
-            <p class="app-idea-label">Reminders</p>
-            <h3>The practical things that slip.</h3>
-            <p>Calls, bins, appointments, birthdays, shopping, and the small errands around the house.</p>
-          </article>
-          <article class="app-idea">
-            <p class="app-idea-label">Family messages</p>
-            <h3>A simple way to pass something on.</h3>
-            <p>Grace can help send a clear note when the person at home asks her to.</p>
-          </article>
-        </div>
-      </section>
-
-      <section id="privacy" class="section trust-section">
-        <div class="trust-copy">
-          <p class="eyebrow">Trust close</p>
-          <h2>Private by default. Honest about limits.</h2>
+      <section id="response" class="section response-section">
+        <figure class="response-media">
+          <img
+            src="assets/call-center-pexels-tima-miroshnichenko-5455010.jpg"
+            alt="A Grand call center agent wearing a headset, focused on a check-in call."
+          >
+        </figure>
+        <div class="response-copy">
+          <p class="eyebrow">The Grand call center</p>
+          <h2>If the worst does happen, we&rsquo;re there with her.</h2>
           <p>
-            Grand is not a replacement for family, carers, clinicians, or emergency
-            services. Grace offers gentle company and practical help at home. Satellites
-            add thoughtful context for family, without cameras, live feeds, or hidden
-            conversation detail.
+            When Grand detects a possible emergency, a real person from the
+            U.S.-based Grand call center calls your parent through the hub and
+            sensors &mdash; no phone to find, no button to press.
           </p>
-        </div>
-        <div class="trust-rules">
-          <div>No raw transcripts for family</div>
-          <div>No cameras in the home</div>
-          <div>No live feed</div>
-          <div>No medical claims in the headline</div>
-          <div>Emergency-like alerts are clearly framed</div>
+          <div class="response-steps">
+            <article>
+              <h3>A real person calls</h3>
+              <p>A Grand agent speaks with your parent through the hub or the nearest sensor and asks if she&rsquo;s okay.</p>
+            </article>
+            <article>
+              <h3>We confirm she&rsquo;s safe</h3>
+              <p>If she&rsquo;s fine, we&rsquo;ll leave a brief note in your app.</p>
+            </article>
+            <article>
+              <h3>If she isn&rsquo;t, we call EMS</h3>
+              <p>If she needs help &mdash; or doesn&rsquo;t answer &mdash; our agent notifies emergency services right away.</p>
+            </article>
+            <article>
+              <h3>We keep you in the loop</h3>
+              <p>You&rsquo;re notified at each step of the triage process, and you can join the call with your loved one at any moment.</p>
+            </article>
+          </div>
         </div>
       </section>
 
       <section id="waitlist" class="waitlist-section">
         <p class="eyebrow">Early access</p>
-        <h2>Start with Grace. Add home tracking when you need it.</h2>
+        <h2>Peace of mind when you can&rsquo;t be there</h2>
         <form
           class="waitlist-form"
           data-waitlist-form
@@ -272,7 +255,7 @@
               placeholder="you@example.com"
               required
             >
-            <button type="submit">Join waitlist</button>
+            <button type="submit">Become an alpha tester</button>
           </div>
           <p class="form-status" data-waitlist-status role="status" aria-live="polite"></p>
         </form>

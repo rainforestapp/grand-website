@@ -42,6 +42,9 @@ Because this is a static site with no build step, the `Deploy GitHub Pages` work
 ## Waitlist Backend
 
 The waitlist form posts to a Google Apps Script web app and appends rows to a Google Sheet.
+The current configured Sheet is `Grand Waitlist`: https://docs.google.com/spreadsheets/d/1i2_lUmRSIVA1iN3zaE8mLrR-8QEpOUPKtM8Y6aHfw1w/edit
+
+For a fresh setup:
 
 1. Create a Google Sheet for the waitlist.
 2. In the sheet, open Extensions -> Apps Script.

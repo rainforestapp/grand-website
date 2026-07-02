@@ -1,6 +1,6 @@
 // Optional but recommended: paste the ID from the Google Sheet URL here.
 // Example: https://docs.google.com/spreadsheets/d/SPREADSHEET_ID/edit
-const SPREADSHEET_ID = "";
+const SPREADSHEET_ID = "1i2_lUmRSIVA1iN3zaE8mLrR-8QEpOUPKtM8Y6aHfw1w";
 const SHEET_NAME = "Waitlist";
 
 const HEADERS = [

@@ -84,9 +84,8 @@ async function submitWaitlist(endpoint, payload) {
   await fetch(endpoint, {
     method: "POST",
     mode: "no-cors",
-    keepalive: true,
     headers: {
-      "Content-Type": "text/plain;charset=utf-8",
+      "Content-Type": "text/plain",
     },
     body: JSON.stringify(payload),
   });

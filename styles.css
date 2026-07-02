@@ -263,69 +263,41 @@ h3 {
   background: var(--surface-bone);
 }
 
-.worry-timeline {
+.problem-layout {
+  align-items: center;
   display: grid;
-  gap: 32px;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  list-style: none;
-  margin: 50px auto 0;
-  max-width: 1040px;
-  padding: 0;
+  gap: clamp(42px, 7vw, 96px);
+  grid-template-columns: minmax(0, 0.92fr) minmax(320px, 0.72fr);
+  margin: 0 auto;
+  max-width: 1120px;
 }
 
-.worry-timeline li {
-  border-top: 1px solid var(--hairline);
-  padding-top: 20px;
-  position: relative;
+.problem-copy {
+  max-width: 620px;
 }
 
-.worry-timeline li::before {
-  background: var(--status-clay);
-  border-radius: 50%;
-  content: "";
-  height: 9px;
-  left: 0;
-  position: absolute;
-  top: -5px;
-  width: 9px;
-}
-
-.worry-timeline li:last-child::before {
-  background: var(--status-sage);
-}
-
-.worry-time {
-  color: var(--status-clay);
-  font-size: 12px;
-  font-weight: 700;
-  margin-bottom: 10px;
-  text-transform: uppercase;
-}
-
-.worry-timeline li:last-child .worry-time {
-  color: var(--status-sage);
-}
-
-.worry-timeline li p:last-child {
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(21px, 2.2vw, 27px);
-  line-height: 1.16;
-  margin-bottom: 0;
-}
-
-.worry-payoff {
+.problem-copy > p:not(.eyebrow) {
   color: var(--ink-soft);
-  font-size: clamp(19px, 2vw, 23px);
+  font-size: clamp(18px, 2vw, 23px);
   line-height: 1.45;
-  margin: 46px auto 0;
-  max-width: 560px;
-  text-align: center;
+}
+
+.message-device {
+  justify-self: center;
+  max-width: 500px;
+  width: 100%;
+}
+
+.message-device img {
+  display: block;
+  height: auto;
+  width: 100%;
 }
 
 .worry-tried {
   border-top: 1px solid var(--hairline);
-  margin: 54px auto 0;
-  max-width: 760px;
+  margin: clamp(54px, 8vw, 84px) auto 0;
+  max-width: 1120px;
   padding-top: 26px;
 }
 
@@ -1002,6 +974,7 @@ h3 {
   }
 
   .section-two-column,
+  .problem-layout,
   .tracking-section,
   .response-section,
   .trust-section,
@@ -1009,6 +982,12 @@ h3 {
   .example-columns,
   .app-ideas-grid {
     grid-template-columns: 1fr;
+  }
+
+  .problem-copy {
+    margin: 0 auto;
+    max-width: 760px;
+    text-align: center;
   }
 
   .response-media {
@@ -1020,11 +999,6 @@ h3 {
   .family-grid,
   .example-grid {
     grid-template-columns: 1fr;
-  }
-
-  .worry-timeline {
-    gap: 26px;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .worry-tried li {
@@ -1124,9 +1098,22 @@ h3 {
     flex-direction: column;
   }
 
-  .signal-grid,
-  .worry-timeline {
+  .signal-grid {
     grid-template-columns: 1fr;
+  }
+
+  .message-device {
+    max-width: 100%;
+  }
+
+  .problem-copy {
+    max-width: 100%;
+    text-align: left;
+  }
+
+  .problem-copy h2 {
+    font-size: clamp(31px, 8.5vw, 38px);
+    overflow-wrap: break-word;
   }
 
   .signal-tile {

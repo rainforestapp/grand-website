@@ -389,11 +389,6 @@ h3 {
   padding: clamp(22px, 3vw, 34px);
 }
 
-.system-card--primary {
-  background: var(--surface-sage-soft);
-  border-color: rgba(143, 163, 142, 0.48);
-}
-
 .system-card h3 {
   font-family: Georgia, "Times New Roman", serif;
   font-size: clamp(30px, 3vw, 42px);

@@ -122,7 +122,7 @@ if (waitlistForm) {
       const payload = await buildWaitlistPayload(email);
       await submitWaitlist(endpoint, payload);
       waitlistForm.reset();
-      setWaitlistStatus("You're on the waitlist. We'll be in touch soon.", "success");
+      setWaitlistStatus("You're on the list. We'll let you know when Grand is available.", "success");
     } catch (error) {
       console.warn(error);
       setWaitlistStatus("Something went wrong. Please try again.", "error");

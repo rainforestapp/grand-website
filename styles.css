@@ -623,10 +623,17 @@ h3 {
 }
 
 .response-media {
+  aspect-ratio: 3 / 4;
   justify-self: end;
   margin: 0;
   max-width: 460px;
+  overflow: hidden;
   width: 100%;
+}
+
+.response-media picture {
+  display: block;
+  height: 100%;
 }
 
 .response-media img {
@@ -634,8 +641,9 @@ h3 {
   border-radius: var(--radius-large);
   box-shadow: var(--shadow-soft);
   display: block;
+  height: 100%;
   object-fit: cover;
-  object-position: center;
+  object-position: 34% center;
   width: 100%;
 }
 
@@ -1056,21 +1064,27 @@ h3 {
 
 @media (max-width: 560px) {
   .site-header {
-    align-items: stretch;
+    align-items: center;
+    flex-direction: row;
     gap: 12px;
-    min-height: 112px;
-    padding: 12px 16px;
+    min-height: 64px;
+    padding: 10px 14px;
   }
 
   .brand {
     flex-direction: column;
     gap: 4px;
+    min-width: 0;
+  }
+
+  .brand span:last-child {
+    display: none;
   }
 
   .nav {
-    display: grid;
-    gap: 10px;
-    grid-template-columns: 1fr;
+    display: flex;
+    flex: 1;
+    justify-content: flex-end;
   }
 
   .nav a:not(.nav-cta) {
@@ -1079,11 +1093,12 @@ h3 {
 
   .nav-cta {
     justify-content: center;
+    padding: 10px 14px;
     text-align: center;
   }
 
   .hero {
-    min-height: clamp(500px, calc(88svh - 112px), 620px);
+    min-height: clamp(500px, calc(88svh - 64px), 620px);
   }
 
   .hero-media {
@@ -1212,11 +1227,13 @@ h3 {
   }
 
   .response-media {
-    max-width: 340px;
+    aspect-ratio: 4 / 3;
+    max-width: min(340px, 100%);
   }
 
   .response-media img {
     aspect-ratio: 4 / 3;
+    object-position: center;
   }
 
   .form-row {

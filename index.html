@@ -220,14 +220,21 @@
 
       <section id="response" class="section response-section">
         <figure class="response-media">
-          <img
-            src="assets/call-center-pexels-kampus-8204317.jpg"
-            width="1200"
-            height="1600"
-            loading="lazy"
-            decoding="async"
-            alt="Grand call center agents wearing headsets while working at computers."
-          >
+          <picture>
+            <source
+              media="(max-width: 560px)"
+              srcset="assets/call-center-pexels-kampus-8204317-mobile.jpg 340w, assets/call-center-pexels-kampus-8204317-mobile-2x.jpg 680w"
+              sizes="calc(100vw - 36px)"
+            >
+            <img
+              src="assets/call-center-pexels-kampus-8204317.jpg"
+              width="1200"
+              height="1600"
+              loading="lazy"
+              decoding="async"
+              alt="Grand call center agents wearing headsets while working at computers."
+            >
+          </picture>
         </figure>
         <div class="response-copy">
           <p class="eyebrow">The Grand call center</p>

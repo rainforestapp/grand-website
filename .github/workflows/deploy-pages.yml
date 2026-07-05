@@ -36,6 +36,10 @@ jobs:
             --exclude ".git" \
             --exclude ".github" \
             --exclude ".context" \
+            --exclude ".gitattributes" \
+            --exclude ".gitignore" \
+            --exclude "README.md" \
+            --exclude "google-apps-script" \
             ./ "$staging_dir/"
 
           echo "www.grandeldercare.com" > "$staging_dir/CNAME"

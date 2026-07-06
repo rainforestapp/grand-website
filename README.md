@@ -29,6 +29,8 @@ Static landing-page wireframe for Grand.
 
 - Added baseline SEO and indexing plumbing: canonical URL, Open Graph and Twitter card tags, JSON-LD structured data (Organization + WebSite), `robots.txt`, `sitemap.xml`, and a favicon set. **Why:** the site previously had none of this, so Google had little to work with and link previews in iMessage/Slack/social showed no image or branding. This is intentionally the crawlability baseline, not an optimization pass. See the "SEO & Indexing" section below.
 
+- Rebuilt the site footer into a labelled three-column layout (brand blurb / "Explore" nav / "Get in touch") with a full-width bottom bar for the copyright. **Why:** the previous footer laid the nav links out as a single centered horizontal row, so "How it works Caregiver experience Emergency response Join waitlist" ran together as one unreadable line and read as unfinished. Links are now stacked vertically under uppercase section headings, and a `hello@grandelderare.com` `mailto:` contact was added under "Get in touch" so visitors and press have a way to reach the team. The 911/medical disclaimer sits beside the contact; the copyright drops to a hairline-topped row spanning the full width.
+
 ## SEO & Indexing
 
 All URLs are canonicalized to `https://www.grandeldercare.com/` (the `www` host, matching `CNAME`).
@@ -84,3 +86,4 @@ Every content section leads with a standardized eyebrow (uppercase, 12px, clay `
 - "Caregiver experience": the daily "she's okay" app view with real iOS app screens, plus a parent-perspective dignity note.
 - "The Grand call center" (`#response`): what happens in an emergency — a mirrored two-column section (photo left, copy right) with a four-step numbered process (real person calls through the hub/sensors, confirms she's safe, calls EMS if not, family stays notified and can join the call). Step numerals are bare clay Georgia counters via CSS `counter()`; the photo slot falls back to the standard dashed placeholder if the image is removed.
 - Waitlist form with validation and Google Sheets handoff.
+- Site footer: three labelled columns (brand blurb, "Explore" nav links stacked vertically, "Get in touch" with a `hello@grandelderare.com` contact and the 911/medical disclaimer) above a full-width copyright bar.

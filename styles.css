@@ -971,48 +971,85 @@ h3 {
   border-top: 1px solid var(--hairline);
   color: var(--ink-soft);
   display: grid;
-  gap: 28px;
-  grid-template-columns: minmax(220px, 1.1fr) minmax(320px, 1fr) minmax(260px, 0.9fr);
-  padding: 34px clamp(20px, 5vw, 72px);
+  gap: 40px 56px;
+  grid-template-columns: minmax(240px, 1.4fr) minmax(180px, 0.8fr) minmax(240px, 1fr);
+  padding: 56px clamp(20px, 5vw, 72px) 32px;
+}
+
+.footer-heading {
+  color: var(--ink-faint);
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  margin-bottom: 16px;
+  text-transform: uppercase;
 }
 
 .footer-brand a {
   color: var(--ink);
   display: inline-block;
+  font-size: 20px;
   font-weight: 700;
-  margin-bottom: 10px;
-}
-
-.footer-brand p,
-.footer-meta p {
-  margin: 0;
+  margin-bottom: 12px;
 }
 
 .footer-brand p {
-  max-width: 330px;
+  margin: 0;
+  max-width: 300px;
 }
 
 .footer-links {
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px 18px;
-  justify-content: center;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .footer-links a {
+  color: var(--ink-soft);
+  font-size: 15px;
+  font-weight: 500;
+  transition: color 0.2s ease;
+  width: fit-content;
+}
+
+.footer-links a:hover {
   color: var(--ink);
-  font-size: 14px;
-  font-weight: 700;
-  white-space: nowrap;
+}
+
+.footer-contact {
+  display: grid;
+  gap: 14px;
+}
+
+.footer-contact a {
+  color: var(--ink);
+  font-weight: 600;
+  width: fit-content;
+}
+
+.footer-contact a:hover {
+  text-decoration: underline;
+}
+
+.footer-contact p {
+  color: var(--ink-faint);
+  font-size: 13px;
+  margin: 0;
+  max-width: 300px;
 }
 
 .footer-meta {
+  border-top: 1px solid var(--hairline);
   color: var(--ink-faint);
-  display: grid;
   font-size: 13px;
-  gap: 10px;
-  justify-items: end;
-  text-align: right;
+  grid-column: 1 / -1;
+  margin-top: 8px;
+  padding-top: 24px;
+}
+
+.footer-meta p {
+  margin: 0;
 }
 
 @media (max-width: 900px) {
@@ -1083,17 +1120,9 @@ h3 {
   }
 
   .site-footer {
-    gap: 22px;
+    gap: 36px;
     grid-template-columns: 1fr;
-  }
-
-  .footer-links {
-    justify-content: flex-start;
-  }
-
-  .footer-meta {
-    justify-items: start;
-    text-align: left;
+    padding-top: 44px;
   }
 }
 

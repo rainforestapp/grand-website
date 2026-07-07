@@ -984,12 +984,20 @@ h3 {
 
 .footer-intro {
   display: grid;
-  gap: 14px;
+  gap: 8px;
   max-width: 320px;
 }
 
 .footer-intro p {
   margin: 0;
+}
+
+.footer-contact-label {
+  color: var(--ink-faint);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .footer-intro a {

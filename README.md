@@ -71,9 +71,11 @@ For a fresh setup:
 7. Copy the `/exec` web app URL.
 8. Paste that URL into `index.html` on the waitlist form's `data-waitlist-endpoint` attribute.
 
-When updating the Apps Script code, use Deploy -> Manage deployments -> Edit -> New version. Saving the code alone does not update the deployed web app. Visiting the `/exec` URL directly should return JSON with `spreadsheet_url`, `sheet_name`, and `last_row`; this confirms which sheet/tab the script is writing to.
+When updating the Apps Script code, use Deploy -> Manage deployments -> Edit -> New version. Saving the code alone does not update the deployed web app. Visiting the `/exec` URL directly should return JSON with `spreadsheet_url`, `waitlist_last_row`, and `event_last_row`; this confirms which spreadsheet the script is writing to.
 
 The client sends email, source, page URL, referrer, user agent, user-agent client hints where available, language, timezone, viewport, screen, connection hints, and other browser metadata. The request uses a simple `text/plain` POST because Google Apps Script web apps are easiest to call from a static GitHub Pages site without a CORS preflight.
+
+The same Apps Script endpoint also receives anonymous interaction analytics and writes them to an `Events` tab in the same spreadsheet. The site records section views, link/button clicks, and waitlist funnel events (`waitlist_email_focus`, `waitlist_submit_attempt`, `waitlist_submit_success`, and `waitlist_submit_error`). These events use a per-browser-tab `session_id` stored in `sessionStorage`; they do not include the waitlist email address.
 
 ## Current Sections
 

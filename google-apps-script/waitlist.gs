@@ -2,6 +2,7 @@
 // Example: https://docs.google.com/spreadsheets/d/SPREADSHEET_ID/edit
 const SPREADSHEET_ID = "1i2_lUmRSIVA1iN3zaE8mLrR-8QEpOUPKtM8Y6aHfw1w";
 const SHEET_NAME = "Waitlist";
+const EVENT_SHEET_NAME = "Events";
 
 const HEADERS = [
   "received_at",
@@ -36,52 +37,118 @@ const HEADERS = [
   "raw_payload",
 ];
 
+const EVENT_HEADERS = [
+  "received_at",
+  "event_at",
+  "event_type",
+  "session_id",
+  "page_url",
+  "page_path",
+  "page_hash",
+  "referrer",
+  "section_id",
+  "section_label",
+  "element_type",
+  "target_text",
+  "target_href",
+  "target_id",
+  "target_classes",
+  "target_label",
+  "viewport_width",
+  "viewport_height",
+  "error",
+  "raw_payload",
+];
+
 function doGet() {
-  const sheet = getSheet_();
+  const spreadsheet = getSpreadsheet_();
+  const waitlistSheet = getSheet_(spreadsheet, SHEET_NAME);
+  const eventSheet = getSheet_(spreadsheet, EVENT_SHEET_NAME);
 
   return jsonResponse_({
     ok: true,
-    service: "Grand waitlist",
-    spreadsheet_url: sheet.getParent().getUrl(),
-    sheet_name: sheet.getName(),
-    last_row: sheet.getLastRow(),
+    service: "Grand website backend",
+    spreadsheet_url: spreadsheet.getUrl(),
+    waitlist_sheet_name: waitlistSheet.getName(),
+    waitlist_last_row: waitlistSheet.getLastRow(),
+    event_sheet_name: eventSheet.getName(),
+    event_last_row: eventSheet.getLastRow(),
   });
 }
 
 function doPost(event) {
   try {
     const payload = JSON.parse(event?.postData?.contents || "{}");
-    const email = String(payload.email || "").trim().toLowerCase();
 
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      return jsonResponse_({ ok: false, error: "invalid_email" });
+    if (payload.type === "analytics_event") {
+      return handleAnalyticsEvent_(payload);
     }
 
-    const lock = LockService.getScriptLock();
-    lock.waitLock(10000);
-
-    let result;
-    try {
-      const sheet = getSheet_();
-      ensureHeaders_(sheet);
-      sheet.appendRow(rowForPayload_(email, payload));
-      result = {
-        ok: true,
-        spreadsheet_url: sheet.getParent().getUrl(),
-        sheet_name: sheet.getName(),
-        row: sheet.getLastRow(),
-      };
-    } finally {
-      lock.releaseLock();
-    }
-
-    return jsonResponse_(result);
+    return handleWaitlistSignup_(payload);
   } catch (error) {
     return jsonResponse_({ ok: false, error: String(error) });
   }
 }
 
-function getSheet_() {
+function handleWaitlistSignup_(payload) {
+  const email = String(payload.email || "").trim().toLowerCase();
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return jsonResponse_({ ok: false, error: "invalid_email" });
+  }
+
+  const lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+
+  let result;
+  try {
+    const spreadsheet = getSpreadsheet_();
+    const sheet = getSheet_(spreadsheet, SHEET_NAME);
+    ensureHeaders_(sheet, HEADERS);
+    sheet.appendRow(rowForPayload_(email, payload));
+    result = {
+      ok: true,
+      spreadsheet_url: sheet.getParent().getUrl(),
+      sheet_name: sheet.getName(),
+      row: sheet.getLastRow(),
+    };
+  } finally {
+    lock.releaseLock();
+  }
+
+  return jsonResponse_(result);
+}
+
+function handleAnalyticsEvent_(payload) {
+  const eventType = String(payload.event_type || "").trim();
+
+  if (!eventType) {
+    return jsonResponse_({ ok: false, error: "missing_event_type" });
+  }
+
+  const lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+
+  let result;
+  try {
+    const spreadsheet = getSpreadsheet_();
+    const sheet = getSheet_(spreadsheet, EVENT_SHEET_NAME);
+    ensureHeaders_(sheet, EVENT_HEADERS);
+    sheet.appendRow(rowForEventPayload_(payload));
+    result = {
+      ok: true,
+      spreadsheet_url: sheet.getParent().getUrl(),
+      sheet_name: sheet.getName(),
+      row: sheet.getLastRow(),
+    };
+  } finally {
+    lock.releaseLock();
+  }
+
+  return jsonResponse_(result);
+}
+
+function getSpreadsheet_() {
   const spreadsheet = SPREADSHEET_ID
     ? SpreadsheetApp.openById(SPREADSHEET_ID)
     : SpreadsheetApp.getActiveSpreadsheet();
@@ -90,13 +157,17 @@ function getSheet_() {
     throw new Error("No spreadsheet found. Bind this script to a Google Sheet or set SPREADSHEET_ID.");
   }
 
-  return spreadsheet.getSheetByName(SHEET_NAME) || spreadsheet.insertSheet(SHEET_NAME);
+  return spreadsheet;
 }
 
-function ensureHeaders_(sheet) {
+function getSheet_(spreadsheet, sheetName) {
+  return spreadsheet.getSheetByName(sheetName) || spreadsheet.insertSheet(sheetName);
+}
+
+function ensureHeaders_(sheet, headers) {
   if (sheet.getLastRow() > 0) return;
 
-  sheet.getRange(1, 1, 1, HEADERS.length).setValues([HEADERS]);
+  sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
   sheet.setFrozenRows(1);
 }
 
@@ -139,8 +210,40 @@ function rowForPayload_(email, payload) {
   ];
 }
 
+function rowForEventPayload_(payload) {
+  const viewport = payload.viewport || {};
+
+  return [
+    new Date(),
+    payload.event_at || "",
+    payload.event_type || "",
+    payload.session_id || "",
+    payload.page_url || "",
+    payload.page_path || "",
+    payload.page_hash || "",
+    payload.referrer || "",
+    payload.section_id || "",
+    payload.section_label || "",
+    payload.element_type || "",
+    truncate_(payload.target_text, 500),
+    payload.target_href || "",
+    payload.target_id || "",
+    payload.target_classes || "",
+    payload.target_label || "",
+    valueOrBlank_(viewport.width),
+    valueOrBlank_(viewport.height),
+    payload.error || "",
+    JSON.stringify(payload),
+  ];
+}
+
 function valueOrBlank_(value) {
   return value === undefined || value === null ? "" : value;
+}
+
+function truncate_(value, maxLength) {
+  const text = String(value || "");
+  return text.length > maxLength ? `${text.slice(0, maxLength - 1)}...` : text;
 }
 
 function jsonResponse_(data) {

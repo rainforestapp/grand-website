@@ -43,6 +43,11 @@ All URLs are canonicalized to `https://www.grandeldercare.com/` (the `www` host,
 - Favicons: `favicon.svg` is the source of truth (serif "g" on the charcoal `--surface-charcoal` rounded square); `favicon.ico` (32px) is the legacy fallback that crawlers request blindly, and `apple-touch-icon.png` (180px, square-cornered because iOS applies its own mask) covers iOS home-screen bookmarks.
 - Google Search Console: the site is verified via the `google-site-verification` meta tag in `index.html` (URL-prefix property for `https://www.grandeldercare.com/`). Don't remove that tag — verification lapses without it. After content changes, the sitemap doesn't need resubmitting; Google re-crawls on its own.
 
+## Ad Pixels
+
+- Meta Pixel is installed in `index.html` and tracks the standard `PageView` event.
+- Reddit Pixel is installed in `index.html` with pixel ID `a2_jb07ge9fad9n` and tracks the standard `PageVisit` event.
+
 ## Open Locally
 
 Open `index.html` in a browser. No build step is required.

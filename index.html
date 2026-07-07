@@ -70,6 +70,31 @@
     /></noscript>
     <!-- End Meta Pixel Code -->
 
+    <!-- Reddit Pixel Code -->
+    <script>
+    !function(w,d){
+      var redditPixelId = 'a2_jb07ge9fad9n';
+
+      if (!redditPixelId || redditPixelId === 'REDDIT_PIXEL_ID') return;
+
+      if(!w.rdt){
+        var p=w.rdt=function(){
+          p.sendEvent?p.sendEvent.apply(p,arguments):p.callQueue.push(arguments)
+        };
+        p.callQueue=[];
+        var t=d.createElement('script');
+        t.src='https://www.redditstatic.com/ads/pixel.js';
+        t.async=!0;
+        var s=d.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(t,s);
+      }
+
+      w.rdt('init', redditPixelId);
+      w.rdt('track', 'PageVisit');
+    }(window,document);
+    </script>
+    <!-- End Reddit Pixel Code -->
+
     <link rel="stylesheet" href="styles.css">
     <script src="script.js" defer></script>
   </head>

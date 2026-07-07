@@ -1030,12 +1030,10 @@ h3 {
 
 .footer-bottom {
   align-items: center;
-  border-top: 1px solid var(--hairline);
   display: flex;
   flex-wrap: wrap;
   gap: 16px;
   justify-content: space-between;
-  padding-top: 24px;
 }
 
 .footer-logo {

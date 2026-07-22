@@ -22,6 +22,7 @@
 }
 
 html {
+  scroll-padding-top: 96px;
   scroll-behavior: smooth;
 }
 
@@ -883,6 +884,7 @@ h3 {
 .waitlist-section {
   background: var(--surface-stone);
   padding: clamp(74px, 11vw, 140px) 20px;
+  scroll-margin-top: 96px;
   text-align: center;
 }
 
@@ -1344,6 +1346,10 @@ h3 {
 }
 
 @media (max-width: 560px) {
+  html {
+    scroll-padding-top: 84px;
+  }
+
   .site-header {
     align-items: center;
     flex-direction: row;
@@ -1515,6 +1521,10 @@ h3 {
   .response-media img {
     aspect-ratio: 4 / 3;
     object-position: center;
+  }
+
+  .waitlist-section {
+    scroll-margin-top: 84px;
   }
 
   .form-row {

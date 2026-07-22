@@ -583,13 +583,15 @@ h3 {
 .screen-showcase {
   align-items: center;
   display: grid;
-  gap: clamp(18px, 3vw, 28px);
-  grid-template-columns: minmax(180px, 0.9fr) minmax(160px, 0.74fr);
+  gap: clamp(10px, 1.8vw, 18px);
+  grid-template-areas: "timeline status alert";
+  grid-template-columns: minmax(112px, 0.72fr) minmax(172px, 1fr) minmax(112px, 0.72fr);
   justify-content: center;
 }
 
 .phone-shot {
   margin: 0;
+  min-width: 0;
 }
 
 .phone-shot img {
@@ -607,12 +609,38 @@ h3 {
   color: rgba(26, 24, 22, 0.58);
   font-size: 13px;
   font-weight: 700;
+  line-height: 1.25;
   margin-top: 12px;
+  min-height: 32px;
   text-align: center;
 }
 
-.phone-shot--secondary {
-  transform: translateY(34px);
+.phone-shot--timeline {
+  grid-area: timeline;
+}
+
+.phone-shot--status {
+  grid-area: status;
+  z-index: 2;
+}
+
+.phone-shot--alert {
+  grid-area: alert;
+}
+
+@media (max-width: 1040px) {
+  .tracking-section {
+    grid-template-columns: 1fr;
+  }
+
+  .tracking-copy {
+    max-width: 760px;
+  }
+
+  .screen-showcase {
+    margin: 0 auto;
+    max-width: 760px;
+  }
 }
 
 .response-section {
@@ -1307,7 +1335,7 @@ h3 {
 
   .screen-showcase {
     margin: 0 auto;
-    max-width: 680px;
+    max-width: 760px;
   }
 
   .site-footer {
@@ -1494,17 +1522,25 @@ h3 {
 
   .screen-showcase {
     gap: 22px;
+    grid-template-areas:
+      "timeline"
+      "status"
+      "alert";
     grid-template-columns: 1fr;
   }
 
   .phone-shot {
     margin-left: auto;
     margin-right: auto;
+    max-width: min(260px, 78vw);
+  }
+
+  .phone-shot--status {
     max-width: min(280px, 82vw);
   }
 
-  .phone-shot--secondary {
-    max-width: min(260px, 78vw);
+  .phone-shot--status,
+  .phone-shot--alert {
     transform: none;
   }
 

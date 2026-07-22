@@ -70,6 +70,9 @@ const EVENT_HEADERS = [
   "viewport_height",
   "error",
   "raw_payload",
+  "has_value",
+  "looks_valid",
+  "value_length_bucket",
 ];
 
 function doGet() {
@@ -361,6 +364,9 @@ function rowForEventPayload_(payload) {
     valueOrBlank_(viewport.height),
     payload.error || "",
     JSON.stringify(payload),
+    valueOrBlank_(payload.has_value),
+    valueOrBlank_(payload.looks_valid),
+    payload.value_length_bucket || "",
   ];
 }
 

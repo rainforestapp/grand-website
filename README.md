@@ -29,6 +29,10 @@ Static landing-page wireframe for Grand.
 
 - Added baseline SEO and indexing plumbing: canonical URL, Open Graph and Twitter card tags, JSON-LD structured data (Organization + WebSite), `robots.txt`, `sitemap.xml`, and a favicon set. **Why:** the site previously had none of this, so Google had little to work with and link previews in iMessage/Slack/social showed no image or branding. This is intentionally the crawlability baseline, not an optimization pass. See the "SEO & Indexing" section below.
 
+- Enriched waitlist signups to qualify fit against the ICP **without adding friction to the email capture**. **Why:** the sheet previously held only an email, giving no way to tell whether a signup matches the target buyer (an anxious adult child of a single senior who lives alone) or where to launch first. Three changes:
+  - **Passive location at signup.** `script.js` fires a best-effort client-side IP geolocation lookup (`https://ipapi.co/json/`) on page load and attaches `geo` (city/region/country/postal) to the signup payload. It is time-boxed to ~1.2s and can never block or fail a signup — if it's slow or blocked, the row just has no location. This is on top of the coarse `timezone` already captured.
+  - **Post-signup profile page (`welcome.html`).** The email stays the only required field; on success the homepage stores the email in `sessionStorage` (not the URL, to avoid leaking it into referrer/pixel traffic) and redirects to `welcome.html`, which asks four optional questions — ZIP code, why they're interested, whether the person Grand is for lives alone, and alpha-tester interest. This is progressive profiling: motivated signers answer, hesitant ones still convert. The page is `noindex`.
+  - **Real conversion events.** Both pixels previously fired only `PageView`/`PageVisit`, so ad platforms couldn't see signups. `script.js` now fires `fbq('track','Lead')` + `rdt('track','SignUp')` on signup, and `fbq('track','CompleteRegistration')` + `rdt('track','Lead')` on profile completion.
 - Rebuilt the site footer: a top row with a "Contact us" label + `hello@grandelderare.com` `mailto:` link on the left and the four nav links as a single right-aligned column, above a bottom bar with the `grand.` wordmark logo (`assets/grand-logo.png`) on the bottom-left and the copyright on the bottom-right (no divider — the footer reads as one section). **Why:** earlier footer iterations laid the nav links out as a run-on horizontal line, then as labelled columns that still read as cluttered. This is the simplified layout the team asked for. The "Grand is not a replacement for 911 or professional medical care" disclaimer was dropped per request, and the earlier "Quiet home monitoring…" tagline was removed from the footer (it wasn't requested). The logo is the brand wordmark trimmed and made transparent (cream background removed) so it blends on the footer surface.
 
 ## SEO & Indexing
@@ -45,8 +49,9 @@ All URLs are canonicalized to `https://www.grandeldercare.com/` (the `www` host,
 
 ## Ad Pixels
 
-- Meta Pixel is installed in `index.html` and tracks the standard `PageView` event.
-- Reddit Pixel is installed in `index.html` with pixel ID `a2_jb07ge9fad9n` and tracks the standard `PageVisit` event.
+- Meta Pixel is installed in `index.html` and `welcome.html` and tracks the standard `PageView` event on load.
+- Reddit Pixel is installed in `index.html` and `welcome.html` with pixel ID `a2_jb07ge9fad9n` and tracks the standard `PageVisit` event on load.
+- **Conversion events** fire from `script.js` (not the pixel snippets): a waitlist signup fires `fbq('track','Lead')` + `rdt('track','SignUp')`, and completing the profile page fires `fbq('track','CompleteRegistration')` + `rdt('track','Lead')`. All track calls are guarded, so a blocked or absent pixel never throws.
 
 ## Open Locally
 
@@ -78,9 +83,19 @@ For a fresh setup:
 
 When updating the Apps Script code, use Deploy -> Manage deployments -> Edit -> New version. Saving the code alone does not update the deployed web app. Visiting the `/exec` URL directly should return JSON with `spreadsheet_url`, `waitlist_last_row`, and `event_last_row`; this confirms which spreadsheet the script is writing to.
 
-The client sends email, source, page URL, referrer, user agent, user-agent client hints where available, language, timezone, viewport, screen, connection hints, and other browser metadata. The request uses a simple `text/plain` POST because Google Apps Script web apps are easiest to call from a static GitHub Pages site without a CORS preflight.
+The client sends email, source, page URL, referrer, user agent, user-agent client hints where available, language, timezone, viewport, screen, connection hints, a coarse IP-derived `geo` object (city/region/country/postal, best-effort), and other browser metadata. The request uses a simple `text/plain` POST because Google Apps Script web apps are easiest to call from a static GitHub Pages site without a CORS preflight.
 
-The same Apps Script endpoint also receives anonymous interaction analytics and writes them to an `Events` tab in the same spreadsheet. The site records section views, link/button clicks, and waitlist funnel events (`waitlist_email_focus`, `waitlist_submit_attempt`, `waitlist_submit_success`, and `waitlist_submit_error`). These events use a per-browser-tab `session_id` stored in `sessionStorage`; they do not include the waitlist email address.
+**Privacy note:** the IP geolocation lookup sends the visitor's IP to a third party (`ipapi.co`) and we store their coarse location. If the site gains a privacy policy, it should disclose this. The free `ipapi.co` tier is ~1,000 lookups/day, which is ample at current volume — revisit (or add an API key) if traffic grows.
+
+### Profile fields and the profile page
+
+After a successful signup, `index.html` stores the email in `sessionStorage` under `grand_signup_email` and redirects to `welcome.html`, a `noindex` page that collects four optional qualifying fields: `zipcode`, `reason_interested`, `lives_alone` (yes/no/not_sure), and `alpha_tester` (yes/no). It POSTs a `{ type: "waitlist_profile", email, ... }` payload to the same endpoint.
+
+`handleWaitlistProfile_` in `waitlist.gs` looks up the person's existing row by email (case-insensitive, most-recent match wins) and **updates that row in place** — one row per person, no duplicates. If the email is missing or unmatched, it appends a standalone profile row so the answers aren't lost.
+
+`ensureHeaders_` now auto-migrates the live sheet: because new columns are only ever appended to the end of `HEADERS` (`geo_*`, then the profile fields), it rewrites the header row in place when the sheet has fewer columns than `HEADERS`, so no manual column setup is needed after deploying a new version.
+
+The same Apps Script endpoint also receives anonymous interaction analytics and writes them to an `Events` tab in the same spreadsheet. The site records section views, link/button clicks, and waitlist funnel events (`waitlist_email_focus`, `waitlist_submit_attempt`, `waitlist_submit_success`, `waitlist_submit_error`, and the profile-page equivalents `waitlist_profile_submit_attempt`, `waitlist_profile_submit_success`, `waitlist_profile_submit_error`). These events use a per-browser-tab `session_id` stored in `sessionStorage`; they do not include the waitlist email address.
 
 ## Current Sections
 
@@ -92,5 +107,6 @@ Every content section leads with a standardized eyebrow (uppercase, 12px, clay `
 - "What Grand pays attention to": everyday activity, the kitchen (meals), and a call for help.
 - "Caregiver experience": the daily "she's okay" app view with real iOS app screens, plus a parent-perspective dignity note.
 - "The Grand call center" (`#response`): what happens in an emergency — a mirrored two-column section (photo left, copy right) with a four-step numbered process (real person calls through the hub/sensors, confirms she's safe, calls EMS if not, family stays notified and can join the call). Step numerals are bare clay Georgia counters via CSS `counter()`; the photo slot falls back to the standard dashed placeholder if the image is removed.
-- Waitlist form with validation and Google Sheets handoff.
+- Waitlist form with validation and Google Sheets handoff. On success it redirects to the post-signup profile page.
+- Post-signup profile page (`welcome.html`, `noindex`): optional ZIP, reason for interest, whether the person Grand is for lives alone, and alpha-tester interest, styled with the shared `styles.css` `.profile-*` rules.
 - Site footer: a top row ("Contact us" label + `hello@grandelderare.com` on the left, four nav links as a right-aligned single column) above a bottom bar with the `grand.` logo bottom-left and the copyright bottom-right.

@@ -35,6 +35,18 @@ const HEADERS = [
   "connection_rtt",
   "connection_save_data",
   "raw_payload",
+  // Captured passively at signup via client-side IP geolocation.
+  "geo_city",
+  "geo_region",
+  "geo_country",
+  "geo_postal",
+  // Collected on the post-signup profile page (welcome.html); blank until the
+  // person completes it, then filled in on the same row by email.
+  "zipcode",
+  "reason_interested",
+  "lives_alone",
+  "alpha_tester",
+  "profile_completed_at",
 ];
 
 const EVENT_HEADERS = [
@@ -84,6 +96,10 @@ function doPost(event) {
       return handleAnalyticsEvent_(payload);
     }
 
+    if (payload.type === "waitlist_profile") {
+      return handleWaitlistProfile_(payload);
+    }
+
     return handleWaitlistSignup_(payload);
   } catch (error) {
     return jsonResponse_({ ok: false, error: String(error) });
@@ -112,6 +128,51 @@ function handleWaitlistSignup_(payload) {
       sheet_name: sheet.getName(),
       row: sheet.getLastRow(),
     };
+  } finally {
+    lock.releaseLock();
+  }
+
+  return jsonResponse_(result);
+}
+
+function handleWaitlistProfile_(payload) {
+  const email = String(payload.email || "").trim().toLowerCase();
+
+  const profileValues = {
+    zipcode: String(payload.zipcode || "").trim(),
+    reason_interested: String(payload.reason_interested || "").trim(),
+    lives_alone: String(payload.lives_alone || "").trim(),
+    alpha_tester: String(payload.alpha_tester || "").trim(),
+    profile_completed_at: payload.profile_completed_at || new Date().toISOString(),
+  };
+
+  const lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+
+  let result;
+  try {
+    const spreadsheet = getSpreadsheet_();
+    const sheet = getSheet_(spreadsheet, SHEET_NAME);
+    ensureHeaders_(sheet, HEADERS);
+
+    const rowIndex = email ? findRowByEmail_(sheet, email) : -1;
+
+    if (rowIndex > 0) {
+      // Update the existing signup row in place — one row per person.
+      writeProfileColumns_(sheet, rowIndex, profileValues);
+      result = { ok: true, matched: true, updated_row: rowIndex };
+    } else {
+      // No matching signup (email missing or unknown) — append a standalone
+      // row so the answers aren't lost.
+      const row = new Array(HEADERS.length).fill("");
+      row[HEADERS.indexOf("received_at")] = new Date();
+      row[HEADERS.indexOf("email")] = email;
+      row[HEADERS.indexOf("source")] = payload.source || "";
+      row[HEADERS.indexOf("raw_payload")] = JSON.stringify(payload);
+      applyProfileToRow_(row, profileValues);
+      sheet.appendRow(row);
+      result = { ok: true, matched: false, appended_row: sheet.getLastRow() };
+    }
   } finally {
     lock.releaseLock();
   }
@@ -165,16 +226,60 @@ function getSheet_(spreadsheet, sheetName) {
 }
 
 function ensureHeaders_(sheet, headers) {
-  if (sheet.getLastRow() > 0) return;
+  // Empty sheet: write the header row and freeze it.
+  if (sheet.getLastRow() === 0) {
+    sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+    sheet.setFrozenRows(1);
+    return;
+  }
 
-  sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
-  sheet.setFrozenRows(1);
+  // Existing sheet: if columns were appended to `headers`, extend the header
+  // row in place so the live sheet auto-migrates without a manual step. Safe
+  // because we only ever append columns to the end — no existing column moves,
+  // so overwriting row 1 rewrites the same labels plus the new ones.
+  if (sheet.getLastColumn() < headers.length) {
+    sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+  }
+}
+
+function findRowByEmail_(sheet, email) {
+  const lastRow = sheet.getLastRow();
+  if (lastRow < 2) return -1;
+
+  const emailColumn = HEADERS.indexOf("email") + 1;
+  const values = sheet.getRange(2, emailColumn, lastRow - 1, 1).getValues();
+
+  // Search from the bottom so the most recent signup wins on duplicate emails.
+  for (let i = values.length - 1; i >= 0; i--) {
+    if (String(values[i][0] || "").trim().toLowerCase() === email) {
+      return i + 2;
+    }
+  }
+
+  return -1;
+}
+
+function writeProfileColumns_(sheet, rowIndex, profileValues) {
+  Object.keys(profileValues).forEach((header) => {
+    const column = HEADERS.indexOf(header) + 1;
+    if (column > 0) {
+      sheet.getRange(rowIndex, column).setValue(profileValues[header]);
+    }
+  });
+}
+
+function applyProfileToRow_(row, profileValues) {
+  Object.keys(profileValues).forEach((header) => {
+    const index = HEADERS.indexOf(header);
+    if (index >= 0) row[index] = profileValues[header];
+  });
 }
 
 function rowForPayload_(email, payload) {
   const viewport = payload.viewport || {};
   const screen = payload.screen || {};
   const connection = payload.connection || {};
+  const geo = payload.geo || {};
 
   return [
     new Date(),
@@ -207,6 +312,12 @@ function rowForPayload_(email, payload) {
     valueOrBlank_(connection.rtt),
     valueOrBlank_(connection.save_data),
     JSON.stringify(payload),
+    geo.city || "",
+    geo.region || "",
+    geo.country || "",
+    geo.postal || "",
+    // zipcode, reason_interested, lives_alone, alpha_tester,
+    // profile_completed_at are left empty here and filled by the profile page.
   ];
 }
 

@@ -3,6 +3,7 @@ const profileForm = document.querySelector("[data-profile-form]");
 const analyticsEndpoint =
   (waitlistForm || profileForm)?.dataset.waitlistEndpoint?.trim() || "";
 const trackedSections = ["problem", "system", "attention", "tracking", "response", "waitlist"];
+const anchorScrollRetries = [0, 120, 360, 760];
 let fallbackSessionId = "";
 
 // Best-effort, non-blocking IP geolocation. Kicked off on load (homepage only)
@@ -120,6 +121,82 @@ function setupClickTracking() {
     },
     { capture: true },
   );
+}
+
+function getStickyHeaderOffset() {
+  const header = document.querySelector(".site-header");
+  if (!header) return 0;
+
+  return Math.ceil(header.getBoundingClientRect().height) + 12;
+}
+
+function getSamePageAnchorTarget(link) {
+  const href = link?.getAttribute("href") || "";
+  if (!href.startsWith("#") || href === "#") return null;
+
+  return getHashTarget(href);
+}
+
+function getHashTarget(hash) {
+  try {
+    return document.getElementById(decodeURIComponent(hash.slice(1)));
+  } catch {
+    return document.getElementById(hash.slice(1));
+  }
+}
+
+function scrollToAnchorTarget(target, behavior = "smooth") {
+  const top = target.getBoundingClientRect().top + window.scrollY - getStickyHeaderOffset();
+
+  window.scrollTo({
+    top: Math.max(0, top),
+    behavior,
+  });
+}
+
+function setupAnchorScrolling() {
+  document.addEventListener("click", (event) => {
+    const link = event.target instanceof Element ? event.target.closest("a") : null;
+    const target = getSamePageAnchorTarget(link);
+    if (!target) return;
+
+    event.preventDefault();
+    const hash = `#${target.id}`;
+
+    try {
+      if (window.location.hash !== hash) {
+        window.history.pushState(null, "", hash);
+      }
+    } catch {
+      window.location.hash = hash;
+    }
+
+    anchorScrollRetries.forEach((delay, index) => {
+      window.setTimeout(() => {
+        scrollToAnchorTarget(target, index === 0 ? "smooth" : "auto");
+      }, delay);
+    });
+
+    if (!target.hasAttribute("tabindex")) {
+      target.setAttribute("tabindex", "-1");
+    }
+    try {
+      target.focus({ preventScroll: true });
+    } catch {
+      target.focus();
+    }
+  });
+
+  window.addEventListener("load", () => {
+    const target = getHashTarget(window.location.hash || "");
+    if (!target) return;
+
+    anchorScrollRetries.forEach((delay) => {
+      window.setTimeout(() => {
+        scrollToAnchorTarget(target, "auto");
+      }, delay);
+    });
+  });
 }
 
 function setupSectionViewTracking() {
@@ -462,4 +539,5 @@ if (profileForm) {
 }
 
 setupClickTracking();
+setupAnchorScrolling();
 setupSectionViewTracking();

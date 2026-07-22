@@ -146,21 +146,36 @@ function handleWaitlistProfile_(payload) {
     profile_completed_at: payload.profile_completed_at || new Date().toISOString(),
   };
 
+  const spreadsheet = getSpreadsheet_();
+  const sheet = getSheet_(spreadsheet, SHEET_NAME);
+
   const lock = LockService.getScriptLock();
   lock.waitLock(10000);
 
   let result;
   try {
-    const spreadsheet = getSpreadsheet_();
-    const sheet = getSheet_(spreadsheet, SHEET_NAME);
+    ensureHeaders_(sheet, HEADERS);
+  } finally {
+    lock.releaseLock();
+  }
+
+  // The email capture is submitted with sendBeacon/keepalive so visitors can
+  // leave the page immediately. If the profile form is submitted right away,
+  // give the signup append a short chance to land before appending a fallback
+  // profile-only row.
+  const rowIndex = email ? waitForSignupRow_(sheet, email) : -1;
+
+  lock.waitLock(10000);
+  try {
     ensureHeaders_(sheet, HEADERS);
 
-    const rowIndex = email ? findRowByEmail_(sheet, email) : -1;
+    const latestRowIndex = email ? findRowByEmail_(sheet, email) : -1;
+    const targetRowIndex = latestRowIndex > 0 ? latestRowIndex : rowIndex;
 
-    if (rowIndex > 0) {
+    if (targetRowIndex > 0) {
       // Update the existing signup row in place — one row per person.
-      writeProfileColumns_(sheet, rowIndex, profileValues);
-      result = { ok: true, matched: true, updated_row: rowIndex };
+      writeProfileColumns_(sheet, targetRowIndex, profileValues);
+      result = { ok: true, matched: true, updated_row: targetRowIndex };
     } else {
       // No matching signup (email missing or unknown) — append a standalone
       // row so the answers aren't lost.
@@ -187,26 +202,17 @@ function handleAnalyticsEvent_(payload) {
     return jsonResponse_({ ok: false, error: "missing_event_type" });
   }
 
-  const lock = LockService.getScriptLock();
-  lock.waitLock(10000);
+  const spreadsheet = getSpreadsheet_();
+  const sheet = getSheet_(spreadsheet, EVENT_SHEET_NAME);
+  ensureHeaders_(sheet, EVENT_HEADERS);
+  sheet.appendRow(rowForEventPayload_(payload));
 
-  let result;
-  try {
-    const spreadsheet = getSpreadsheet_();
-    const sheet = getSheet_(spreadsheet, EVENT_SHEET_NAME);
-    ensureHeaders_(sheet, EVENT_HEADERS);
-    sheet.appendRow(rowForEventPayload_(payload));
-    result = {
-      ok: true,
-      spreadsheet_url: sheet.getParent().getUrl(),
-      sheet_name: sheet.getName(),
-      row: sheet.getLastRow(),
-    };
-  } finally {
-    lock.releaseLock();
-  }
-
-  return jsonResponse_(result);
+  return jsonResponse_({
+    ok: true,
+    spreadsheet_url: sheet.getParent().getUrl(),
+    sheet_name: sheet.getName(),
+    row: sheet.getLastRow(),
+  });
 }
 
 function getSpreadsheet_() {
@@ -254,6 +260,16 @@ function findRowByEmail_(sheet, email) {
     if (String(values[i][0] || "").trim().toLowerCase() === email) {
       return i + 2;
     }
+  }
+
+  return -1;
+}
+
+function waitForSignupRow_(sheet, email) {
+  for (let attempt = 0; attempt < 4; attempt++) {
+    const rowIndex = findRowByEmail_(sheet, email);
+    if (rowIndex > 0) return rowIndex;
+    Utilities.sleep(350);
   }
 
   return -1;

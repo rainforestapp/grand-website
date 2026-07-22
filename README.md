@@ -84,15 +84,15 @@ For a fresh setup:
 
 When updating the Apps Script code, use Deploy -> Manage deployments -> Edit -> New version. Saving the code alone does not update the deployed web app. Visiting the `/exec` URL directly should return JSON with `spreadsheet_url`, `waitlist_last_row`, and `event_last_row`; this confirms which spreadsheet the script is writing to.
 
-The client sends email, source, page URL, referrer, user agent, user-agent client hints where available, language, timezone, viewport, screen, connection hints, a coarse IP-derived `geo` object (city/region/country/postal, best-effort), and other browser metadata. The request uses a simple `text/plain` POST because Google Apps Script web apps are easiest to call from a static GitHub Pages site without a CORS preflight.
+The client sends email, source, page URL, referrer, user agent, user-agent client hints where available, language, timezone, viewport, screen, connection hints, a coarse IP-derived `geo` object when the lookup has already completed (city/region/country/postal, best-effort), and other browser metadata. The initial email capture uses `sendBeacon` with a `keepalive` fetch fallback so the visitor can advance immediately instead of waiting for the Google Apps Script round trip. The request uses a simple `text/plain` POST because Google Apps Script web apps are easiest to call from a static GitHub Pages site without a CORS preflight.
 
 **Privacy note:** the IP geolocation lookup sends the visitor's IP to a third party (`ipapi.co`) and we store their coarse location. If the site gains a privacy policy, it should disclose this. The free `ipapi.co` tier is ~1,000 lookups/day, which is ample at current volume — revisit (or add an API key) if traffic grows.
 
 ### Profile fields and the profile page
 
-After a successful signup, `index.html` stores the email in `sessionStorage` under `grand_signup_email` and redirects to `welcome.html`, a `noindex` page that collects four optional qualifying fields: `zipcode`, `reason_interested`, `lives_alone` (yes/no/not_sure), and `alpha_tester` (yes/no). It POSTs a `{ type: "waitlist_profile", email, ... }` payload to the same endpoint.
+After queueing the signup, `index.html` stores the email in `sessionStorage` under `grand_signup_email` and redirects to `welcome.html`, a `noindex` page that collects four optional qualifying fields: `zipcode`, `reason_interested`, `lives_alone` (yes/no/not_sure), and `alpha_tester` (yes/no). It POSTs a `{ type: "waitlist_profile", email, ... }` payload to the same endpoint.
 
-`handleWaitlistProfile_` in `waitlist.gs` looks up the person's existing row by email (case-insensitive, most-recent match wins) and **updates that row in place** — one row per person, no duplicates. If the email is missing or unmatched, it appends a standalone profile row so the answers aren't lost.
+`handleWaitlistProfile_` in `waitlist.gs` looks up the person's existing row by email (case-insensitive, most-recent match wins) and **updates that row in place** — one row per person, no duplicates. Because the initial signup is queued optimistically, the profile handler briefly retries the lookup before appending a standalone profile row. If the email is missing or still unmatched, it appends a standalone profile row so the answers aren't lost.
 
 `ensureHeaders_` now auto-migrates the live sheet: because new columns are only ever appended to the end of `HEADERS` (`geo_*`, then the profile fields), it rewrites the header row in place when the sheet has fewer columns than `HEADERS`, so no manual column setup is needed after deploying a new version.
 

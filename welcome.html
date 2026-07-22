@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>You&rsquo;re on the list &middot; Grand</title>
+    <meta
+      name="description"
+      content="Thanks for joining the Grand waitlist. A few optional questions help us understand who Grand is for and where to launch first."
+    >
+    <!-- Post-signup page: kept out of search results. -->
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#f5f0e8">
+
+    <link rel="icon" href="favicon.ico" sizes="32x32">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+    <!-- Meta Pixel Code -->
+    <script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '2025489411398936');
+    fbq('track', 'PageView');
+    </script>
+    <noscript><img height="1" width="1" style="display:none"
+    src="https://www.facebook.com/tr?id=2025489411398936&ev=PageView&noscript=1"
+    /></noscript>
+    <!-- End Meta Pixel Code -->
+
+    <!-- Reddit Pixel Code -->
+    <script>
+    !function(w,d){
+      var redditPixelId = 'a2_jb07ge9fad9n';
+
+      if (!redditPixelId || redditPixelId === 'REDDIT_PIXEL_ID') return;
+
+      if(!w.rdt){
+        var p=w.rdt=function(){
+          p.sendEvent?p.sendEvent.apply(p,arguments):p.callQueue.push(arguments)
+        };
+        p.callQueue=[];
+        var t=d.createElement('script');
+        t.src='https://www.redditstatic.com/ads/pixel.js';
+        t.async=!0;
+        var s=d.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(t,s);
+      }
+
+      w.rdt('init', redditPixelId);
+      w.rdt('track', 'PageVisit');
+    }(window,document);
+    </script>
+    <!-- End Reddit Pixel Code -->
+
+    <link rel="stylesheet" href="styles.css">
+    <script src="script.js" defer></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="index.html" aria-label="Grand home">
+        <span>grand</span>
+        <span>know they&rsquo;re okay</span>
+      </a>
+      <nav class="nav" aria-label="Primary navigation">
+        <a href="index.html#system">How it works</a>
+        <a href="index.html#tracking">Caregiver experience</a>
+        <a href="index.html#response">Emergency response</a>
+      </nav>
+    </header>
+
+    <main id="top">
+      <section class="profile-section">
+        <h1>You&rsquo;re on the list.</h1>
+
+        <div class="profile-layout" data-profile-layout>
+          <aside class="profile-aside">
+            <img
+              class="profile-image"
+              src="assets/grand-sensor.jpg"
+              width="1024"
+              height="1536"
+              loading="lazy"
+              decoding="async"
+              alt="A Grand sensor plugged into a wall outlet at home."
+            >
+          </aside>
+
+          <div class="profile-main">
+            <p class="profile-note">
+              A few optional questions help us plan our launch and get Grand into
+              the homes of alpha testers early. Answer what you&rsquo;d like, or
+              skip for now.
+            </p>
+
+            <form
+              class="profile-form"
+              data-profile-form
+              data-waitlist-endpoint="https://script.google.com/macros/s/AKfycbwlWToG306aii_X506SiB1tvDmhL_SYTz4Ma8k3KU0MjS6toQP4E09bAz7M1nW25iYt/exec"
+              novalidate
+            >
+            <div class="profile-field">
+              <label for="zipcode">ZIP code</label>
+              <p class="profile-hint">Helps us prioritize where to launch first.</p>
+              <input
+                id="zipcode"
+                name="zipcode"
+                type="text"
+                inputmode="numeric"
+                autocomplete="postal-code"
+                maxlength="10"
+                placeholder="e.g. 94110"
+              >
+            </div>
+
+            <div class="profile-field">
+              <label for="reason_interested">Why are you interested in Grand?</label>
+              <textarea
+                id="reason_interested"
+                name="reason_interested"
+                rows="4"
+                placeholder="A sentence or two is plenty."
+              ></textarea>
+            </div>
+
+            <fieldset class="profile-field profile-choices">
+              <legend>Does the person Grand is for live alone?</legend>
+              <label class="choice"><input type="radio" name="lives_alone" value="yes"> Yes</label>
+              <label class="choice"><input type="radio" name="lives_alone" value="no"> No</label>
+            </fieldset>
+
+            <fieldset class="profile-field profile-choices">
+              <legend>
+                Are you interested in learning more about our alpha tester
+                program? By selecting yes, you&rsquo;re not committing to
+                anything beyond getting more information.
+              </legend>
+              <label class="choice"><input type="radio" name="alpha_tester" value="yes"> Yes</label>
+              <label class="choice"><input type="radio" name="alpha_tester" value="no"> No</label>
+            </fieldset>
+
+            <div class="profile-actions">
+              <button type="submit" class="profile-button">Submit</button>
+            </div>
+            <p class="form-status" data-profile-status role="status" aria-live="polite"></p>
+            </form>
+          </div>
+        </div>
+
+        <div class="profile-done" data-profile-done hidden>
+          <h2>Thank you.</h2>
+          <p>That&rsquo;s everything &mdash; we&rsquo;ll be in touch as Grand gets closer to launch.</p>
+          <a class="profile-button" href="index.html">Back to home</a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer" aria-label="Site footer">
+      <div class="footer-top">
+        <div class="footer-intro">
+          <p class="footer-contact-label">Contact us</p>
+          <a href="mailto:hello@grandelderare.com">hello@grandelderare.com</a>
+        </div>
+        <nav class="footer-links" aria-label="Footer navigation">
+          <a href="index.html#system">How it works</a>
+          <a href="index.html#tracking">Caregiver experience</a>
+          <a href="index.html#response">Emergency response</a>
+          <a href="index.html">Home</a>
+        </nav>
+      </div>
+      <div class="footer-bottom">
+        <a href="index.html" class="footer-logo" aria-label="Grand home">
+          <img src="assets/grand-logo.png" alt="Grand" width="132" height="60" />
+        </a>
+        <p class="footer-copyright">&copy; 2026 Grand. All rights reserved.</p>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -1,7 +1,14 @@
 const waitlistForm = document.querySelector("[data-waitlist-form]");
-const analyticsEndpoint = waitlistForm?.dataset.waitlistEndpoint?.trim() || "";
+const profileForm = document.querySelector("[data-profile-form]");
+const analyticsEndpoint =
+  (waitlistForm || profileForm)?.dataset.waitlistEndpoint?.trim() || "";
 const trackedSections = ["problem", "system", "attention", "tracking", "response", "waitlist"];
 let fallbackSessionId = "";
+
+// Best-effort, non-blocking IP geolocation. Kicked off on load (homepage only)
+// so a coarse location is usually ready by the time the visitor submits. We
+// never block or fail a signup on this — see buildWaitlistPayload.
+const geoPromise = waitlistForm ? fetchGeoLocation() : null;
 
 function getSessionId() {
   const key = "grand_analytics_session_id";
@@ -180,9 +187,56 @@ async function getUserAgentData() {
   }
 }
 
+async function fetchGeoLocation() {
+  try {
+    const response = await fetch("https://ipapi.co/json/", {
+      headers: { Accept: "application/json" },
+    });
+    if (!response.ok) return null;
+
+    const data = await response.json();
+    if (!data || data.error) return null;
+
+    return {
+      city: data.city || "",
+      region: data.region || "",
+      country: data.country_name || data.country || "",
+      postal: data.postal || "",
+      source: "ipapi.co",
+    };
+  } catch {
+    return null;
+  }
+}
+
+function withTimeout(promise, ms) {
+  return Promise.race([
+    Promise.resolve(promise),
+    new Promise((resolve) => {
+      setTimeout(() => resolve(null), ms);
+    }),
+  ]);
+}
+
+// Report a conversion to the ad pixels. The base pixels load in the page head;
+// here we fire the standard conversion events so Meta/Reddit can attribute and
+// optimize toward signups (previously only PageView/PageVisit fired). Guarded
+// so a blocked or absent pixel never throws.
+function firePixelConversion(metaEvent, redditEvent) {
+  try {
+    if (typeof window.fbq === "function") window.fbq("track", metaEvent);
+  } catch {}
+  try {
+    if (typeof window.rdt === "function") window.rdt("track", redditEvent);
+  } catch {}
+}
+
 async function buildWaitlistPayload(email) {
   const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
   const userAgentData = await getUserAgentData();
+  // Resolve the in-flight geolocation lookup, capped so a slow/blocked lookup
+  // never delays the signup by more than ~1.2s (null = no location captured).
+  const geo = await withTimeout(geoPromise, 1200);
 
   return {
     type: "waitlist_signup",
@@ -222,6 +276,7 @@ async function buildWaitlistPayload(email) {
           save_data: Boolean(connection.saveData),
         }
       : null,
+    geo,
   };
 }
 
@@ -294,7 +349,18 @@ if (waitlistForm) {
       trackAnalyticsEvent("waitlist_submit_success", {
         section_id: "waitlist",
       });
-      setWaitlistStatus("You're on the list. We'll let you know when Grand is available.", "success");
+      firePixelConversion("Lead", "SignUp");
+      setWaitlistStatus("You're on the list. Taking you to a couple of quick questions...", "success");
+
+      // Progressive profiling: hand off to the profile page to collect
+      // qualifying details, without ever gating the email behind them. The
+      // email travels via sessionStorage (not the URL) so it isn't leaked into
+      // the profile page's referrer/pixel traffic. The success message above
+      // stays visible if navigation is blocked.
+      try {
+        window.sessionStorage.setItem("grand_signup_email", email);
+      } catch {}
+      window.location.assign("welcome.html");
     } catch (error) {
       console.warn(error);
       trackAnalyticsEvent("waitlist_submit_error", {
@@ -303,6 +369,92 @@ if (waitlistForm) {
       });
       setWaitlistStatus("Something went wrong. Please try again.", "error");
     } finally {
+      button.disabled = false;
+      button.textContent = originalLabel;
+    }
+  });
+}
+
+function setProfileStatus(message, type = "neutral") {
+  const status = document.querySelector("[data-profile-status]");
+  if (!status) return;
+
+  status.textContent = message;
+  status.dataset.status = type;
+}
+
+function buildProfilePayload(form) {
+  let email = "";
+  try {
+    email = window.sessionStorage.getItem("grand_signup_email") || "";
+  } catch {}
+
+  const data = new FormData(form);
+
+  return {
+    type: "waitlist_profile",
+    email,
+    source: "grand-website",
+    zipcode: String(data.get("zipcode") || "").trim(),
+    reason_interested: String(data.get("reason_interested") || "").trim(),
+    lives_alone: String(data.get("lives_alone") || ""),
+    alpha_tester: String(data.get("alpha_tester") || ""),
+    profile_completed_at: new Date().toISOString(),
+    page_url: window.location.href,
+    referrer: document.referrer || "",
+  };
+}
+
+if (profileForm) {
+  const doneMessage = document.querySelector("[data-profile-done]");
+
+  profileForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const button = profileForm.querySelector("button[type='submit']");
+    const endpoint = profileForm.dataset.waitlistEndpoint?.trim();
+    if (!button) return;
+
+    trackAnalyticsEvent("waitlist_profile_submit_attempt", {
+      section_id: "welcome",
+    });
+
+    if (!endpoint) {
+      trackAnalyticsEvent("waitlist_profile_submit_error", {
+        section_id: "welcome",
+        error: "missing_endpoint",
+      });
+      setProfileStatus("This form is not connected yet.", "error");
+      return;
+    }
+
+    const originalLabel = button.textContent;
+    button.disabled = true;
+    button.textContent = "Saving...";
+    setProfileStatus("", "neutral");
+
+    try {
+      const payload = buildProfilePayload(profileForm);
+      await submitWaitlist(endpoint, payload);
+      firePixelConversion("CompleteRegistration", "Lead");
+      trackAnalyticsEvent("waitlist_profile_submit_success", {
+        section_id: "welcome",
+      });
+
+      if (doneMessage) {
+        (profileForm.closest("[data-profile-layout]") || profileForm).hidden = true;
+        doneMessage.hidden = false;
+        doneMessage.scrollIntoView({ behavior: "smooth", block: "center" });
+      } else {
+        setProfileStatus("Thank you — we've got everything we need.", "success");
+      }
+    } catch (error) {
+      console.warn(error);
+      trackAnalyticsEvent("waitlist_profile_submit_error", {
+        section_id: "welcome",
+        error: "network_or_script_error",
+      });
+      setProfileStatus("Something went wrong. Please try again.", "error");
       button.disabled = false;
       button.textContent = originalLabel;
     }

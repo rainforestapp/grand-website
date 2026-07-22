@@ -5,11 +5,24 @@ const analyticsEndpoint =
 const trackedSections = ["problem", "system", "attention", "tracking", "response", "waitlist"];
 const anchorScrollRetries = [0, 120, 360, 760];
 let fallbackSessionId = "";
+let cachedGeoLocation = null;
+let cachedUserAgentData = null;
 
 // Best-effort, non-blocking IP geolocation. Kicked off on load (homepage only)
 // so a coarse location is usually ready by the time the visitor submits. We
 // never block or fail a signup on this — see buildWaitlistPayload.
-const geoPromise = waitlistForm ? fetchGeoLocation() : null;
+if (waitlistForm) {
+  fetchGeoLocation()
+    .then((geo) => {
+      cachedGeoLocation = geo;
+    })
+    .catch(() => {});
+  getUserAgentData()
+    .then((userAgentData) => {
+      cachedUserAgentData = userAgentData;
+    })
+    .catch(() => {});
+}
 
 function getSessionId() {
   const key = "grand_analytics_session_id";
@@ -237,14 +250,8 @@ function setWaitlistStatus(message, type = "neutral") {
 }
 
 async function getUserAgentData() {
-  if (!navigator.userAgentData) return null;
-
-  const base = {
-    brands: navigator.userAgentData.brands,
-    mobile: navigator.userAgentData.mobile,
-    platform: navigator.userAgentData.platform,
-  };
-
+  const base = getBaseUserAgentData();
+  if (!base) return null;
   if (!navigator.userAgentData.getHighEntropyValues) return base;
 
   try {
@@ -262,6 +269,16 @@ async function getUserAgentData() {
   } catch {
     return base;
   }
+}
+
+function getBaseUserAgentData() {
+  if (!navigator.userAgentData) return null;
+
+  return {
+    brands: navigator.userAgentData.brands,
+    mobile: navigator.userAgentData.mobile,
+    platform: navigator.userAgentData.platform,
+  };
 }
 
 async function fetchGeoLocation() {
@@ -286,15 +303,6 @@ async function fetchGeoLocation() {
   }
 }
 
-function withTimeout(promise, ms) {
-  return Promise.race([
-    Promise.resolve(promise),
-    new Promise((resolve) => {
-      setTimeout(() => resolve(null), ms);
-    }),
-  ]);
-}
-
 // Report a conversion to the ad pixels. The base pixels load in the page head;
 // here we fire the standard conversion events so Meta/Reddit can attribute and
 // optimize toward signups (previously only PageView/PageVisit fired). Guarded
@@ -308,12 +316,8 @@ function firePixelConversion(metaEvent, redditEvent) {
   } catch {}
 }
 
-async function buildWaitlistPayload(email) {
+function buildWaitlistPayload(email) {
   const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-  const userAgentData = await getUserAgentData();
-  // Resolve the in-flight geolocation lookup, capped so a slow/blocked lookup
-  // never delays the signup by more than ~1.2s (null = no location captured).
-  const geo = await withTimeout(geoPromise, 1200);
 
   return {
     type: "waitlist_signup",
@@ -323,7 +327,7 @@ async function buildWaitlistPayload(email) {
     page_url: window.location.href,
     referrer: document.referrer || "",
     user_agent: navigator.userAgent,
-    user_agent_data: userAgentData,
+    user_agent_data: cachedUserAgentData || getBaseUserAgentData(),
     language: navigator.language || "",
     languages: navigator.languages || [],
     platform: navigator.platform || "",
@@ -353,19 +357,32 @@ async function buildWaitlistPayload(email) {
           save_data: Boolean(connection.saveData),
         }
       : null,
-    geo,
+    geo: cachedGeoLocation,
   };
 }
 
-async function submitWaitlist(endpoint, payload) {
-  await fetch(endpoint, {
+function submitWaitlist(endpoint, payload, options = {}) {
+  const { waitForCompletion = true } = options;
+  const body = JSON.stringify(payload);
+
+  if (!waitForCompletion && navigator.sendBeacon) {
+    const blob = new Blob([body], { type: "text/plain;charset=UTF-8" });
+    if (navigator.sendBeacon(endpoint, blob)) {
+      return Promise.resolve();
+    }
+  }
+
+  const request = fetch(endpoint, {
     method: "POST",
     mode: "no-cors",
+    keepalive: !waitForCompletion,
     headers: {
       "Content-Type": "text/plain",
     },
-    body: JSON.stringify(payload),
+    body,
   });
+
+  return waitForCompletion ? request : request.catch(() => {});
 }
 
 if (waitlistForm) {
@@ -420,8 +437,8 @@ if (waitlistForm) {
     setWaitlistStatus("", "neutral");
 
     try {
-      const payload = await buildWaitlistPayload(email);
-      await submitWaitlist(endpoint, payload);
+      const payload = buildWaitlistPayload(email);
+      void submitWaitlist(endpoint, payload, { waitForCompletion: false });
       waitlistForm.reset();
       trackAnalyticsEvent("waitlist_submit_success", {
         section_id: "waitlist",

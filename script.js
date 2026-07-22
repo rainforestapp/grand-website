@@ -350,7 +350,7 @@ if (waitlistForm) {
         section_id: "waitlist",
       });
       firePixelConversion("Lead", "SignUp");
-      setWaitlistStatus("Taking you to a couple of quick questions...", "success");
+      setWaitlistStatus("You're on the list. Taking you to a couple of quick questions...", "success");
 
       // Progressive profiling: hand off to the profile page to collect
       // qualifying details, without ever gating the email behind them. The

@@ -236,6 +236,26 @@ function setWaitlistStatus(message, type = "neutral") {
   status.dataset.status = type;
 }
 
+function getValueLengthBucket(value) {
+  const length = String(value || "").trim().length;
+
+  if (length === 0) return "0";
+  if (length < 6) return "1-5";
+  if (length < 12) return "6-11";
+  if (length < 24) return "12-23";
+  return "24+";
+}
+
+function getEmailFieldState(input) {
+  const value = input.value.trim();
+
+  return {
+    has_value: value.length > 0,
+    looks_valid: value.length > 0 && input.validity.valid,
+    value_length_bucket: getValueLengthBucket(value),
+  };
+}
+
 async function getUserAgentData() {
   if (!navigator.userAgentData) return null;
 
@@ -370,6 +390,7 @@ async function submitWaitlist(endpoint, payload) {
 
 if (waitlistForm) {
   const input = waitlistForm.querySelector("input[type='email']");
+  let trackedEmailInputStart = false;
 
   if (input) {
     input.addEventListener(
@@ -381,6 +402,23 @@ if (waitlistForm) {
       },
       { once: true },
     );
+
+    input.addEventListener("input", () => {
+      if (trackedEmailInputStart || input.value.trim().length === 0) return;
+
+      trackedEmailInputStart = true;
+      trackAnalyticsEvent("waitlist_email_input_start", {
+        section_id: "waitlist",
+        ...getEmailFieldState(input),
+      });
+    });
+
+    input.addEventListener("blur", () => {
+      trackAnalyticsEvent("waitlist_email_blur", {
+        section_id: "waitlist",
+        ...getEmailFieldState(input),
+      });
+    });
   }
 
   waitlistForm.addEventListener("submit", async (event) => {

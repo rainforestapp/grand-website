@@ -1523,8 +1523,8 @@ h3 {
   .screen-showcase {
     gap: 22px;
     grid-template-areas:
-      "timeline"
       "status"
+      "timeline"
       "alert";
     grid-template-columns: 1fr;
   }

@@ -4,6 +4,21 @@ const SPREADSHEET_ID = "1i2_lUmRSIVA1iN3zaE8mLrR-8QEpOUPKtM8Y6aHfw1w";
 const SHEET_NAME = "Waitlist";
 const EVENT_SHEET_NAME = "Events";
 
+// Separate product lines (gracecompanion, gracephone) share this one endpoint
+// and spreadsheet but land in their own tabs, so their signups/events never mix
+// with Grand's. Payloads carry a `product` field; anything without a known
+// product (i.e. the Grand site) falls through to the default tabs above, so
+// Grand's behavior is completely unchanged.
+const PRODUCT_SHEETS = {
+  gracecompanion: { waitlist: "GraceCompanion Waitlist", events: "GraceCompanion Events" },
+  gracephone: { waitlist: "GracePhone Waitlist", events: "GracePhone Events" },
+};
+
+function sheetNamesForProduct_(product) {
+  const key = String(product || "").trim().toLowerCase();
+  return PRODUCT_SHEETS[key] || { waitlist: SHEET_NAME, events: EVENT_SHEET_NAME };
+}
+
 const HEADERS = [
   "received_at",
   "email",
@@ -122,7 +137,7 @@ function handleWaitlistSignup_(payload) {
   let result;
   try {
     const spreadsheet = getSpreadsheet_();
-    const sheet = getSheet_(spreadsheet, SHEET_NAME);
+    const sheet = getSheet_(spreadsheet, sheetNamesForProduct_(payload.product).waitlist);
     ensureHeaders_(sheet, HEADERS);
     sheet.appendRow(rowForPayload_(email, payload));
     result = {
@@ -150,7 +165,7 @@ function handleWaitlistProfile_(payload) {
   };
 
   const spreadsheet = getSpreadsheet_();
-  const sheet = getSheet_(spreadsheet, SHEET_NAME);
+  const sheet = getSheet_(spreadsheet, sheetNamesForProduct_(payload.product).waitlist);
 
   const lock = LockService.getScriptLock();
   lock.waitLock(10000);
@@ -206,7 +221,7 @@ function handleAnalyticsEvent_(payload) {
   }
 
   const spreadsheet = getSpreadsheet_();
-  const sheet = getSheet_(spreadsheet, EVENT_SHEET_NAME);
+  const sheet = getSheet_(spreadsheet, sheetNamesForProduct_(payload.product).events);
   ensureHeaders_(sheet, EVENT_HEADERS);
   sheet.appendRow(rowForEventPayload_(payload));
 

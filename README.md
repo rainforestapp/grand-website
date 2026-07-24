@@ -133,17 +133,37 @@ test separate product lines under the Grand umbrella.
   `url("/assets/...")` (root-absolute) so background images resolve from the
   subfolder. GitHub Pages serves `/gracecompanion` from `gracecompanion/index.html`
   automatically; the deploy workflow publishes the new folders with no config change.
-- **Lean scaffolding.** Each page keeps the Grand section shells (hero, `#problem`,
-  `#system`, `#attention`, `#tracking`, `#waitlist`) with their eyebrow labels intact
-  as placeholders, but all other content (headings, body copy, product cards, image
-  galleries, lists) is stripped so the pages can be filled in per product. The
-  **call-center (`#response`) section is removed entirely**, along with its nav
-  links. Brand text is "Grace" throughout (the shared `grandeldercare.com` domain and
-  `hello@grandeldercare.com` contact are kept). The Meta/Reddit ad pixels are kept
-  and reuse Grand's pixel IDs (D3) — Grace conversions can be split from Grand's by
-  filtering on URL in Ads Manager. The footers link to the shared root
+- **Lean scaffolding (`/gracephone`).** `/gracephone` keeps the Grand section shells
+  (hero, `#problem`, `#system`, `#attention`, `#tracking`, `#waitlist`) with their
+  eyebrow labels intact as placeholders, but all other content (headings, body copy,
+  product cards, image galleries, lists) is stripped so the page can be filled in per
+  product. The **call-center (`#response`) section is removed entirely**, along with
+  its nav links. Brand text is "Grace" throughout (the shared `grandeldercare.com`
+  domain and `hello@grandeldercare.com` contact are kept). The Meta/Reddit ad pixels
+  are kept and reuse Grand's pixel IDs (D3) — Grace conversions can be split from
+  Grand's by filtering on URL in Ads Manager. The footers link to the shared root
   `/privacy.html` and `/terms.html` (the company-wide Grand legal pages are reused;
   there are no Grace-specific legal pages).
+- **`/gracecompanion` is now a fully built page** (no longer a shell). It documents
+  the Grace companion product end to end — a voice companion that sits on a parent's
+  kitchen counter. **Why:** the companion product needed a page that explains the
+  problem (loneliness, not physical safety) and the product (company first, then
+  daily help, then reaching people). The page is nine sections: hero, **The worry**
+  (`#worry`, centered serif + three real interview quotes), **Meet Grace**
+  (`#meet-grace`), **What Grace does** (`#what-grace-does`), **Grace helps her reach
+  out** (`#reach-out`), **Caregiver experience** (`#caregiver`), **What Grace isn't**
+  (`#what-grace-isnt`), and the unchanged **Early access** waitlist (`#waitlist`).
+  The old `#system`/`#attention`/`#tracking`/`#problem` shells and their dead CSS were
+  replaced; nav + footer + `trackedSections` (in `script.js`) + `welcome.html`'s links
+  were repointed to the new anchors. **All imagery is intentional placeholders** —
+  seven labelled `.img-placeholder` dashed boxes (`data-slot` names describe the shot
+  and note "TBD"), so nothing real ships until industrial design lands. Five visible
+  `[TK]` markers flag unsettled copy (quote attributions, a v1 read-aloud scope
+  question, and a permanent no-camera commitment) on purpose. Copy is verbatim from
+  the reviewed spec — do not paraphrase. **Known a11y note:** the terracotta eyebrow
+  labels (`#b85f4a`) sit at ~3.9:1 on cream and ~3.4:1 on the stone band, below WCAG
+  AA 4.5:1; left unchanged pending a brand-color decision (body text and dark pill
+  buttons pass). The waitlist form (fields, button, handler) is untouched.
 - **Post-signup flow.** After a waitlist signup each Grace page redirects to its own
   in-folder `welcome.html` profiling page (same four optional questions as Grand),
   rebranded to Grace.

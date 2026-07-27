@@ -107,7 +107,7 @@ a {
 .hero-media {
   background:
     var(--surface-sage-soft)
-    url("/assets/hero-pexels-moe-magners-5335290.jpg")
+    url("/assets/gracephone-hero.jpg")
     center center / cover
     no-repeat;
   min-height: 620px;
@@ -1527,8 +1527,8 @@ h3 {
   }
 
   .hero-media {
-    background-image: url("/assets/hero-pexels-moe-magners-5335290-mobile.jpg");
-    background-position: 52% center;
+    background-image: url("/assets/gracephone-hero-mobile.jpg");
+    background-position: center center;
     min-height: 500px;
   }
 
@@ -1687,4 +1687,371 @@ h3 {
     min-height: 48px;
   }
 
+}
+
+/* ---------------------------------------------------------------------------
+   Grace Phone page
+--------------------------------------------------------------------------- */
+.section .eyebrow,
+.waitlist-section .eyebrow {
+  color: var(--status-clay);
+}
+
+.hero-microcopy {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 15px;
+  font-weight: 700;
+  margin: 18px 0 0;
+  max-width: 560px;
+}
+
+.worry-section {
+  background: var(--surface-bone);
+}
+
+.worry-layout {
+  align-items: center;
+  display: grid;
+  gap: clamp(34px, 7vw, 92px);
+  grid-template-columns: minmax(0, 0.95fr) minmax(300px, 0.72fr);
+  margin: 0 auto;
+  max-width: 1120px;
+}
+
+.worry-copy > p:not(.eyebrow) {
+  color: var(--ink-soft);
+  font-size: clamp(18px, 2vw, 22px);
+  line-height: 1.55;
+}
+
+.phone-note-panel {
+  background: var(--surface-card);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-soft);
+  padding: clamp(20px, 3vw, 30px);
+}
+
+.phone-note-label,
+.card-label {
+  color: var(--ink-faint);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0;
+  margin-bottom: 24px;
+  text-transform: uppercase;
+}
+
+.phone-note {
+  border-top: 1px solid var(--hairline);
+  display: grid;
+  gap: 8px;
+  grid-template-columns: 76px 1fr;
+  padding: 18px 0;
+}
+
+.phone-note:last-child {
+  padding-bottom: 0;
+}
+
+.phone-note span {
+  color: var(--status-sage);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.phone-note p {
+  color: var(--ink-soft);
+  font-size: 17px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.system-grid--three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  max-width: 1120px;
+}
+
+.card-media--phone {
+  aspect-ratio: 4 / 3;
+  background:
+    linear-gradient(135deg, rgba(143, 163, 142, 0.15), rgba(184, 95, 74, 0.12)),
+    var(--surface-clear);
+  border-style: solid;
+  color: var(--ink-soft);
+}
+
+.phone-boundary {
+  border-top: 1px solid rgba(26, 24, 22, 0.18);
+  color: var(--ink-soft);
+  font-size: clamp(18px, 2vw, 22px);
+  line-height: 1.5;
+  margin: clamp(34px, 5vw, 54px) auto 0;
+  max-width: 720px;
+  padding-top: 22px;
+  text-align: center;
+}
+
+.helps-section {
+  background: var(--surface-clear);
+}
+
+.phone-section {
+  background: var(--surface-stone);
+}
+
+.phone-split {
+  align-items: start;
+  display: grid;
+  gap: clamp(34px, 7vw, 90px);
+  grid-template-columns: minmax(0, 0.95fr) minmax(300px, 1.05fr);
+  margin: 0 auto;
+  max-width: 1120px;
+}
+
+.phone-copy {
+  max-width: 640px;
+}
+
+.prose p {
+  color: var(--ink-soft);
+  font-size: 18px;
+  line-height: 1.6;
+  margin-bottom: 18px;
+  max-width: 62ch;
+}
+
+.prose p:last-child {
+  margin-bottom: 0;
+}
+
+.phone-ritual {
+  display: grid;
+  gap: 16px;
+}
+
+.phone-ritual div {
+  background: rgba(253, 251, 246, 0.58);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius);
+  display: grid;
+  gap: 8px;
+  grid-template-columns: 42px 1fr;
+  padding: 22px;
+}
+
+.phone-ritual span {
+  color: var(--status-clay);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 34px;
+  grid-row: span 2;
+  line-height: 1;
+}
+
+.phone-ritual strong {
+  color: var(--ink);
+  font-size: 18px;
+}
+
+.phone-ritual p {
+  color: var(--ink-soft);
+  margin: 0;
+}
+
+.elder-section {
+  background: var(--surface-bone);
+}
+
+.value-grid {
+  align-items: start;
+  display: grid;
+  gap: clamp(34px, 7vw, 90px);
+  grid-template-columns: minmax(0, 0.9fr) minmax(320px, 1.1fr);
+  margin: 0 auto;
+  max-width: 1120px;
+}
+
+.value-list {
+  display: grid;
+  gap: 18px;
+}
+
+.value-list article {
+  border-top: 1px solid var(--hairline);
+  padding-top: 18px;
+}
+
+.value-list h3 {
+  font-size: 19px;
+}
+
+.value-list p {
+  color: var(--ink-soft);
+  font-size: 18px;
+  line-height: 1.55;
+  margin: 0;
+}
+
+.family-section {
+  grid-template-columns: minmax(0, 1.02fr) minmax(300px, 0.98fr);
+}
+
+.family-callout {
+  align-self: center;
+  border-left: 3px solid var(--status-clay);
+  max-width: 520px;
+  padding-left: clamp(20px, 3vw, 34px);
+}
+
+.family-callout p {
+  color: var(--ink);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(30px, 4vw, 52px);
+  line-height: 1.05;
+  margin: 0;
+}
+
+.family-callout p + p {
+  color: var(--ink-soft);
+  margin-top: 14px;
+}
+
+.reassurance-section {
+  background: var(--surface-sage-soft);
+}
+
+.reassurance-copy {
+  margin: 0 auto;
+  max-width: 760px;
+}
+
+.reassurance-copy p:not(.eyebrow) {
+  color: var(--ink-soft);
+  font-size: clamp(18px, 2vw, 22px);
+  line-height: 1.55;
+  margin-bottom: 18px;
+}
+
+.reassurance-copy p:last-child {
+  margin-bottom: 0;
+}
+
+.isnt-section,
+.faq-section {
+  background: var(--surface-clear);
+}
+
+.isnt-intro {
+  margin: 0 auto clamp(28px, 4vw, 44px);
+  max-width: 680px;
+}
+
+.isnt-list {
+  list-style: none;
+  margin: 0 auto;
+  max-width: 760px;
+  padding: 0;
+}
+
+.isnt-list li {
+  color: var(--ink-soft);
+  font-size: 18px;
+  line-height: 1.55;
+  padding: 18px 0;
+}
+
+.isnt-list li + li {
+  border-top: 1px solid var(--hairline);
+}
+
+.isnt-list strong {
+  color: var(--ink);
+}
+
+.isnt-major {
+  font-size: 22px;
+}
+
+.faq-list {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0 auto;
+  max-width: 980px;
+}
+
+.faq-list article {
+  background: rgba(253, 251, 246, 0.64);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius);
+  padding: clamp(20px, 3vw, 28px);
+}
+
+.faq-list h3 {
+  font-size: 19px;
+  margin-bottom: 10px;
+}
+
+.faq-list p {
+  color: var(--ink-soft);
+  font-size: 17px;
+  line-height: 1.55;
+  margin: 0;
+}
+
+@media (max-width: 1040px) {
+  .family-section {
+    grid-template-columns: 1fr;
+  }
+
+  .system-grid--three {
+    grid-template-columns: 1fr;
+    max-width: 760px;
+  }
+}
+
+@media (max-width: 900px) {
+  .worry-layout,
+  .phone-split,
+  .value-grid,
+  .family-section {
+    grid-template-columns: 1fr;
+  }
+
+  .phone-note-panel,
+  .family-callout {
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+  }
+
+  .family-callout {
+    max-width: 760px;
+  }
+}
+
+@media (max-width: 720px) {
+  .faq-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .hero-microcopy {
+    font-size: 14px;
+    max-width: 320px;
+  }
+
+  .phone-note {
+    grid-template-columns: 1fr;
+  }
+
+  .phone-ritual div {
+    grid-template-columns: 36px 1fr;
+    padding: 18px;
+  }
+
+  .family-callout p {
+    font-size: clamp(27px, 8vw, 36px);
+  }
 }

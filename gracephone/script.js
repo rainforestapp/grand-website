@@ -9,7 +9,6 @@ const trackedSections = [
   "worry",
   "how-it-works",
   "what-grace-helps",
-  "why-phone",
   "for-her",
   "for-family",
   "reassurance",

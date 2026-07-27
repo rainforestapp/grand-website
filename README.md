@@ -140,11 +140,11 @@ test separate product lines under the Grand umbrella.
   `/gracecompanion`: instead of a cute presence inside the home, Grace Phone is a
   familiar line outward. The page sections are hero, **The worry** (`#worry`),
   **How it works** (`#how-it-works`), **What Grace helps with**
-  (`#what-grace-helps`), **Why a phone** (`#why-phone`), **For the older adult**
-  (`#for-her`), **For family** (`#for-family`), **Peace of mind**
-  (`#reassurance`), **What Grace isn't** (`#what-grace-isnt`), **FAQ** (`#faq`),
-  and the waitlist (`#waitlist`). Nav + footer + `trackedSections` (in
-  `script.js`) + `welcome.html` links were repointed to the new anchors. Brand
+  (`#what-grace-helps`), **For the older adult** (`#for-her`), **For family**
+  (`#for-family`), **Peace of mind** (`#reassurance`), **What Grace isn't**
+  (`#what-grace-isnt`), **FAQ** (`#faq`), and the waitlist (`#waitlist`). Nav +
+  footer + `trackedSections` (in `script.js`) + `welcome.html` links were repointed
+  to the new anchors. Brand
   text is "Grace" throughout (the shared `grandeldercare.com` domain and
   `hello@grandeldercare.com` contact are kept). The Meta/Reddit ad pixels are
   kept and reuse Grand's pixel IDs (D3) — Grace conversions can be split from

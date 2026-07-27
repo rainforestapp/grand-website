@@ -107,7 +107,7 @@ a {
 .hero-media {
   background:
     var(--surface-sage-soft)
-    url("/assets/hero-pexels-moe-magners-5335290.jpg")
+    url("/assets/gracephone-hero.jpg")
     center center / cover
     no-repeat;
   min-height: 620px;
@@ -1527,8 +1527,8 @@ h3 {
   }
 
   .hero-media {
-    background-image: url("/assets/hero-pexels-moe-magners-5335290-mobile.jpg");
-    background-position: 52% center;
+    background-image: url("/assets/gracephone-hero-mobile.jpg");
+    background-position: center center;
     min-height: 500px;
   }
 

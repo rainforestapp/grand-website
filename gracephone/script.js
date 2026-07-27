@@ -5,7 +5,18 @@ const analyticsEndpoint =
 // Grace product line. Tags every payload so the shared Apps Script endpoint
 // routes this product's signups/events into its own spreadsheet tabs.
 const PRODUCT = "gracephone";
-const trackedSections = ["problem", "system", "attention", "tracking", "waitlist"];
+const trackedSections = [
+  "worry",
+  "how-it-works",
+  "what-grace-helps",
+  "why-phone",
+  "for-her",
+  "for-family",
+  "reassurance",
+  "what-grace-isnt",
+  "faq",
+  "waitlist",
+];
 const anchorScrollRetries = [0, 120, 360, 760];
 let fallbackSessionId = "";
 let cachedGeoLocation = null;

@@ -133,17 +133,24 @@ test separate product lines under the Grand umbrella.
   `url("/assets/...")` (root-absolute) so background images resolve from the
   subfolder. GitHub Pages serves `/gracecompanion` from `gracecompanion/index.html`
   automatically; the deploy workflow publishes the new folders with no config change.
-- **Lean scaffolding (`/gracephone`).** `/gracephone` keeps the Grand section shells
-  (hero, `#problem`, `#system`, `#attention`, `#tracking`, `#waitlist`) with their
-  eyebrow labels intact as placeholders, but all other content (headings, body copy,
-  product cards, image galleries, lists) is stripped so the page can be filled in per
-  product. The **call-center (`#response`) section is removed entirely**, along with
-  its nav links. Brand text is "Grace" throughout (the shared `grandeldercare.com`
-  domain and `hello@grandeldercare.com` contact are kept). The Meta/Reddit ad pixels
-  are kept and reuse Grand's pixel IDs (D3) — Grace conversions can be split from
+- **`/gracephone` is now a fully built page** (no longer a shell). It positions
+  Grace as a familiar home phone that is also a regular phone: a way to pick up
+  and talk to Grace for reminders, questions, family messages, conversation, and
+  permissioned check-ins. **Why:** this tests a different emotional premise from
+  `/gracecompanion`: instead of a cute presence inside the home, Grace Phone is a
+  familiar line outward. The page sections are hero, **The worry** (`#worry`),
+  **How it works** (`#how-it-works`), **What Grace helps with**
+  (`#what-grace-helps`), **Why a phone** (`#why-phone`), **For the older adult**
+  (`#for-her`), **For family** (`#for-family`), **Peace of mind**
+  (`#reassurance`), **What Grace isn't** (`#what-grace-isnt`), **FAQ** (`#faq`),
+  and the waitlist (`#waitlist`). Nav + footer + `trackedSections` (in
+  `script.js`) + `welcome.html` links were repointed to the new anchors. Brand
+  text is "Grace" throughout (the shared `grandeldercare.com` domain and
+  `hello@grandeldercare.com` contact are kept). The Meta/Reddit ad pixels are
+  kept and reuse Grand's pixel IDs (D3) — Grace conversions can be split from
   Grand's by filtering on URL in Ads Manager. The footers link to the shared root
-  `/privacy.html` and `/terms.html` (the company-wide Grand legal pages are reused;
-  there are no Grace-specific legal pages).
+  `/privacy.html` and `/terms.html` (the company-wide Grand legal pages are
+  reused; there are no Grace-specific legal pages).
 - **`/gracecompanion` is now a fully built page** (no longer a shell). It documents
   the Grace companion product end to end — a voice companion that sits on a parent's
   kitchen counter. **Why:** the companion product needed a page that explains the

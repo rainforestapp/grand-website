@@ -8,12 +8,10 @@ const PRODUCT = "gracephone";
 const trackedSections = [
   "worry",
   "how-it-works",
-  "what-grace-helps",
-  "for-her",
-  "for-family",
-  "reassurance",
+  "what-grace-does",
+  "reach-out",
+  "caregiver",
   "what-grace-isnt",
-  "faq",
   "waitlist",
 ];
 const anchorScrollRetries = [0, 120, 360, 760];

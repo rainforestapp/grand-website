@@ -21,7 +21,7 @@ let cachedUserAgentData = null;
 
 // Best-effort, non-blocking IP geolocation. Kicked off on load (homepage only)
 // so a coarse location is usually ready by the time the visitor submits. We
-// never block or fail a signup on this — see buildWaitlistPayload.
+// never block or fail a signup on this - see buildWaitlistPayload.
 if (waitlistForm) {
   fetchGeoLocation()
     .then((geo) => {
@@ -592,7 +592,7 @@ if (profileForm) {
         doneMessage.hidden = false;
         doneMessage.scrollIntoView({ behavior: "smooth", block: "center" });
       } else {
-        setProfileStatus("Thank you — we've got everything we need.", "success");
+        setProfileStatus("Thank you - we've got everything we need.", "success");
       }
     } catch (error) {
       console.warn(error);

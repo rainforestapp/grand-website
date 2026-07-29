@@ -154,7 +154,9 @@ test separate product lines under the Grand umbrella.
   reused; there are no Grace-specific legal pages).
 - **`/grace` is a clone of `/gracecompanion`.** It keeps the same page content,
   post-signup flow, tracking product identifier, and Grace Companion waitlist routing,
-  with canonical/Open Graph/schema URLs repointed to `/grace`.
+  with canonical/Open Graph/schema URLs repointed to `/grace`. Its visible CTA and
+  profiling copy are aligned with the tester-focused Grand CTA update: "Become a
+  tester," an early Grace tester note, and "ZIP code of your loved one."
 - **`/gracecompanion` is now a fully built page** (no longer a shell). It documents
   the Grace companion product end to end — a voice companion that sits on a parent's
   kitchen counter. **Why:** the companion product needed a page that explains the

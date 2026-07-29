@@ -36,7 +36,7 @@ Static landing-page wireframe for Grand.
   - **Real conversion events.** Both pixels previously fired only `PageView`/`PageVisit`, so ad platforms couldn't see signups. `script.js` now fires `fbq('track','Lead')` + `rdt('track','SignUp')` on signup, and `fbq('track','CompleteRegistration')` + `rdt('track','Lead')` on profile completion.
 - Added **Privacy Policy (`privacy.html`)** and **Terms of Service (`terms.html`)** pages and linked both from the footer of `index.html`, `welcome.html`, and each other. **Why:** the site runs Meta and Reddit ad pixels and collects waitlist emails plus optional profile data, so it needs a published privacy policy and terms — and the ad platforms require a linked privacy policy for pixel/conversion use. Both pages are boilerplate written from what we know about Grand (pre-launch home-sensor product, waitlist only, US-based call center is not yet live), using a new shared `.legal-*` layout in `styles.css` (readable 760px prose column, serif section headings, clay links) that matches the site's warm surfaces and editorial type. The privacy policy explicitly discloses that **a waitlist sign-up is recorded as a conversion event and shared back to advertising partners (Meta, Reddit)** so campaigns can be measured — the specific fact the team wanted stated. The legal pages deliberately omit the Meta/Reddit pixel snippets (no need to fire ad tracking on the privacy/terms pages themselves) and are indexable (added to `sitemap.xml`). One placeholder to confirm with counsel: governing law is set to Delaware. All contact addresses site-wide use `hello@grandeldercare.com` — a `mailto:` typo (`grandelderare.com`, missing a "c") in the `index.html` and `welcome.html` footers was corrected as part of this change.
 - Rebuilt the site footer: a top row with a "Contact us" label + `hello@grandeldercare.com` `mailto:` link on the left and the four nav links as a single right-aligned column, above a bottom bar with the `grand.` wordmark logo (`assets/grand-logo.png`) on the bottom-left and the copyright on the bottom-right (no divider — the footer reads as one section). **Why:** earlier footer iterations laid the nav links out as a run-on horizontal line, then as labelled columns that still read as cluttered. This is the simplified layout the team asked for. The "Grand is not a replacement for 911 or professional medical care" disclaimer was dropped per request, and the earlier "Quiet home monitoring…" tagline was removed from the footer (it wasn't requested). The logo is the brand wordmark trimmed and made transparent (cream background removed) so it blends on the footer surface.
-- Added two **"Grace" product-experiment subpages** at `/gracecompanion` and `/gracephone` as lean, de-branded scaffolds. **Why:** we want to test separate product lines under the Grand umbrella without touching the main Grand page or linking the three sites together. See the "Grace Product Subpages" section below. The main Grand page (`index.html`) and all its supporting files were left completely untouched.
+- Added **"Grace" product-experiment subpages** at `/gracecompanion` and `/gracephone` as lean, de-branded scaffolds, with `/grace` now available as a clone of `/gracecompanion`. **Why:** we want to test separate product lines under the Grand umbrella without touching the main Grand page or linking the sites together. See the "Grace Product Subpages" section below. The main Grand page (`index.html`) and all its supporting files were left completely untouched.
 
 ## SEO & Indexing
 
@@ -116,23 +116,24 @@ Every content section leads with a standardized eyebrow (uppercase, 12px, clay `
 
 ## Grace Product Subpages
 
-`/gracecompanion` and `/gracephone` are two independent product-experiment sites
+`/gracecompanion`, `/grace`, and `/gracephone` are independent product-experiment sites
 that start as lean, de-branded duplicates of the main Grand page. They are meant to
 test separate product lines under the Grand umbrella.
 
 - **Three independent sites, no cross-links.** There are deliberately **no
-  navigational links** between Grand, `/gracecompanion`, and `/gracephone` — the
+  navigational links** between Grand, `/gracecompanion`, `/grace`, and `/gracephone` — the
   only way to reach a Grace page is to type/visit its URL. The Grace pages are also
   **left out of `sitemap.xml`** so they aren't publicly discoverable via SEO.
-- **Self-contained folders (isolation over DRY).** Each product is a folder
-  (`gracecompanion/`, `gracephone/`) with its own `index.html`, `welcome.html`, and
+- **Self-contained folders (isolation over DRY).** Each Grace route is a folder
+  (`gracecompanion/`, `grace/`, `gracephone/`) with its own `index.html`, `welcome.html`, and
   its **own copies** of `styles.css` and `script.js`. This means editing a Grace
   page can never affect Grand or the other Grace product. The tradeoff: future style
   changes must be applied per folder. Shared images are referenced with
   **root-absolute** paths (`/assets/...`), and the CSS copies were edited to use
   `url("/assets/...")` (root-absolute) so background images resolve from the
-  subfolder. GitHub Pages serves `/gracecompanion` from `gracecompanion/index.html`
-  automatically; the deploy workflow publishes the new folders with no config change.
+  subfolder. GitHub Pages serves `/gracecompanion` and `/grace` from their in-folder
+  `index.html` files automatically; the deploy workflow publishes the new folders
+  with no config change.
 - **`/gracephone` is now a fully built page** (no longer a shell). It positions
   Grace as a familiar home phone that is also a regular phone: a way to pick up
   and talk to Grace for reminders, questions, family messages, conversation, and
@@ -151,6 +152,9 @@ test separate product lines under the Grand umbrella.
   Grand's by filtering on URL in Ads Manager. The footers link to the shared root
   `/privacy.html` and `/terms.html` (the company-wide Grand legal pages are
   reused; there are no Grace-specific legal pages).
+- **`/grace` is a clone of `/gracecompanion`.** It keeps the same page content,
+  post-signup flow, tracking product identifier, and Grace Companion waitlist routing,
+  with canonical/Open Graph/schema URLs repointed to `/grace`.
 - **`/gracecompanion` is now a fully built page** (no longer a shell). It documents
   the Grace companion product end to end — a voice companion that sits on a parent's
   kitchen counter. **Why:** the companion product needed a page that explains the
@@ -177,10 +181,11 @@ test separate product lines under the Grand umbrella.
 
 ### Grace waitlist storage (separate tabs, one endpoint)
 
-All three sites POST to the **same** Apps Script endpoint. Grace signups carry a
-`product` field (`gracecompanion` / `gracephone`) set in each folder's `script.js`
-copy (also on the profile and analytics payloads, plus product-scoped
-`sessionStorage` keys). `waitlist.gs` routes by that field:
+All three Grace routes POST to the **same** Apps Script endpoint. Grace signups carry a
+`product` field set in each folder's `script.js` copy (`/gracecompanion` and
+`/grace` use `gracecompanion`; `/gracephone` uses `gracephone`). The same field is
+also on the profile and analytics payloads, plus product-scoped `sessionStorage`
+keys. `waitlist.gs` routes by that field:
 
 - `PRODUCT_SHEETS` + `sheetNamesForProduct_()` map each product to its own tabs —
   `GraceCompanion Waitlist`/`GraceCompanion Events` and

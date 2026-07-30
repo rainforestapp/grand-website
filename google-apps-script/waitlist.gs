@@ -62,6 +62,7 @@ const HEADERS = [
   "lives_alone",
   "alpha_tester",
   "profile_completed_at",
+  "full_name",
 ];
 
 const EVENT_HEADERS = [
@@ -157,6 +158,7 @@ function handleWaitlistProfile_(payload) {
   const email = String(payload.email || "").trim().toLowerCase();
 
   const profileValues = {
+    full_name: String(payload.full_name || "").trim(),
     zipcode: String(payload.zipcode || "").trim(),
     reason_interested: String(payload.reason_interested || "").trim(),
     lives_alone: String(payload.lives_alone || "").trim(),
@@ -351,7 +353,8 @@ function rowForPayload_(email, payload) {
     geo.country || "",
     geo.postal || "",
     // zipcode, reason_interested, lives_alone, alpha_tester,
-    // profile_completed_at are left empty here and filled by the profile page.
+    // profile_completed_at, and full_name are left empty here and filled by
+    // the profile page.
   ];
 }
 

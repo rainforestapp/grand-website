@@ -541,6 +541,7 @@ function buildProfilePayload(form) {
     product: PRODUCT,
     email,
     source: "gracephone-website",
+    full_name: String(data.get("full_name") || "").trim(),
     zipcode: String(data.get("zipcode") || "").trim(),
     reason_interested: String(data.get("reason_interested") || "").trim(),
     lives_alone: String(data.get("lives_alone") || ""),

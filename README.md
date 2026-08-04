@@ -167,6 +167,18 @@ test separate product lines under the Grand umbrella.
 - **Post-signup flow.** After a waitlist signup each Grace page redirects to its own
   in-folder `welcome.html` profiling page (same four optional questions as Grand),
   rebranded to Grace.
+- **`/gracecompanion` waitlist row spacing + `#worry` copy revision.** Bumped the
+  `.form-row` gap from `8px` to `20px` (desktop only; the mobile stacked layout keeps
+  its `8px` vertical gap). **Why:** the input runs flush to the button, so a trailing
+  icon that lands at the input's right edge — e.g. a browser password-manager badge
+  like Proton Pass — crowded the button and looked cramped; the roomier gap gives that
+  edge breathing room without changing the form's function or copy. Separately,
+  rewrote the two `#worry` paragraphs at the founder's request to lead with "She says
+  she's fine, and physically that's true." and land on the caregiver's own limits
+  ("you can't be there for her as much as she needs"), replacing the earlier
+  loneliness framing. This supersedes the "verbatim from the reviewed spec" note above
+  for that block; two typos in the supplied copy ("physcially", "your try") were
+  corrected.
 
 ### Grace waitlist storage (separate tabs, one endpoint)
 

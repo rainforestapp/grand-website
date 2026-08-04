@@ -673,7 +673,9 @@ h3 {
   border: 1px solid var(--hairline);
   border-radius: 999px;
   display: flex;
-  gap: 8px;
+  /* Roomier gap so a trailing icon at the input's right edge (e.g. a browser
+     password-manager badge) has breathing room instead of crowding the button. */
+  gap: 20px;
   padding: 8px;
 }
 
@@ -1278,6 +1280,9 @@ h3 {
 
   .form-row {
     border-radius: 22px;
+    /* Stacked column here, so this gap is vertical between input and button;
+       keep it tight (the roomier desktop gap would look like a floating gap). */
+    gap: 8px;
   }
 
   .form-row input {

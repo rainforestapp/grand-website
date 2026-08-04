@@ -4,10 +4,10 @@ const analyticsEndpoint =
   (waitlistForm || profileForm)?.dataset.waitlistEndpoint?.trim() || "";
 // Grace product line. Tags every payload so the shared Apps Script endpoint
 // routes this product's signups/events into its own spreadsheet tabs.
-const PRODUCT = "gracephone";
+const PRODUCT = "gracecompanion";
 const trackedSections = [
   "worry",
-  "how-it-works",
+  "meet-grace",
   "what-grace-does",
   "reach-out",
   "caregiver",
@@ -21,7 +21,7 @@ let cachedUserAgentData = null;
 
 // Best-effort, non-blocking IP geolocation. Kicked off on load (homepage only)
 // so a coarse location is usually ready by the time the visitor submits. We
-// never block or fail a signup on this — see buildWaitlistPayload.
+// never block or fail a signup on this - see buildWaitlistPayload.
 if (waitlistForm) {
   fetchGeoLocation()
     .then((geo) => {
@@ -36,7 +36,7 @@ if (waitlistForm) {
 }
 
 function getSessionId() {
-  const key = "gracephone_analytics_session_id";
+  const key = "gracecompanion_analytics_session_id";
 
   try {
     const storedSessionId = window.sessionStorage.getItem(key);
@@ -355,7 +355,7 @@ function buildWaitlistPayload(email) {
     type: "waitlist_signup",
     product: PRODUCT,
     email,
-    source: "gracephone-website",
+    source: "gracecompanion-website",
     submitted_at: new Date().toISOString(),
     page_url: window.location.href,
     referrer: document.referrer || "",
@@ -503,7 +503,7 @@ if (waitlistForm) {
       // the profile page's referrer/pixel traffic. The success message above
       // stays visible if navigation is blocked.
       try {
-        window.sessionStorage.setItem("gracephone_signup_email", email);
+        window.sessionStorage.setItem("gracecompanion_signup_email", email);
       } catch {}
       window.location.assign("welcome.html");
     } catch (error) {
@@ -531,7 +531,7 @@ function setProfileStatus(message, type = "neutral") {
 function buildProfilePayload(form) {
   let email = "";
   try {
-    email = window.sessionStorage.getItem("gracephone_signup_email") || "";
+    email = window.sessionStorage.getItem("gracecompanion_signup_email") || "";
   } catch {}
 
   const data = new FormData(form);
@@ -540,7 +540,7 @@ function buildProfilePayload(form) {
     type: "waitlist_profile",
     product: PRODUCT,
     email,
-    source: "gracephone-website",
+    source: "gracecompanion-website",
     full_name: String(data.get("full_name") || "").trim(),
     zipcode: String(data.get("zipcode") || "").trim(),
     reason_interested: String(data.get("reason_interested") || "").trim(),
@@ -593,7 +593,7 @@ if (profileForm) {
         doneMessage.hidden = false;
         doneMessage.scrollIntoView({ behavior: "smooth", block: "center" });
       } else {
-        setProfileStatus("Thank you — we've got everything we need.", "success");
+        setProfileStatus("Thank you - we've got everything we need.", "success");
       }
     } catch (error) {
       console.warn(error);

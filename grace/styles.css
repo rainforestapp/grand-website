@@ -337,10 +337,34 @@ h3 {
   background: var(--surface-clear);
 }
 
-.worry-copy {
+.worry-lead {
+  align-items: center;
+  display: grid;
+  gap: clamp(32px, 5vw, 72px);
+  grid-template-columns: minmax(0, 1fr) 380px;
   margin: 0 auto;
+  max-width: 1000px;
+}
+
+.worry-copy {
   max-width: 60ch;
-  text-align: center;
+  text-align: left;
+}
+
+.worry-photo {
+  aspect-ratio: 3 / 4;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-soft);
+  margin: 0;
+  overflow: hidden;
+  width: 100%;
+}
+
+.worry-photo img {
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
 }
 
 .worry-copy p:not(.eyebrow) {
@@ -387,16 +411,51 @@ h3 {
 
 /* ---- 3. Meet Grace ------------------------------------------------------- */
 .meet-section {
+  --meet-content-max: 1120px;
+  --meet-gutter: max(clamp(20px, 5vw, 72px), calc((100vw - var(--meet-content-max)) / 2));
   background: var(--surface-stone);
+  color: #2a2724;
+  padding: 96px 0 128px;
+}
+
+.meet-section .section-intro {
+  margin: 0 auto 40px;
+  max-width: min(var(--meet-content-max), calc(100% - (var(--meet-gutter) * 2)));
+  text-align: left;
+}
+
+.meet-section h2 {
+  color: #2a2724;
+  font-size: clamp(40px, 4.5vw, 64px);
+  line-height: 1.05;
+  margin-bottom: 0;
+  max-width: none;
+  white-space: nowrap;
 }
 
 .meet-media {
   align-items: start;
   display: grid;
-  gap: clamp(18px, 3vw, 28px);
-  grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
-  margin: 0 auto clamp(34px, 5vw, 56px);
-  max-width: 1040px;
+  gap: clamp(40px, 5vw, 64px);
+  grid-template-columns: 560px minmax(0, 1fr);
+  margin: 0 auto;
+  max-width: min(var(--meet-content-max), calc(100% - (var(--meet-gutter) * 2)));
+}
+
+.meet-photo {
+  aspect-ratio: 4 / 3;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-soft);
+  margin: 0;
+  overflow: hidden;
+  width: 560px;
+}
+
+.meet-photo img {
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
 }
 
 .meet-body {
@@ -404,29 +463,44 @@ h3 {
   max-width: 680px;
 }
 
+.meet-media .meet-body {
+  align-self: start;
+  margin: 0;
+  max-width: 440px;
+}
+
 .meet-body p {
-  font-size: clamp(18px, 2vw, 21px);
+  color: rgba(42, 39, 36, 0.7);
+  font-size: 20px;
+  line-height: 1.5;
   max-width: none;
 }
 
+.meet-body .meet-deck {
+  color: rgba(42, 39, 36, 0.7);
+  font-size: 24px;
+  line-height: 1.35;
+  margin: 0 0 24px;
+}
+
 .spec-strip {
+  border-top: 1px solid rgba(42, 39, 36, 0.16);
   display: grid;
-  gap: 18px;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  margin: 0 auto;
-  max-width: 1040px;
+  gap: 40px 64px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 96px auto 0;
+  max-width: min(var(--meet-content-max), calc(100% - (var(--meet-gutter) * 2)));
+  padding-top: 24px;
 }
 
 .spec-item {
-  border-top: 1px solid var(--hairline);
-  color: var(--ink-soft);
+  color: rgba(42, 39, 36, 0.7);
   font-size: 18px;
   line-height: 1.5;
-  padding-top: 18px;
 }
 
 .spec-item strong {
-  color: var(--ink);
+  color: #2a2724;
   display: block;
   margin-bottom: 4px;
 }
@@ -476,6 +550,21 @@ h3 {
   max-width: none;
 }
 
+.feature-photo {
+  aspect-ratio: 4 / 3;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-soft);
+  margin: 0;
+  overflow: hidden;
+}
+
+.feature-photo img {
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
 .does-list {
   display: grid;
   gap: 16px;
@@ -499,106 +588,7 @@ h3 {
   font-style: italic;
 }
 
-/* ---- 5. Grace helps her reach out ---------------------------------------- */
-.reach-section {
-  background: var(--surface-stone);
-}
-
-.reach-copy {
-  margin: 0 auto;
-  max-width: 720px;
-}
-
-.reach-copy h2 {
-  margin-bottom: 24px;
-}
-
-.reach-copy .prose p {
-  font-size: clamp(18px, 2vw, 21px);
-  max-width: none;
-}
-
-.reach-diagram {
-  margin: clamp(40px, 6vw, 64px) auto 0;
-  max-width: 900px;
-}
-
-.reach-callout {
-  border-left: 3px solid var(--status-clay);
-  margin: clamp(40px, 6vw, 64px) auto 0;
-  max-width: 720px;
-  padding-left: clamp(18px, 3vw, 28px);
-}
-
-.reach-callout p {
-  color: var(--ink);
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(20px, 2.4vw, 27px);
-  line-height: 1.4;
-  margin: 0;
-}
-
-/* ---- 6. Caregiver experience --------------------------------------------- */
-.caregiver-section {
-  align-items: start;
-  background: var(--surface-clear);
-  display: grid;
-  gap: clamp(34px, 7vw, 90px);
-  grid-template-columns: minmax(300px, 0.82fr) minmax(0, 1.18fr);
-}
-
-.caregiver-media {
-  justify-self: center;
-  max-width: 420px;
-  width: 100%;
-}
-
-.caregiver-copy {
-  max-width: 640px;
-}
-
-.caregiver-intro {
-  color: var(--ink-soft);
-  font-size: clamp(18px, 2vw, 22px);
-  line-height: 1.5;
-}
-
-.caregiver-features {
-  display: grid;
-  gap: 22px;
-  margin-top: clamp(28px, 4vw, 40px);
-}
-
-.caregiver-features article {
-  border-top: 1px solid var(--hairline);
-  padding-top: 20px;
-}
-
-.caregiver-features h3 {
-  font-size: 19px;
-  margin-bottom: 8px;
-}
-
-.caregiver-features p {
-  color: var(--ink-soft);
-  font-size: 18px;
-  line-height: 1.55;
-  margin: 0 0 10px;
-}
-
-.caregiver-features p:last-child {
-  margin-bottom: 0;
-}
-
-.caregiver-aside {
-  font-style: italic;
-}
-
-.caregiver-features strong {
-  color: var(--ink);
-}
-
-/* ---- 7. What Grace isn't ------------------------------------------------- */
+/* ---- 5. What Grace isn't ------------------------------------------------- */
 .isnt-section {
   background: var(--surface-stone);
 }
@@ -1116,32 +1106,51 @@ h3 {
     padding-top: 120px;
   }
 
-  .caregiver-section,
   .does-block {
     grid-template-columns: 1fr;
   }
 
+  .meet-section {
+    --meet-gutter: clamp(20px, 5vw, 72px);
+    padding: 64px 0 96px;
+  }
+
+  .meet-section .section-intro {
+    margin-bottom: 40px;
+  }
+
+  .meet-section h2 {
+    white-space: normal;
+  }
+
   .meet-media {
+    gap: 24px;
     grid-template-columns: 1fr;
-    margin-inline: auto;
-    max-width: 560px;
+  }
+
+  .meet-photo {
+    width: 100%;
   }
 
   .spec-strip {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-top: 64px;
+  }
+
+  .worry-lead {
+    gap: 32px;
+    grid-template-columns: 1fr;
+    max-width: 560px;
+  }
+
+  .worry-photo {
+    max-width: 380px;
+    order: -1;
   }
 
   .worry-quotes {
     grid-template-columns: 1fr;
     max-width: 560px;
-  }
-
-  .caregiver-copy {
-    max-width: 760px;
-  }
-
-  .caregiver-media {
-    max-width: 340px;
   }
 
   .site-footer {
@@ -1245,6 +1254,30 @@ h3 {
     padding: 58px 18px;
   }
 
+  .meet-section {
+    padding: 58px 0 64px;
+  }
+
+  .meet-section .section-intro {
+    max-width: calc(100% - (var(--meet-gutter) * 2));
+  }
+
+  .meet-section h2 {
+    font-size: clamp(40px, 11vw, 48px);
+  }
+
+  .meet-deck {
+    font-size: 22px;
+  }
+
+  .meet-media {
+    max-width: calc(100% - (var(--meet-gutter) * 2));
+  }
+
+  .meet-body p {
+    font-size: 18px;
+  }
+
   .hero-intro {
     font-size: 18px;
     max-width: 340px;
@@ -1262,14 +1295,11 @@ h3 {
 
   .spec-strip {
     grid-template-columns: 1fr;
+    margin-top: 64px;
   }
 
   .worry-copy p:not(.eyebrow) {
     font-size: clamp(21px, 6vw, 26px);
-  }
-
-  .reach-callout p {
-    font-size: clamp(19px, 5.5vw, 23px);
   }
 
   .waitlist-section {

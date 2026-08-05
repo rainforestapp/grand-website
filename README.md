@@ -192,6 +192,17 @@ test separate product lines under the Grand umbrella.
   loneliness framing. This supersedes the "verbatim from the reviewed spec" note above
   for that block; two typos in the supplied copy ("physcially", "your try") were
   corrected.
+- **`/grace` `#worry` section now grounds the problem with a photo.** Added
+  `assets/worry-alone.jpg` (an older woman sitting alone in a dim living room at dusk,
+  the cordless phone on the side table beside her) next to the worry copy. The copy and
+  image now sit in a `.worry-lead` two-column grid (text left, 380px image right,
+  vertically centered) above the existing three interview quotes. **Why:** the worry
+  section was text-only, so the anxiety it describes had nothing visual to land on — the
+  photo makes "she lives alone, and the days are long" concrete before the reader hits
+  the copy. On ≤900px the grid collapses to one column and the image is ordered *above*
+  the text (`order: -1`) so it grounds the problem first on mobile. The source PNG was
+  converted to a ~290KB JPG (1000px wide, matching the light-weight `meet-grace-hero.jpg`
+  treatment) rather than shipped as a 2.1MB PNG.
 
 ### Grace waitlist storage (separate tabs, one endpoint)
 

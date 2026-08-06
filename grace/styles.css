@@ -409,11 +409,11 @@ h3 {
   text-transform: uppercase;
 }
 
-/* ---- 3. Meet Grace ------------------------------------------------------- */
+/* ---- 3. How Grace works -------------------------------------------------- */
 .meet-section {
   --meet-content-max: 1120px;
   --meet-gutter: max(clamp(20px, 5vw, 72px), calc((100vw - var(--meet-content-max)) / 2));
-  background: var(--surface-stone);
+  background: var(--surface-clear);
   color: #2a2724;
   padding: 96px 0 128px;
 }
@@ -507,7 +507,7 @@ h3 {
 
 /* ---- 4. What Grace does -------------------------------------------------- */
 .does-section {
-  background: var(--surface-clear);
+  background: var(--surface-stone);
 }
 
 .does-block {

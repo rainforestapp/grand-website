@@ -37,6 +37,8 @@ Static landing-page wireframe for Grand.
 - Added **Privacy Policy (`privacy.html`)** and **Terms of Service (`terms.html`)** pages and linked both from the footer of `index.html`, `welcome.html`, and each other. **Why:** the site runs Meta and Reddit ad pixels and collects waitlist emails plus optional profile data, so it needs a published privacy policy and terms — and the ad platforms require a linked privacy policy for pixel/conversion use. Both pages are boilerplate written from what we know about Grand (pre-launch home-sensor product, waitlist only, US-based call center is not yet live), using a new shared `.legal-*` layout in `styles.css` (readable 760px prose column, serif section headings, clay links) that matches the site's warm surfaces and editorial type. The privacy policy explicitly discloses that **a waitlist sign-up is recorded as a conversion event and shared back to advertising partners (Meta, Reddit)** so campaigns can be measured — the specific fact the team wanted stated. The legal pages deliberately omit the Meta/Reddit pixel snippets (no need to fire ad tracking on the privacy/terms pages themselves) and are indexable (added to `sitemap.xml`). One placeholder to confirm with counsel: governing law is set to Delaware. All contact addresses site-wide use `hello@grandeldercare.com` — a `mailto:` typo (`grandelderare.com`, missing a "c") in the `index.html` and `welcome.html` footers was corrected as part of this change.
 - Rebuilt the site footer: a top row with a "Contact us" label + `hello@grandeldercare.com` `mailto:` link on the left and the four nav links as a single right-aligned column, above a bottom bar with the `grand.` wordmark logo (`assets/grand-logo.png`) on the bottom-left and the copyright on the bottom-right (no divider — the footer reads as one section). **Why:** earlier footer iterations laid the nav links out as a run-on horizontal line, then as labelled columns that still read as cluttered. This is the simplified layout the team asked for. The "Grand is not a replacement for 911 or professional medical care" disclaimer was dropped per request, and the earlier "Quiet home monitoring…" tagline was removed from the footer (it wasn't requested). The logo is the brand wordmark trimmed and made transparent (cream background removed) so it blends on the footer surface.
 - Added **"Grace" product-experiment subpages** at `/gracecompanion` and `/gracephone` as lean, de-branded scaffolds, with `/grace` now available as a clone of `/gracecompanion`. **Why:** we want to test separate product lines under the Grand umbrella without touching the main Grand page or linking the sites together. See the "Grace Product Subpages" section below. The main Grand page (`index.html`) and all its supporting files were left completely untouched.
+- **Consolidated the Grace experiment to a single `/grace` page.** Deleted the `gracecompanion/` and `gracephone/` folders, leaving `/grace` as the only Grace site. **Why:** we no longer need three parallel product-line experiments — one Grace page is enough to maintain and iterate on. This supersedes the "three independent sites" model above. On the next deploy the `rsync --delete` step drops the live `/gracecompanion` and `/gracephone` URLs automatically; nothing else referenced them (no cross-nav, not in `sitemap.xml`), and the root Grand site is untouched. `/grace` keeps its existing `product = "gracecompanion"` waitlist tag so signups continue flowing to the GraceCompanion sheet tabs (data continuity; the label is invisible to users).
+- **Standardized the `/grace` "What Grace does" section to list format.** Converted the two flowing-paragraph blocks ("Grace keeps her company", "She brings people closer") to the same `.does-list` bold-lead-in style as the middle block, and removed the leftover `[TK - confirm in v1]` read-aloud marker. **Why:** the section mixed prose and list formatting; the founder found the scannable bold-lead-in list easier to read, so all three blocks now match. HTML-only change — `.does-list` was already defined in `grace/styles.css`.
 
 ## SEO & Indexing
 
@@ -114,116 +116,57 @@ Every content section leads with a standardized eyebrow (uppercase, 12px, clay `
 - Post-signup profile page (`welcome.html`, `noindex`): optional full name, ZIP, reason for interest, whether the person Grand is for lives alone, and alpha-tester interest, styled with the shared `styles.css` `.profile-*` rules.
 - Site footer: a top row ("Contact us" label + `hello@grandeldercare.com` on the left, nav links — including Privacy Policy and Terms of Service — as a right-aligned single column) above a bottom bar with the `grand.` logo bottom-left and the copyright bottom-right.
 
-## Grace Product Subpages
+## Grace Product Subpage
 
-`/gracecompanion`, `/grace`, and `/gracephone` are independent product-experiment sites
-that start as lean, de-branded duplicates of the main Grand page. They are meant to
-test separate product lines under the Grand umbrella.
+`/grace` is an independent product-experiment site for the Grace companion — a voice
+companion that sits on a parent's kitchen counter. It began as a de-branded duplicate
+of the main Grand page and is now the only Grace page (the earlier `/gracecompanion`
+and `/gracephone` experiments were removed; see the consolidation note in Status).
 
-- **Three independent sites, no cross-links.** There are deliberately **no
-  navigational links** between Grand, `/gracecompanion`, `/grace`, and `/gracephone` — the
-  only way to reach a Grace page is to type/visit its URL. The Grace pages are also
-  **left out of `sitemap.xml`** so they aren't publicly discoverable via SEO.
-- **Self-contained folders (isolation over DRY).** Each Grace route is a folder
-  (`gracecompanion/`, `grace/`, `gracephone/`) with its own `index.html`, `welcome.html`, and
-  its **own copies** of `styles.css` and `script.js`. This means editing a Grace
-  page can never affect Grand or the other Grace product. The tradeoff: future style
-  changes must be applied per folder. Shared images are referenced with
-  **root-absolute** paths (`/assets/...`), and the CSS copies were edited to use
-  `url("/assets/...")` (root-absolute) so background images resolve from the
-  subfolder. GitHub Pages serves `/gracecompanion` and `/grace` from their in-folder
-  `index.html` files automatically; the deploy workflow publishes the new folders
-  with no config change.
-- **`/gracephone` is now a fully built page** (no longer a shell). It positions
-  Grace as a familiar home phone that is also a regular phone: a way to pick up
-  and talk to Grace for reminders, questions, family messages, conversation, and
-  permissioned check-ins. **Why:** this tests a different emotional premise from
-  `/gracecompanion`: instead of a cute presence inside the home, Grace Phone is a
-  familiar line outward. The page sections are hero, **The worry** (`#worry`),
-  **How it works** (`#how-it-works`), **What Grace helps with**
-  (`#what-grace-helps`), **For the older adult** (`#for-her`), **For family**
-  (`#for-family`), **Peace of mind** (`#reassurance`), **What Grace isn't**
-  (`#what-grace-isnt`), **FAQ** (`#faq`), and the waitlist (`#waitlist`). Nav +
-  footer + `trackedSections` (in `script.js`) + `welcome.html` links were repointed
-  to the new anchors. Brand
-  text is "Grace" throughout (the shared `grandeldercare.com` domain and
-  `hello@grandeldercare.com` contact are kept). The Meta/Reddit ad pixels are
-  kept and reuse Grand's pixel IDs (D3) — Grace conversions can be split from
-  Grand's by filtering on URL in Ads Manager. The footers link to the shared root
-  `/privacy.html` and `/terms.html` (the company-wide Grand legal pages are
-  reused; there are no Grace-specific legal pages).
-- **`/grace` is a clone of `/gracecompanion`.** It keeps the same page content,
-  post-signup flow, tracking product identifier, and Grace Companion waitlist routing,
-  with canonical/Open Graph/schema URLs repointed to `/grace`. Its visible CTA and
-  profiling copy are aligned with the tester-focused Grand CTA update: "Become a
-  tester," an early Grace tester note, and "ZIP code of your loved one."
-- **`/gracecompanion` is now a fully built page** (no longer a shell). It documents
-  the Grace companion product end to end — a voice companion that sits on a parent's
-  kitchen counter. **Why:** the companion product needed a page that explains the
-  problem (loneliness, not physical safety) and the product (company first, then
-  daily help, then reaching people). The page is nine sections: hero, **The worry**
-  (`#worry`, centered serif + three real interview quotes), **Meet Grace**
-  (`#meet-grace`), **What Grace does** (`#what-grace-does`), **Grace helps her reach
-  out** (`#reach-out`), **Caregiver experience** (`#caregiver`), **What Grace isn't**
-  (`#what-grace-isnt`), and the unchanged **Early access** waitlist (`#waitlist`).
-  The old `#system`/`#attention`/`#tracking`/`#problem` shells and their dead CSS were
-  replaced; nav + footer + `trackedSections` (in `script.js`) + `welcome.html`'s links
-  were repointed to the new anchors. **All imagery is intentional placeholders** —
-  seven labelled `.img-placeholder` dashed boxes (`data-slot` names describe the shot
-  and note "TBD"), so nothing real ships until industrial design lands. Five visible
-  `[TK]` markers flag unsettled copy (quote attributions, a v1 read-aloud scope
-  question, and a permanent no-camera commitment) on purpose. Copy is verbatim from
-  the reviewed spec — do not paraphrase. **Known a11y note:** the terracotta eyebrow
-  labels (`#b85f4a`) sit at ~3.9:1 on cream and ~3.4:1 on the stone band, below WCAG
-  AA 4.5:1; left unchanged pending a brand-color decision (body text and dark pill
-  buttons pass). The waitlist form (fields, button, handler) is untouched.
-- **Post-signup flow.** After a waitlist signup each Grace page redirects to its own
-  in-folder `welcome.html` profiling page (same five optional fields as Grand),
-  rebranded to Grace.
-- **`/gracecompanion` waitlist row spacing + `#worry` copy revision.** Bumped the
-  `.form-row` gap from `8px` to `20px` (desktop only; the mobile stacked layout keeps
-  its `8px` vertical gap). **Why:** the input runs flush to the button, so a trailing
-  icon that lands at the input's right edge — e.g. a browser password-manager badge
-  like Proton Pass — crowded the button and looked cramped; the roomier gap gives that
-  edge breathing room without changing the form's function or copy. Separately,
-  rewrote the two `#worry` paragraphs at the founder's request to lead with "She says
-  she's fine, and physically that's true." and land on the caregiver's own limits
-  ("you can't be there for her as much as she needs"), replacing the earlier
-  loneliness framing. This supersedes the "verbatim from the reviewed spec" note above
-  for that block; two typos in the supplied copy ("physcially", "your try") were
-  corrected.
-- **`/grace` `#worry` section now grounds the problem with a photo.** Added
-  `assets/worry-alone.jpg` (an older woman sitting alone in a dim living room at dusk,
-  the cordless phone on the side table beside her) next to the worry copy. The copy and
-  image now sit in a `.worry-lead` two-column grid (text left, 380px image right,
-  vertically centered) above the existing three interview quotes. **Why:** the worry
-  section was text-only, so the anxiety it describes had nothing visual to land on — the
-  photo makes "she lives alone, and the days are long" concrete before the reader hits
-  the copy. On ≤900px the grid collapses to one column and the image is ordered *above*
-  the text (`order: -1`) so it grounds the problem first on mobile. The source PNG was
-  converted to a ~290KB JPG (1000px wide, matching the light-weight `meet-grace-hero.jpg`
-  treatment) rather than shipped as a 2.1MB PNG.
+- **Independent, no cross-links.** There are deliberately **no navigational links**
+  between Grand and `/grace` — the only way to reach it is to type/visit its URL. It
+  is also **left out of `sitemap.xml`** so it isn't publicly discoverable via SEO.
+- **Self-contained folder (isolation over DRY).** `grace/` has its own `index.html`,
+  `welcome.html`, and **own copies** of `styles.css` and `script.js`, so editing it
+  can never affect the Grand site. The tradeoff: style changes made to the root site
+  must be re-applied here by hand. Shared images use **root-absolute** paths
+  (`/assets/...`) so they resolve from the subfolder. GitHub Pages serves `/grace`
+  from its in-folder `index.html` automatically; the deploy workflow needs no config.
+- **Page structure.** Hero, **The worry** (`#worry`, centered serif + three real
+  interview quotes, grounded by `assets/worry-alone.jpg` in a `.worry-lead` two-column
+  grid that collapses to one column ≤900px), **Meet Grace** (`#meet-grace`), **What
+  Grace does** (`#what-grace-does`), **Grace helps her reach out** (`#reach-out`),
+  **Caregiver experience** (`#caregiver`), **What Grace isn't** (`#what-grace-isnt`),
+  and the **Early access** waitlist (`#waitlist`). CTA/profiling copy is tester-focused
+  ("Become a tester", an early Grace tester note, "ZIP code of your loved one").
+- **"What Grace does" is list-formatted.** All three blocks use the `.does-list`
+  bold-lead-in style (see the Status note) so the section scans consistently.
+- **Post-signup flow.** After a waitlist signup `/grace` redirects to its in-folder
+  `welcome.html` profiling page (same five optional fields as Grand, rebranded to Grace).
+- **Ad pixels.** The Meta/Reddit pixels reuse Grand's pixel IDs; Grace conversions can
+  be split from Grand's by filtering on URL in Ads Manager. The footer links to the
+  shared root `/privacy.html` and `/terms.html` (no Grace-specific legal pages).
+- **Known a11y note:** the terracotta eyebrow labels (`#b85f4a`) sit at ~3.9:1 on
+  cream and ~3.4:1 on the stone band, below WCAG AA 4.5:1; left unchanged pending a
+  brand-color decision (body text and dark pill buttons pass).
 
-### Grace waitlist storage (separate tabs, one endpoint)
+### Grace waitlist storage (shared endpoint)
 
-All three Grace routes POST to the **same** Apps Script endpoint. Grace signups carry a
-`product` field set in each folder's `script.js` copy (`/gracecompanion` and
-`/grace` use `gracecompanion`; `/gracephone` uses `gracephone`). The same field is
-also on the profile and analytics payloads, plus product-scoped `sessionStorage`
-keys. `waitlist.gs` routes by that field:
+`/grace` POSTs to the **same** Apps Script endpoint as the Grand site. Its signups
+carry `product = "gracecompanion"` (set in `grace/script.js`, and also on the profile
+and analytics payloads plus product-scoped `sessionStorage` keys), so `waitlist.gs`
+routes them to the dedicated `GraceCompanion Waitlist`/`GraceCompanion Events` tabs in
+the shared spreadsheet — kept as-is after the consolidation for data continuity.
 
-- `PRODUCT_SHEETS` + `sheetNamesForProduct_()` map each product to its own tabs —
-  `GraceCompanion Waitlist`/`GraceCompanion Events` and
-  `GracePhone Waitlist`/`GracePhone Events` — in the **same** spreadsheet.
-- Payloads with no/unknown `product` (i.e. the Grand site) fall through to the
+- `PRODUCT_SHEETS` + `sheetNamesForProduct_()` map the `gracecompanion` product to its
+  own tabs; payloads with no/unknown `product` (the Grand site) fall through to the
   existing `Waitlist`/`Events` tabs, so **Grand's behavior and data are unchanged**.
-- New tabs are auto-created by `getSheet_` + `ensureHeaders_` on first write — no
-  manual tab setup.
+  (The `gracephone` mapping remains in `waitlist.gs` but is now unused.)
+- New tabs are auto-created by `getSheet_` + `ensureHeaders_` on first write.
 
 **Deploy step (required for routing to take effect):** after changing `waitlist.gs`,
 re-deploy the existing web app via **Deploy → Manage deployments → Edit → New
-version** so the endpoint URL stays identical. Until you redeploy, Grace signups hit
-the old script and land in Grand's tabs (not broken, just not separated).
+version** so the endpoint URL stays identical.
 
 ## Legal Pages
 

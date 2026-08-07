@@ -7,8 +7,8 @@ const analyticsEndpoint =
 const PRODUCT = "gracecompanion";
 const trackedSections = [
   "worry",
-  "meet-grace",
   "what-grace-does",
+  "how-grace-works",
   "reach-out",
   "caregiver",
   "what-grace-isnt",

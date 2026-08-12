@@ -783,25 +783,12 @@ h3 {
 }
 
 .profile-field label,
-.profile-field legend,
-.profile-field .profile-lead {
+.profile-field legend {
   display: block;
   font-size: 14px;
   font-weight: 700;
   margin-bottom: 8px;
   padding: 0;
-}
-
-.profile-alpha-link {
-  color: var(--status-sage);
-  font-size: 15px;
-  font-weight: 600;
-  text-decoration: none;
-}
-
-.profile-alpha-link:hover,
-.profile-alpha-link:focus {
-  text-decoration: underline;
 }
 
 .profile-hint {

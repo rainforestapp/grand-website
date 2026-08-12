@@ -571,35 +571,25 @@ if (profileForm) {
       return;
     }
 
-    const originalLabel = button.textContent;
-    button.disabled = true;
-    button.textContent = "Saving...";
-    setProfileStatus("", "neutral");
+    const payload = buildProfilePayload(profileForm);
+    // Fire-and-forget, like the initial signup capture: sendBeacon (with a
+    // keepalive fetch fallback) so the confirmation shows instantly instead of
+    // blocking on the Apps Script round trip — that call holds a script lock and
+    // runs a signup-row retry loop that can take ~1.4s. The backend appends a
+    // fallback row if the match is missed, so optional profile answers are never
+    // lost.
+    void submitWaitlist(endpoint, payload, { waitForCompletion: false });
+    firePixelConversion("CompleteRegistration", "Lead");
+    trackAnalyticsEvent("waitlist_profile_submit_success", {
+      section_id: "welcome",
+    });
 
-    try {
-      const payload = buildProfilePayload(profileForm);
-      await submitWaitlist(endpoint, payload);
-      firePixelConversion("CompleteRegistration", "Lead");
-      trackAnalyticsEvent("waitlist_profile_submit_success", {
-        section_id: "welcome",
-      });
-
-      if (doneMessage) {
-        (profileForm.closest("[data-profile-layout]") || profileForm).hidden = true;
-        doneMessage.hidden = false;
-        doneMessage.scrollIntoView({ behavior: "smooth", block: "center" });
-      } else {
-        setProfileStatus("Thank you — we've got everything we need.", "success");
-      }
-    } catch (error) {
-      console.warn(error);
-      trackAnalyticsEvent("waitlist_profile_submit_error", {
-        section_id: "welcome",
-        error: "network_or_script_error",
-      });
-      setProfileStatus("Something went wrong. Please try again.", "error");
-      button.disabled = false;
-      button.textContent = originalLabel;
+    if (doneMessage) {
+      (profileForm.closest("[data-profile-layout]") || profileForm).hidden = true;
+      doneMessage.hidden = false;
+      doneMessage.scrollIntoView({ behavior: "smooth", block: "center" });
+    } else {
+      setProfileStatus("Thank you — we've got everything we need.", "success");
     }
   });
 }

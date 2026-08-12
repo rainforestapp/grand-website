@@ -182,6 +182,11 @@ function handleWaitlistProfile_(payload) {
     profile_completed_at: payload.profile_completed_at || new Date().toISOString(),
   };
 
+  // Optional email captured on the profile page (phone products identify by
+  // phone, so email is just extra contact data). Only write it when provided so
+  // an empty submission never clears an email already on the row.
+  if (email) profileValues.email = email;
+
   const spreadsheet = getSpreadsheet_();
   const sheet = getSheet_(spreadsheet, sheetNamesForProduct_(payload.product).waitlist);
 

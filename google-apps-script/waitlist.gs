@@ -232,7 +232,7 @@ function handleWaitlistProfile_(payload) {
       const row = new Array(HEADERS.length).fill("");
       row[HEADERS.indexOf("received_at")] = new Date();
       row[HEADERS.indexOf("email")] = email;
-      row[HEADERS.indexOf("phone")] = phone;
+      row[HEADERS.indexOf("phone")] = plainTextPhone_(phone);
       row[HEADERS.indexOf("source")] = payload.source || "";
       row[HEADERS.indexOf("raw_payload")] = JSON.stringify(payload);
       applyProfileToRow_(row, profileValues);
@@ -309,6 +309,11 @@ function normalizeIdentity_(header, value) {
 function isValidPhone_(value) {
   const digits = String(value || "").replace(/\D/g, "");
   return digits.length >= 10 && digits.length <= 15;
+}
+
+function plainTextPhone_(value) {
+  const phone = String(value || "").trim();
+  return phone ? `'${phone}` : "";
 }
 
 function findRowByColumn_(sheet, header, value) {
@@ -408,7 +413,7 @@ function rowForPayload_(email, payload) {
   // Pad to the full width and set the phone column (last), which lives after
   // the profile columns. Blank for email signups.
   while (row.length < HEADERS.length) row.push("");
-  row[HEADERS.indexOf("phone")] = String(payload.phone || "").trim();
+  row[HEADERS.indexOf("phone")] = plainTextPhone_(payload.phone);
   return row;
 }
 

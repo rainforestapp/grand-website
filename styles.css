@@ -1108,6 +1108,7 @@ h3 {
   margin: -4px 0 10px;
 }
 
+.profile-field input[type="email"],
 .profile-field input[type="text"],
 .profile-field textarea {
   background: var(--surface-card);
@@ -1128,6 +1129,7 @@ h3 {
   resize: vertical;
 }
 
+.profile-field input[type="email"]:focus,
 .profile-field input[type="text"]:focus,
 .profile-field textarea:focus {
   border-color: var(--status-sage);

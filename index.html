@@ -378,19 +378,23 @@
           novalidate
         >
           <label for="phone">Phone number</label>
-          <div class="form-row">
-            <input
-              id="phone"
-              name="phone"
-              type="tel"
-              autocomplete="tel"
-              inputmode="tel"
-              placeholder="(555) 123-4567"
-              required
-            >
-            <button type="submit">Become a tester</button>
+          <div class="form-row phone-form-row">
+            <div class="phone-input-shell">
+              <span class="phone-country-code" aria-hidden="true">+1</span>
+              <input
+                id="phone"
+                name="phone"
+                type="tel"
+                autocomplete="tel"
+                inputmode="tel"
+                placeholder="(555) 123-4567"
+                aria-describedby="phone-status"
+                required
+              >
+            </div>
+            <button type="submit" disabled>Become a tester</button>
           </div>
-          <p class="form-status" data-waitlist-status role="status" aria-live="polite"></p>
+          <p id="phone-status" class="form-status" data-waitlist-status role="status" aria-live="polite"></p>
         </form>
       </section>
     </main>

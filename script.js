@@ -254,6 +254,80 @@ function setWaitlistStatus(message, type = "neutral") {
   status.dataset.status = type;
 }
 
+function getUsPhoneDigits(value) {
+  const rawDigits = String(value || "").replace(/\D/g, "");
+  const digits = rawDigits.length > 10 && rawDigits.startsWith("1")
+    ? rawDigits.slice(1)
+    : rawDigits;
+
+  return digits.slice(0, 10);
+}
+
+function formatUsPhone(digits) {
+  const value = getUsPhoneDigits(digits);
+  if (!value) return "";
+  if (value.length < 4) return `(${value}`;
+  if (value.length < 7) return `(${value.slice(0, 3)}) ${value.slice(3)}`;
+  return `(${value.slice(0, 3)}) ${value.slice(3, 6)}-${value.slice(6)}`;
+}
+
+function getNormalizedPhoneDigitCountBeforeCursor(value, cursorPosition) {
+  const allDigits = String(value || "").replace(/\D/g, "");
+  const cursorDigits = String(value || "")
+    .slice(0, cursorPosition)
+    .replace(/\D/g, "");
+  const countryPrefixWasTyped = allDigits.length > 10 && allDigits.startsWith("1");
+  const digitCount = countryPrefixWasTyped && cursorDigits.length > 0
+    ? cursorDigits.length - 1
+    : cursorDigits.length;
+
+  return Math.max(0, Math.min(digitCount, 10));
+}
+
+function getCaretPositionForPhoneDigitCount(formattedValue, digitCount) {
+  if (digitCount <= 0) return formattedValue ? 1 : 0;
+
+  let digitsSeen = 0;
+  for (let index = 0; index < formattedValue.length; index += 1) {
+    if (/\d/.test(formattedValue[index])) {
+      digitsSeen += 1;
+      if (digitsSeen === digitCount) return index + 1;
+    }
+  }
+
+  return formattedValue.length;
+}
+
+function formatPhoneInput(input) {
+  const cursorPosition = input.selectionStart;
+  const digitCountBeforeCursor = typeof cursorPosition === "number"
+    ? getNormalizedPhoneDigitCountBeforeCursor(input.value, cursorPosition)
+    : null;
+  const formattedValue = formatUsPhone(input.value);
+
+  input.value = formattedValue;
+
+  if (
+    digitCountBeforeCursor !== null &&
+    document.activeElement === input &&
+    typeof input.setSelectionRange === "function"
+  ) {
+    const nextCursorPosition = getCaretPositionForPhoneDigitCount(
+      formattedValue,
+      digitCountBeforeCursor,
+    );
+    input.setSelectionRange(nextCursorPosition, nextCursorPosition);
+  }
+}
+
+function getWaitlistPhoneSubmissionValue(input) {
+  return `+1 ${formatUsPhone(input.value)}`;
+}
+
+function isValidWaitlistPhone(input) {
+  return getUsPhoneDigits(input.value).length === 10;
+}
+
 function getValueLengthBucket(value) {
   const length = String(value || "").trim().length;
 
@@ -269,7 +343,7 @@ function getPhoneFieldState(input) {
 
   return {
     has_value: value.length > 0,
-    looks_valid: value.length > 0 && input.validity.valid,
+    looks_valid: isValidWaitlistPhone(input),
     value_length_bucket: getValueLengthBucket(value),
   };
 }
@@ -413,9 +487,29 @@ function submitWaitlist(endpoint, payload, options = {}) {
 
 if (waitlistForm) {
   const input = waitlistForm.querySelector("input[type='tel']");
+  const button = waitlistForm.querySelector("button[type='submit']");
   let trackedPhoneInputStart = false;
 
-  if (input) {
+  function syncWaitlistPhoneState(options = {}) {
+    if (!input || !button) return;
+
+    const hasValue = getUsPhoneDigits(input.value).length > 0;
+    const isValid = isValidWaitlistPhone(input);
+    const showError = Boolean(options.showError && hasValue && !isValid);
+
+    button.disabled = !isValid;
+    input.setAttribute("aria-invalid", showError ? "true" : "false");
+
+    if (showError) {
+      setWaitlistStatus("Enter a 10-digit US phone number.", "error");
+    } else if (!options.preserveStatus) {
+      setWaitlistStatus("", "neutral");
+    }
+  }
+
+  if (input && button) {
+    syncWaitlistPhoneState();
+
     input.addEventListener(
       "focus",
       () => {
@@ -427,6 +521,9 @@ if (waitlistForm) {
     );
 
     input.addEventListener("input", () => {
+      formatPhoneInput(input);
+      syncWaitlistPhoneState();
+
       if (trackedPhoneInputStart || input.value.trim().length === 0) return;
 
       trackedPhoneInputStart = true;
@@ -437,6 +534,9 @@ if (waitlistForm) {
     });
 
     input.addEventListener("blur", () => {
+      formatPhoneInput(input);
+      syncWaitlistPhoneState({ showError: true });
+
       trackAnalyticsEvent("waitlist_phone_blur", {
         section_id: "waitlist",
         ...getPhoneFieldState(input),
@@ -447,7 +547,6 @@ if (waitlistForm) {
   waitlistForm.addEventListener("submit", async (event) => {
     event.preventDefault();
 
-    const button = waitlistForm.querySelector("button[type='submit']");
     const endpoint = waitlistForm.dataset.waitlistEndpoint?.trim();
     if (!input || !button) return;
 
@@ -455,16 +554,14 @@ if (waitlistForm) {
       section_id: "waitlist",
     });
 
-    const phone = input.value.trim();
-    // `type="tel"` has no built-in format check, so validate the digit count
-    // here to match the backend (10-15 digits).
-    const phoneDigits = phone.replace(/\D/g, "");
-    if (!phone || phoneDigits.length < 10 || phoneDigits.length > 15) {
+    formatPhoneInput(input);
+    const phone = getWaitlistPhoneSubmissionValue(input);
+    if (!isValidWaitlistPhone(input)) {
       trackAnalyticsEvent("waitlist_submit_error", {
         section_id: "waitlist",
         error: "invalid_phone",
       });
-      setWaitlistStatus("Enter a valid phone number.", "error");
+      syncWaitlistPhoneState({ showError: true });
       input.focus();
       return;
     }
@@ -479,14 +576,17 @@ if (waitlistForm) {
     }
 
     const originalLabel = button.textContent;
+    waitlistForm.dataset.submitting = "true";
     button.disabled = true;
     button.textContent = "Joining...";
     setWaitlistStatus("", "neutral");
+    let submitted = false;
 
     try {
       const payload = buildWaitlistPayload(phone);
       void submitWaitlist(endpoint, payload, { waitForCompletion: false });
       waitlistForm.reset();
+      submitted = true;
       trackAnalyticsEvent("waitlist_submit_success", {
         section_id: "waitlist",
       });
@@ -510,8 +610,9 @@ if (waitlistForm) {
       });
       setWaitlistStatus("Something went wrong. Please try again.", "error");
     } finally {
-      button.disabled = false;
+      delete waitlistForm.dataset.submitting;
       button.textContent = originalLabel;
+      if (!submitted) syncWaitlistPhoneState({ preserveStatus: true });
     }
   });
 }

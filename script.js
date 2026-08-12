@@ -536,6 +536,9 @@ function buildProfilePayload(form) {
     type: "waitlist_profile",
     product: PRODUCT,
     phone,
+    // Optional: phone stays the identity; email is captured only if the visitor
+    // chooses to give it, and lands in the row's existing email column.
+    email: String(data.get("email") || "").trim(),
     source: "grand-website",
     full_name: String(data.get("full_name") || "").trim(),
     zipcode: String(data.get("zipcode") || "").trim(),

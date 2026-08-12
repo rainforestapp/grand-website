@@ -12,6 +12,10 @@ const EVENT_SHEET_NAME = "Events";
 const PRODUCT_SHEETS = {
   gracecompanion: { waitlist: "GraceCompanion Waitlist", events: "GraceCompanion Events" },
   gracephone: { waitlist: "GracePhone Waitlist", events: "GracePhone Events" },
+  // Grand's alpha signup collects a phone number instead of an email. It lands
+  // in its own tabs so the email-era "Waitlist"/"Events" tabs freeze as an
+  // archive and the phone column never mixes with the historical email column.
+  grandphone: { waitlist: "Grand phone number alpha list", events: "Grand phone number events" },
 };
 
 function sheetNamesForProduct_(product) {
@@ -63,6 +67,10 @@ const HEADERS = [
   "alpha_tester",
   "profile_completed_at",
   "full_name",
+  // Phone-based products (Grand phone alpha list) identify people by phone
+  // instead of email. Appended last so existing email sheets auto-migrate with
+  // a blank column and no existing column shifts.
+  "phone",
 ];
 
 const EVENT_HEADERS = [
@@ -127,8 +135,15 @@ function doPost(event) {
 
 function handleWaitlistSignup_(payload) {
   const email = String(payload.email || "").trim().toLowerCase();
+  const phone = String(payload.phone || "").trim();
 
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+  // Phone-based signups (Grand phone alpha list) identify by phone number and
+  // carry no email. Everything else keeps the existing email contract.
+  if (phone) {
+    if (!isValidPhone_(phone)) {
+      return jsonResponse_({ ok: false, error: "invalid_phone" });
+    }
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return jsonResponse_({ ok: false, error: "invalid_email" });
   }
 
@@ -156,6 +171,7 @@ function handleWaitlistSignup_(payload) {
 
 function handleWaitlistProfile_(payload) {
   const email = String(payload.email || "").trim().toLowerCase();
+  const phone = String(payload.phone || "").trim();
 
   const profileValues = {
     full_name: String(payload.full_name || "").trim(),
@@ -183,13 +199,22 @@ function handleWaitlistProfile_(payload) {
   // leave the page immediately. If the profile form is submitted right away,
   // give the signup append a short chance to land before appending a fallback
   // profile-only row.
-  const rowIndex = email ? waitForSignupRow_(sheet, email) : -1;
+  // Match the signup row by phone for phone-based products, otherwise by email.
+  const rowIndex = phone
+    ? waitForSignupRow_(sheet, "phone", phone)
+    : email
+      ? waitForSignupRow_(sheet, "email", email)
+      : -1;
 
   lock.waitLock(10000);
   try {
     ensureHeaders_(sheet, HEADERS);
 
-    const latestRowIndex = email ? findRowByEmail_(sheet, email) : -1;
+    const latestRowIndex = phone
+      ? findRowByColumn_(sheet, "phone", phone)
+      : email
+        ? findRowByColumn_(sheet, "email", email)
+        : -1;
     const targetRowIndex = latestRowIndex > 0 ? latestRowIndex : rowIndex;
 
     if (targetRowIndex > 0) {
@@ -197,11 +222,12 @@ function handleWaitlistProfile_(payload) {
       writeProfileColumns_(sheet, targetRowIndex, profileValues);
       result = { ok: true, matched: true, updated_row: targetRowIndex };
     } else {
-      // No matching signup (email missing or unknown) — append a standalone
-      // row so the answers aren't lost.
+      // No matching signup (identifier missing or unknown) — append a
+      // standalone row so the answers aren't lost.
       const row = new Array(HEADERS.length).fill("");
       row[HEADERS.indexOf("received_at")] = new Date();
       row[HEADERS.indexOf("email")] = email;
+      row[HEADERS.indexOf("phone")] = phone;
       row[HEADERS.indexOf("source")] = payload.source || "";
       row[HEADERS.indexOf("raw_payload")] = JSON.stringify(payload);
       applyProfileToRow_(row, profileValues);
@@ -268,16 +294,33 @@ function ensureHeaders_(sheet, headers) {
   }
 }
 
-function findRowByEmail_(sheet, email) {
+// Normalize an identity value for matching: phone numbers compare on digits
+// only (so "(555) 123-4567" and "5551234567" match), emails on lowercased text.
+function normalizeIdentity_(header, value) {
+  const text = String(value || "").trim();
+  return header === "phone" ? text.replace(/\D/g, "") : text.toLowerCase();
+}
+
+function isValidPhone_(value) {
+  const digits = String(value || "").replace(/\D/g, "");
+  return digits.length >= 10 && digits.length <= 15;
+}
+
+function findRowByColumn_(sheet, header, value) {
   const lastRow = sheet.getLastRow();
   if (lastRow < 2) return -1;
 
-  const emailColumn = HEADERS.indexOf("email") + 1;
-  const values = sheet.getRange(2, emailColumn, lastRow - 1, 1).getValues();
+  const column = HEADERS.indexOf(header) + 1;
+  if (column <= 0) return -1;
 
-  // Search from the bottom so the most recent signup wins on duplicate emails.
+  const target = normalizeIdentity_(header, value);
+  if (!target) return -1;
+
+  const values = sheet.getRange(2, column, lastRow - 1, 1).getValues();
+
+  // Search from the bottom so the most recent signup wins on duplicates.
   for (let i = values.length - 1; i >= 0; i--) {
-    if (String(values[i][0] || "").trim().toLowerCase() === email) {
+    if (normalizeIdentity_(header, values[i][0]) === target) {
       return i + 2;
     }
   }
@@ -285,9 +328,9 @@ function findRowByEmail_(sheet, email) {
   return -1;
 }
 
-function waitForSignupRow_(sheet, email) {
+function waitForSignupRow_(sheet, header, value) {
   for (let attempt = 0; attempt < 4; attempt++) {
-    const rowIndex = findRowByEmail_(sheet, email);
+    const rowIndex = findRowByColumn_(sheet, header, value);
     if (rowIndex > 0) return rowIndex;
     Utilities.sleep(350);
   }
@@ -317,7 +360,7 @@ function rowForPayload_(email, payload) {
   const connection = payload.connection || {};
   const geo = payload.geo || {};
 
-  return [
+  const row = [
     new Date(),
     email,
     payload.source || "",
@@ -356,6 +399,12 @@ function rowForPayload_(email, payload) {
     // profile_completed_at, and full_name are left empty here and filled by
     // the profile page.
   ];
+
+  // Pad to the full width and set the phone column (last), which lives after
+  // the profile columns. Blank for email signups.
+  while (row.length < HEADERS.length) row.push("");
+  row[HEADERS.indexOf("phone")] = String(payload.phone || "").trim();
+  return row;
 }
 
 function rowForEventPayload_(payload) {

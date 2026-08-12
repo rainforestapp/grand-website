@@ -2,6 +2,10 @@ const waitlistForm = document.querySelector("[data-waitlist-form]");
 const profileForm = document.querySelector("[data-profile-form]");
 const analyticsEndpoint =
   (waitlistForm || profileForm)?.dataset.waitlistEndpoint?.trim() || "";
+// Grand's alpha signup collects a phone number instead of an email. Tagging
+// every payload routes this product's signups/profiles/events into their own
+// spreadsheet tabs, keeping them a clean break from the historical email data.
+const PRODUCT = "grandphone";
 const trackedSections = ["problem", "system", "attention", "tracking", "response", "waitlist"];
 const anchorScrollRetries = [0, 120, 360, 760];
 let fallbackSessionId = "";
@@ -72,6 +76,7 @@ function trackAnalyticsEvent(eventType, details = {}) {
 
   const payload = {
     type: "analytics_event",
+    product: PRODUCT,
     event_type: eventType,
     event_at: new Date().toISOString(),
     session_id: getSessionId(),
@@ -259,7 +264,7 @@ function getValueLengthBucket(value) {
   return "24+";
 }
 
-function getEmailFieldState(input) {
+function getPhoneFieldState(input) {
   const value = input.value.trim();
 
   return {
@@ -336,12 +341,13 @@ function firePixelConversion(metaEvent, redditEvent) {
   } catch {}
 }
 
-function buildWaitlistPayload(email) {
+function buildWaitlistPayload(phone) {
   const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
 
   return {
     type: "waitlist_signup",
-    email,
+    product: PRODUCT,
+    phone,
     source: "grand-website",
     submitted_at: new Date().toISOString(),
     page_url: window.location.href,
@@ -406,14 +412,14 @@ function submitWaitlist(endpoint, payload, options = {}) {
 }
 
 if (waitlistForm) {
-  const input = waitlistForm.querySelector("input[type='email']");
-  let trackedEmailInputStart = false;
+  const input = waitlistForm.querySelector("input[type='tel']");
+  let trackedPhoneInputStart = false;
 
   if (input) {
     input.addEventListener(
       "focus",
       () => {
-        trackAnalyticsEvent("waitlist_email_focus", {
+        trackAnalyticsEvent("waitlist_phone_focus", {
           section_id: "waitlist",
         });
       },
@@ -421,19 +427,19 @@ if (waitlistForm) {
     );
 
     input.addEventListener("input", () => {
-      if (trackedEmailInputStart || input.value.trim().length === 0) return;
+      if (trackedPhoneInputStart || input.value.trim().length === 0) return;
 
-      trackedEmailInputStart = true;
-      trackAnalyticsEvent("waitlist_email_input_start", {
+      trackedPhoneInputStart = true;
+      trackAnalyticsEvent("waitlist_phone_input_start", {
         section_id: "waitlist",
-        ...getEmailFieldState(input),
+        ...getPhoneFieldState(input),
       });
     });
 
     input.addEventListener("blur", () => {
-      trackAnalyticsEvent("waitlist_email_blur", {
+      trackAnalyticsEvent("waitlist_phone_blur", {
         section_id: "waitlist",
-        ...getEmailFieldState(input),
+        ...getPhoneFieldState(input),
       });
     });
   }
@@ -449,13 +455,16 @@ if (waitlistForm) {
       section_id: "waitlist",
     });
 
-    const email = input.value.trim();
-    if (!email || !input.validity.valid) {
+    const phone = input.value.trim();
+    // `type="tel"` has no built-in format check, so validate the digit count
+    // here to match the backend (10-15 digits).
+    const phoneDigits = phone.replace(/\D/g, "");
+    if (!phone || phoneDigits.length < 10 || phoneDigits.length > 15) {
       trackAnalyticsEvent("waitlist_submit_error", {
         section_id: "waitlist",
-        error: "invalid_email",
+        error: "invalid_phone",
       });
-      setWaitlistStatus("Enter a valid email address.", "error");
+      setWaitlistStatus("Enter a valid phone number.", "error");
       input.focus();
       return;
     }
@@ -475,7 +484,7 @@ if (waitlistForm) {
     setWaitlistStatus("", "neutral");
 
     try {
-      const payload = buildWaitlistPayload(email);
+      const payload = buildWaitlistPayload(phone);
       void submitWaitlist(endpoint, payload, { waitForCompletion: false });
       waitlistForm.reset();
       trackAnalyticsEvent("waitlist_submit_success", {
@@ -485,12 +494,12 @@ if (waitlistForm) {
       setWaitlistStatus("You're on the list. Taking you to a couple of quick questions...", "success");
 
       // Progressive profiling: hand off to the profile page to collect
-      // qualifying details, without ever gating the email behind them. The
-      // email travels via sessionStorage (not the URL) so it isn't leaked into
-      // the profile page's referrer/pixel traffic. The success message above
-      // stays visible if navigation is blocked.
+      // qualifying details, without ever gating the phone number behind them.
+      // The phone travels via sessionStorage (not the URL) so it isn't leaked
+      // into the profile page's referrer/pixel traffic. The success message
+      // above stays visible if navigation is blocked.
       try {
-        window.sessionStorage.setItem("grand_signup_email", email);
+        window.sessionStorage.setItem("grand_signup_phone", phone);
       } catch {}
       window.location.assign("welcome.html");
     } catch (error) {
@@ -516,16 +525,17 @@ function setProfileStatus(message, type = "neutral") {
 }
 
 function buildProfilePayload(form) {
-  let email = "";
+  let phone = "";
   try {
-    email = window.sessionStorage.getItem("grand_signup_email") || "";
+    phone = window.sessionStorage.getItem("grand_signup_phone") || "";
   } catch {}
 
   const data = new FormData(form);
 
   return {
     type: "waitlist_profile",
-    email,
+    product: PRODUCT,
+    phone,
     source: "grand-website",
     full_name: String(data.get("full_name") || "").trim(),
     zipcode: String(data.get("zipcode") || "").trim(),

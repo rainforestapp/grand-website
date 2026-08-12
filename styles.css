@@ -1074,12 +1074,25 @@ h3 {
 
 .profile-field label,
 .profile-field legend,
-.profile-field .profile-lead {
+.profile-alpha .profile-lead {
   display: block;
   font-size: 14px;
   font-weight: 700;
   margin-bottom: 8px;
   padding: 0;
+}
+
+/* Alpha-tester scheduling block lives on the Thank-you (done) panel. Scope its
+   type styles so they win over the generic `.profile-done p` rules. */
+.profile-alpha {
+  margin: 0 0 24px;
+}
+
+.profile-alpha .profile-hint {
+  color: var(--ink-faint);
+  font-size: 13px;
+  margin: 0 0 12px;
+  max-width: 52ch;
 }
 
 .profile-alpha-link {

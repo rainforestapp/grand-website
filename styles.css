@@ -957,6 +957,22 @@ h3 {
   padding: 8px;
 }
 
+.phone-input-shell {
+  align-items: center;
+  display: flex;
+  flex: 1;
+  min-width: 0;
+}
+
+.phone-country-code {
+  border-right: 1px solid var(--hairline);
+  color: var(--ink-soft);
+  flex: 0 0 auto;
+  font-weight: 700;
+  line-height: 1;
+  padding: 0 14px 0 10px;
+}
+
 .form-row input,
 .form-row button {
   border: 0;
@@ -981,6 +997,11 @@ h3 {
 }
 
 .form-row button:disabled {
+  cursor: not-allowed;
+  opacity: 0.44;
+}
+
+.waitlist-form[data-submitting="true"] .form-row button:disabled {
   cursor: wait;
   opacity: 0.68;
 }
@@ -1675,6 +1696,10 @@ h3 {
 
   .form-row {
     border-radius: 22px;
+  }
+
+  .phone-input-shell {
+    min-height: 48px;
   }
 
   .form-row input {

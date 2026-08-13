@@ -155,6 +155,7 @@ function handleWaitlistSignup_(payload) {
     const spreadsheet = getSpreadsheet_();
     const sheet = getSheet_(spreadsheet, sheetNamesForProduct_(payload.product).waitlist);
     ensureHeaders_(sheet, HEADERS);
+    ensurePhoneColumnIsText_(sheet);
     sheet.appendRow(rowForPayload_(email, payload));
     result = {
       ok: true,
@@ -214,6 +215,7 @@ function handleWaitlistProfile_(payload) {
   lock.waitLock(10000);
   try {
     ensureHeaders_(sheet, HEADERS);
+    ensurePhoneColumnIsText_(sheet);
 
     const latestRowIndex = phone
       ? findRowByColumn_(sheet, "phone", phone)
@@ -314,6 +316,18 @@ function isValidPhone_(value) {
 function plainTextPhone_(value) {
   const phone = String(value || "").trim();
   return phone ? `'${phone}` : "";
+}
+
+// Force the phone column to plain-text (`@`) number format. Google Sheets
+// parses any cell starting with `+`, `=`, `-`, or `@` as a formula, so a raw
+// phone like "+1 (555) 123-4567" would evaluate to #ERROR!. Belt-and-suspenders
+// alongside plainTextPhone_'s leading apostrophe: even if a value ever reaches a
+// cell without the apostrophe, the text format keeps it from being parsed.
+function ensurePhoneColumnIsText_(sheet) {
+  const column = HEADERS.indexOf("phone") + 1;
+  if (column <= 0) return;
+  const rows = Math.max(sheet.getMaxRows(), 1);
+  sheet.getRange(1, column, rows, 1).setNumberFormat("@");
 }
 
 function findRowByColumn_(sheet, header, value) {

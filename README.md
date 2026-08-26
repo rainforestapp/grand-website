@@ -61,6 +61,14 @@ All URLs are canonicalized to `https://www.grandeldercare.com/` (the `www` host,
 - Reddit Pixel is installed in `index.html` and `welcome.html` with pixel ID `a2_jb07ge9fad9n` and tracks the standard `PageVisit` event on load.
 - **Conversion events** fire from `script.js` (not the pixel snippets): a waitlist signup fires `fbq('track','Lead')` + `rdt('track','SignUp')`, and completing the profile page fires `fbq('track','CompleteRegistration')` + `rdt('track','Lead')`. All track calls are guarded, so a blocked or absent pixel never throws.
 
+## PostHog Website Analytics
+
+The site sends privacy-conscious website analytics to the same PostHog Cloud EU project as the Grand iOS app, with a strict namespace boundary. `posthog.js` loads the EU ingestion endpoint in `cookieless_mode: "always"`, disables person profiles, autocapture, exception capture, feature-flag requests, and session recording, then manually captures pageviews. Every website event carries `platform = "web"` and `analytics_surface = "marketing_website"`; custom events also use a `website_` prefix so they cannot be confused with the iOS taxonomy.
+
+The deliberate website events are `website_cta_clicked`, `website_contact_clicked`, `website_waitlist_started`, `website_waitlist_signup`, `website_waitlist_submission_failed`, `website_profile_completed`, `website_profile_submission_failed`, and `website_onboarding_call_clicked`. Event properties describe only the page/experience, CTA location/label, form type, or fixed failure reason. Phone numbers, email addresses, names, ZIP codes, and free-text answers are never sent to PostHog.
+
+**PostHog project dependency:** in the shared PostHog project's **Project settings → Web analytics**, enable **Cookieless server hash mode** before deploying this integration. Web-vitals capture is intentionally left off initially; it can be enabled separately later without enabling general autocapture.
+
 ## Open Locally
 
 Open `index.html` in a browser. No build step is required.
@@ -179,5 +187,5 @@ version** so the endpoint URL stays identical.
 
 - **Privacy Policy** covers what's collected (waitlist email; optional full-name/ZIP/reason/lives-alone/alpha-tester answers; automatic technical data; cookies/pixels), how it's used and shared, retention, security, children's privacy, and GDPR/CCPA-style choices. Its "Advertising and conversion tracking" section states plainly that **joining the waitlist is treated as a conversion event and shared with advertising partners (Meta, Reddit)** to measure campaigns — the fact the team asked to disclose.
 - **Terms of Service** is pre-launch boilerplate: it makes clear the product/service is not yet available and the waitlist is not a purchase or a guarantee, plus eligibility, acceptable use, IP, an explicit "not an emergency/medical service" clause, disclaimers, limitation of liability, and Delaware governing law.
-- Unlike `index.html`/`welcome.html`, the legal pages do **not** include the Meta/Reddit pixel snippets — there's no reason to fire ad/conversion tracking on the privacy and terms pages. They are indexable (canonical tags set, listed in `sitemap.xml`).
+- Unlike `index.html`/`welcome.html`, the legal pages do **not** include the Meta/Reddit pixel snippets. They do include cookieless PostHog pageview analytics so overall site navigation is complete. They are indexable (canonical tags set, listed in `sitemap.xml`).
 - Both use the correctly-spelled contact address `hello@grandeldercare.com`. Confirm the governing-law jurisdiction (Delaware placeholder) and have counsel review before relying on these.

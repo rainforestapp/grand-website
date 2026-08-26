@@ -93,10 +93,14 @@
             including pages visited, referral and campaign sources, device and
             browser information, calls-to-action clicked, and completion of the
             waitlist and onboarding steps. PostHog is configured in cookieless
-            mode and does not store PostHog identifiers in your browser. We do not
-            send PostHog the phone number, email address, name, ZIP code, or
-            free-text answers you enter into our forms. This analytics data is
-            hosted in PostHog's European Union region.
+            mode for anonymous visits and does not set its own analytics cookies
+            or persistent browser identifiers. If you join the waitlist, we
+            generate a random candidate identifier, keep it for the duration of
+            that browser tab&rsquo;s session, and share it with PostHog so we can
+            connect the website journey to the corresponding waitlist entry. We
+            do not send PostHog the phone number, email address, name, ZIP code,
+            or free-text answers you enter into our forms. This analytics data is
+            hosted in PostHog&rsquo;s United States region.
           </p>
 
           <h2>Advertising and conversion tracking</h2>

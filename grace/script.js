@@ -429,6 +429,9 @@ if (waitlistForm) {
         trackAnalyticsEvent("waitlist_email_focus", {
           section_id: "waitlist",
         });
+        window.grandTrackWebsiteEvent?.("waitlist_started", {
+          form_type: "email",
+        });
       },
       { once: true },
     );
@@ -468,6 +471,9 @@ if (waitlistForm) {
         section_id: "waitlist",
         error: "invalid_email",
       });
+      window.grandTrackWebsiteEvent?.("waitlist_submission_failed", {
+        failure_reason: "invalid_email",
+      });
       setWaitlistStatus("Enter a valid email address.", "error");
       input.focus();
       return;
@@ -477,6 +483,9 @@ if (waitlistForm) {
       trackAnalyticsEvent("waitlist_submit_error", {
         section_id: "waitlist",
         error: "missing_endpoint",
+      });
+      window.grandTrackWebsiteEvent?.("waitlist_submission_failed", {
+        failure_reason: "missing_endpoint",
       });
       setWaitlistStatus("The waitlist sheet is not connected yet.", "error");
       return;
@@ -493,6 +502,9 @@ if (waitlistForm) {
       waitlistForm.reset();
       trackAnalyticsEvent("waitlist_submit_success", {
         section_id: "waitlist",
+      });
+      window.grandTrackWebsiteEvent?.("waitlist_signup", {
+        form_type: "email",
       });
       firePixelConversion("Lead", "SignUp");
       setWaitlistStatus("You're on the list. Taking you to a couple of quick questions...", "success");
@@ -511,6 +523,9 @@ if (waitlistForm) {
       trackAnalyticsEvent("waitlist_submit_error", {
         section_id: "waitlist",
         error: "network_or_script_error",
+      });
+      window.grandTrackWebsiteEvent?.("waitlist_submission_failed", {
+        failure_reason: "network_or_script_error",
       });
       setWaitlistStatus("Something went wrong. Please try again.", "error");
     } finally {
@@ -571,6 +586,9 @@ if (profileForm) {
         section_id: "welcome",
         error: "missing_endpoint",
       });
+      window.grandTrackWebsiteEvent?.("profile_submission_failed", {
+        failure_reason: "missing_endpoint",
+      });
       setProfileStatus("This form is not connected yet.", "error");
       return;
     }
@@ -587,6 +605,7 @@ if (profileForm) {
       trackAnalyticsEvent("waitlist_profile_submit_success", {
         section_id: "welcome",
       });
+      window.grandTrackWebsiteEvent?.("profile_completed");
 
       if (doneMessage) {
         (profileForm.closest("[data-profile-layout]") || profileForm).hidden = true;
@@ -600,6 +619,9 @@ if (profileForm) {
       trackAnalyticsEvent("waitlist_profile_submit_error", {
         section_id: "welcome",
         error: "network_or_script_error",
+      });
+      window.grandTrackWebsiteEvent?.("profile_submission_failed", {
+        failure_reason: "network_or_script_error",
       });
       setProfileStatus("Something went wrong. Please try again.", "error");
       button.disabled = false;

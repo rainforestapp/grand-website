@@ -71,6 +71,9 @@ const HEADERS = [
   // instead of email. Appended last so existing email sheets auto-migrate with
   // a blank column and no existing column shifts.
   "phone",
+  // Random, non-personal UUID shared with the sign-up's PostHog person profile.
+  // Appended last so existing sheets migrate without shifting any columns.
+  "candidate_id",
 ];
 
 const EVENT_HEADERS = [
@@ -183,6 +186,9 @@ function handleWaitlistProfile_(payload) {
     profile_completed_at: payload.profile_completed_at || new Date().toISOString(),
   };
 
+  const candidateId = candidateId_(payload.candidate_id);
+  if (candidateId) profileValues.candidate_id = candidateId;
+
   // Optional email captured on the profile page (phone products identify by
   // phone, so email is just extra contact data). Only write it when provided so
   // an empty submission never clears an email already on the row.
@@ -235,6 +241,7 @@ function handleWaitlistProfile_(payload) {
       row[HEADERS.indexOf("received_at")] = new Date();
       row[HEADERS.indexOf("email")] = email;
       row[HEADERS.indexOf("phone")] = plainTextPhone_(phone);
+      row[HEADERS.indexOf("candidate_id")] = candidateId;
       row[HEADERS.indexOf("source")] = payload.source || "";
       row[HEADERS.indexOf("raw_payload")] = JSON.stringify(payload);
       applyProfileToRow_(row, profileValues);
@@ -311,6 +318,15 @@ function normalizeIdentity_(header, value) {
 function isValidPhone_(value) {
   const digits = String(value || "").replace(/\D/g, "");
   return digits.length >= 10 && digits.length <= 15;
+}
+
+function candidateId_(value) {
+  const candidateId = String(value || "").trim().toLowerCase();
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(
+    candidateId,
+  )
+    ? candidateId
+    : "";
 }
 
 function plainTextPhone_(value) {
@@ -428,6 +444,7 @@ function rowForPayload_(email, payload) {
   // the profile columns. Blank for email signups.
   while (row.length < HEADERS.length) row.push("");
   row[HEADERS.indexOf("phone")] = plainTextPhone_(payload.phone);
+  row[HEADERS.indexOf("candidate_id")] = candidateId_(payload.candidate_id);
   return row;
 }
 

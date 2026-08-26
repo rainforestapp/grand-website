@@ -63,7 +63,7 @@ All URLs are canonicalized to `https://www.grandeldercare.com/` (the `www` host,
 
 ## PostHog Website Analytics
 
-The site sends privacy-conscious website analytics to the same PostHog Cloud EU project as the Grand iOS app, with a strict namespace boundary. `posthog.js` loads the EU ingestion endpoint in `cookieless_mode: "always"`, disables person profiles, autocapture, exception capture, feature-flag requests, and session recording, then manually captures pageviews. Every website event carries `platform = "web"` and `analytics_surface = "marketing_website"`; custom events also use a `website_` prefix so they cannot be confused with the iOS taxonomy.
+The site sends privacy-conscious website analytics to the same PostHog Cloud US project as the Grand iOS app, with a strict namespace boundary. `posthog.js` loads the US ingestion endpoint in `cookieless_mode: "always"`, disables person profiles, autocapture, exception capture, feature-flag requests, and session recording, then manually captures pageviews. Every website event carries `platform = "web"` and `analytics_surface = "marketing_website"`; custom events also use a `website_` prefix so they cannot be confused with the iOS taxonomy.
 
 The deliberate website events are `website_cta_clicked`, `website_contact_clicked`, `website_waitlist_started`, `website_waitlist_signup`, `website_waitlist_submission_failed`, `website_profile_completed`, `website_profile_submission_failed`, and `website_onboarding_call_clicked`. Event properties describe only the page/experience, CTA location/label, form type, or fixed failure reason. Phone numbers, email addresses, names, ZIP codes, and free-text answers are never sent to PostHog.
 

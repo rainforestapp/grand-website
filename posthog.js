@@ -1,9 +1,9 @@
 (function setupGrandWebsiteAnalytics(window, document) {
   "use strict";
 
-  const POSTHOG_PROJECT_TOKEN = "phc_mUSBnDUzt5xFcvdadqqDR9297UH94ttzvRhtRjdpLsrr";
-  const POSTHOG_API_HOST = "https://eu.i.posthog.com";
-  const POSTHOG_ASSET_URL = "https://eu-assets.i.posthog.com/static/1/array.js";
+  const POSTHOG_PROJECT_TOKEN = "phc_pcunHwXxRJ2QgbwTzYuExEm8toDhHboXmfEnzK38A8qd";
+  const POSTHOG_API_HOST = "https://us.i.posthog.com";
+  const POSTHOG_ASSET_URL = "https://us-assets.i.posthog.com/static/1/array.js";
   const queuedEvents = [];
   let posthogReady = false;
 
@@ -97,7 +97,7 @@
     const websiteContext = getWebsiteContext();
     window.posthog.init(POSTHOG_PROJECT_TOKEN, {
       api_host: POSTHOG_API_HOST,
-      ui_host: "https://eu.posthog.com",
+      ui_host: "https://us.posthog.com",
       defaults: "2026-05-30",
       cookieless_mode: "always",
       person_profiles: "never",

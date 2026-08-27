@@ -348,13 +348,14 @@ function firePixelConversion(metaEvent, redditEvent) {
   } catch {}
 }
 
-function buildWaitlistPayload(email) {
+function buildWaitlistPayload(email, candidateId) {
   const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
 
   return {
     type: "waitlist_signup",
     product: PRODUCT,
     email,
+    candidate_id: candidateId,
     source: "gracecompanion-website",
     submitted_at: new Date().toISOString(),
     page_url: window.location.href,
@@ -497,7 +498,9 @@ if (waitlistForm) {
     setWaitlistStatus("", "neutral");
 
     try {
-      const payload = buildWaitlistPayload(email);
+      const candidateId = window.grandGetOrCreateWebsiteCandidateId?.() || "";
+      window.grandIdentifyWebsiteCandidate?.(candidateId);
+      const payload = buildWaitlistPayload(email, candidateId);
       void submitWaitlist(endpoint, payload, { waitForCompletion: false });
       waitlistForm.reset();
       trackAnalyticsEvent("waitlist_submit_success", {
@@ -545,8 +548,10 @@ function setProfileStatus(message, type = "neutral") {
 
 function buildProfilePayload(form) {
   let email = "";
+  let candidateId = "";
   try {
     email = window.sessionStorage.getItem("gracecompanion_signup_email") || "";
+    candidateId = window.sessionStorage.getItem("grand_website_candidate_id") || "";
   } catch {}
 
   const data = new FormData(form);
@@ -555,6 +560,7 @@ function buildProfilePayload(form) {
     type: "waitlist_profile",
     product: PRODUCT,
     email,
+    candidate_id: candidateId,
     source: "gracecompanion-website",
     full_name: String(data.get("full_name") || "").trim(),
     zipcode: String(data.get("zipcode") || "").trim(),

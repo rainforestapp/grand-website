@@ -76,6 +76,12 @@
     };
   }
 
+  function safelyCapture(posthog, eventName, properties) {
+    try {
+      posthog.capture(eventName, properties);
+    } catch {}
+  }
+
   function captureWebsiteEvent(eventName, properties) {
     if (!eventName) return;
 
@@ -92,7 +98,7 @@
       return;
     }
 
-    window.posthog.capture(event.name, event.properties);
+    safelyCapture(window.posthog, event.name, event.properties);
   }
 
   function identifyWebsiteCandidate(candidateId) {
@@ -184,11 +190,13 @@
         posthogReady = true;
         const candidateId = pendingCandidateId || getStoredCandidateId();
         if (candidateId) identifyWebsiteCandidate(candidateId);
-        posthog.register(websiteContext);
-        posthog.capture("$pageview", websiteContext);
+        try {
+          posthog.register(websiteContext);
+        } catch {}
+        safelyCapture(posthog, "$pageview", websiteContext);
 
         queuedEvents.splice(0).forEach(function flushQueuedEvent(event) {
-          posthog.capture(event.name, event.properties);
+          safelyCapture(posthog, event.name, event.properties);
         });
       },
     });

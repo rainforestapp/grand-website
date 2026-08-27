@@ -415,13 +415,14 @@ function firePixelConversion(metaEvent, redditEvent) {
   } catch {}
 }
 
-function buildWaitlistPayload(phone) {
+function buildWaitlistPayload(phone, candidateId) {
   const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
 
   return {
     type: "waitlist_signup",
     product: PRODUCT,
     phone,
+    candidate_id: candidateId,
     source: "grand-website",
     submitted_at: new Date().toISOString(),
     page_url: window.location.href,
@@ -592,7 +593,9 @@ if (waitlistForm) {
     let submitted = false;
 
     try {
-      const payload = buildWaitlistPayload(phone);
+      const candidateId = window.grandGetOrCreateWebsiteCandidateId?.() || "";
+      window.grandIdentifyWebsiteCandidate?.(candidateId);
+      const payload = buildWaitlistPayload(phone, candidateId);
       void submitWaitlist(endpoint, payload, { waitForCompletion: false });
       waitlistForm.reset();
       submitted = true;
@@ -642,8 +645,10 @@ function setProfileStatus(message, type = "neutral") {
 
 function buildProfilePayload(form) {
   let phone = "";
+  let candidateId = "";
   try {
     phone = window.sessionStorage.getItem("grand_signup_phone") || "";
+    candidateId = window.sessionStorage.getItem("grand_website_candidate_id") || "";
   } catch {}
 
   const data = new FormData(form);
@@ -652,6 +657,7 @@ function buildProfilePayload(form) {
     type: "waitlist_profile",
     product: PRODUCT,
     phone,
+    candidate_id: candidateId,
     // Optional: phone stays the identity; email is captured only if the visitor
     // chooses to give it, and lands in the row's existing email column.
     email: String(data.get("email") || "").trim(),

@@ -95,10 +95,12 @@
 
           <div class="profile-main">
             <p class="profile-note">
-              A few optional questions if you&rsquo;d like to speed up getting
-              Grand. We&rsquo;re testing our first set of prototypes in homes now
+              A few quick questions to help us match you with the right next
+              step. We&rsquo;re testing our first set of prototypes in homes now
               and actively looking for more participants.
             </p>
+
+            <p class="profile-required-note"><span class="req" aria-hidden="true">*</span> Required</p>
 
             <form
               class="profile-form"
@@ -107,7 +109,7 @@
               novalidate
             >
             <div class="profile-field">
-              <label for="full_name">Full name</label>
+              <label for="full_name">Full name <span class="req" aria-hidden="true">*</span></label>
               <input
                 id="full_name"
                 name="full_name"
@@ -118,8 +120,8 @@
             </div>
 
             <div class="profile-field">
-              <label for="email">Email</label>
-              <p class="profile-hint">Optional &mdash; handy if you&rsquo;d like us to reach you by email too.</p>
+              <label for="email">Email <span class="req" aria-hidden="true">*</span></label>
+              <p class="profile-hint">So we can reach you about next steps.</p>
               <input
                 id="email"
                 name="email"
@@ -131,7 +133,7 @@
             </div>
 
             <div class="profile-field">
-              <label for="zipcode">ZIP code of your loved one</label>
+              <label for="zipcode">ZIP code of your loved one <span class="req" aria-hidden="true">*</span></label>
               <p class="profile-hint">Helps us prioritize where to launch first.</p>
               <input
                 id="zipcode"
@@ -144,8 +146,28 @@
               >
             </div>
 
+            <fieldset class="profile-field profile-choices">
+              <legend>What kind of phone do you use? <span class="req" aria-hidden="true">*</span></legend>
+              <label class="choice"><input type="radio" name="phone_type" value="iphone"> iPhone</label>
+              <label class="choice"><input type="radio" name="phone_type" value="android"> Android</label>
+              <label class="choice"><input type="radio" name="phone_type" value="other"> Something else</label>
+            </fieldset>
+
+            <fieldset class="profile-field profile-choices">
+              <legend>Does the person Grand is for live alone? <span class="req" aria-hidden="true">*</span></legend>
+              <label class="choice"><input type="radio" name="lives_alone" value="yes"> Yes</label>
+              <label class="choice"><input type="radio" name="lives_alone" value="no"> No</label>
+            </fieldset>
+
+            <fieldset class="profile-field profile-choices">
+              <legend>Does your loved one have any pets? <span class="req" aria-hidden="true">*</span></legend>
+              <label class="choice"><input type="radio" name="has_pets" value="no" checked> No</label>
+              <label class="choice"><input type="radio" name="has_pets" value="yes"> Yes</label>
+            </fieldset>
+
             <div class="profile-field">
               <label for="reason_interested">Why are you interested in Grand?</label>
+              <p class="profile-hint">Optional &mdash; a sentence or two is plenty.</p>
               <textarea
                 id="reason_interested"
                 name="reason_interested"
@@ -153,12 +175,6 @@
                 placeholder="A sentence or two is plenty."
               ></textarea>
             </div>
-
-            <fieldset class="profile-field profile-choices">
-              <legend>Does the person Grand is for live alone?</legend>
-              <label class="choice"><input type="radio" name="lives_alone" value="yes"> Yes</label>
-              <label class="choice"><input type="radio" name="lives_alone" value="no"> No</label>
-            </fieldset>
 
             <div class="profile-actions">
               <button type="submit" class="profile-button">Submit</button>
@@ -182,6 +198,15 @@
             target="_blank"
             rel="noopener"
           >Schedule 20-minute call</a>
+        </div>
+
+        <div class="profile-done" data-profile-waitlisted hidden>
+          <h2>You&rsquo;re on the list.</h2>
+          <p>
+            Thank you &mdash; that&rsquo;s everything we need for now. We&rsquo;ll
+            be in touch as Grand rolls out to more homes.
+          </p>
+          <a class="profile-button" href="index.html">Back to home</a>
         </div>
       </section>
     </main>

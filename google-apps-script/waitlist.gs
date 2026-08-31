@@ -74,6 +74,11 @@ const HEADERS = [
   // Random, non-personal UUID shared with the sign-up's PostHog person profile.
   // Appended last so existing sheets migrate without shifting any columns.
   "candidate_id",
+  // Qualifier answers collected on the profile page (welcome.html); used to
+  // decide who sees the scheduling call link. Appended last so existing sheets
+  // migrate without shifting any columns.
+  "phone_type",
+  "has_pets",
 ];
 
 const EVENT_HEADERS = [
@@ -182,6 +187,8 @@ function handleWaitlistProfile_(payload) {
     zipcode: String(payload.zipcode || "").trim(),
     reason_interested: String(payload.reason_interested || "").trim(),
     lives_alone: String(payload.lives_alone || "").trim(),
+    phone_type: String(payload.phone_type || "").trim(),
+    has_pets: String(payload.has_pets || "").trim(),
     alpha_tester: String(payload.alpha_tester || "").trim(),
     profile_completed_at: payload.profile_completed_at || new Date().toISOString(),
   };

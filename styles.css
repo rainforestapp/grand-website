@@ -1022,7 +1022,7 @@ h3 {
 }
 
 .profile-section {
-  padding: clamp(56px, 8vw, 104px) clamp(20px, 5vw, 72px);
+  padding: clamp(32px, 4vw, 56px) clamp(20px, 5vw, 72px);
 }
 
 .profile-section > * {
@@ -1034,7 +1034,8 @@ h3 {
 .profile-layout {
   align-items: start;
   display: grid;
-  gap: clamp(28px, 5vw, 56px);
+  column-gap: clamp(28px, 5vw, 56px);
+  row-gap: clamp(16px, 2vw, 24px);
   grid-template-columns: minmax(0, 0.85fr) minmax(0, 1fr);
 }
 
@@ -1060,7 +1061,7 @@ h3 {
 .profile-main {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 16px;
 }
 
 .profile-image {
@@ -1106,6 +1107,17 @@ h3 {
   color: var(--ink-faint);
   font-size: 13px;
   margin: -4px 0 10px;
+}
+
+.req {
+  color: var(--status-clay);
+  font-weight: 700;
+}
+
+.profile-required-note {
+  color: var(--ink-faint);
+  font-size: 13px;
+  margin: 0;
 }
 
 .profile-field input[type="email"],

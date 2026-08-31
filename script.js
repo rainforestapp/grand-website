@@ -666,6 +666,8 @@ function buildProfilePayload(form) {
     zipcode: String(data.get("zipcode") || "").trim(),
     reason_interested: String(data.get("reason_interested") || "").trim(),
     lives_alone: String(data.get("lives_alone") || ""),
+    phone_type: String(data.get("phone_type") || ""),
+    has_pets: String(data.get("has_pets") || ""),
     alpha_tester: String(data.get("alpha_tester") || ""),
     profile_completed_at: new Date().toISOString(),
     page_url: window.location.href,
@@ -675,6 +677,7 @@ function buildProfilePayload(form) {
 
 if (profileForm) {
   const doneMessage = document.querySelector("[data-profile-done]");
+  const waitlistedMessage = document.querySelector("[data-profile-waitlisted]");
 
   profileForm.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -686,6 +689,46 @@ if (profileForm) {
     trackAnalyticsEvent("waitlist_profile_submit_attempt", {
       section_id: "welcome",
     });
+
+    // Every field except "why are you interested" is required: the qualifier
+    // answers decide who is routed to the scheduling call vs. the waitlist, and
+    // name/email/ZIP are how we follow up, so we can't accept a blank submission.
+    const answers = new FormData(profileForm);
+    const requiredFields = [
+      "full_name",
+      "email",
+      "zipcode",
+      "phone_type",
+      "lives_alone",
+      "has_pets",
+    ];
+    const firstMissing = requiredFields.find(
+      (name) => !String(answers.get(name) || "").trim()
+    );
+    if (firstMissing) {
+      trackAnalyticsEvent("waitlist_profile_submit_error", {
+        section_id: "welcome",
+        error: "missing_required_field",
+      });
+      setProfileStatus("Please complete all required fields.", "error");
+      profileForm
+        .querySelector(`[name="${firstMissing}"]`)
+        ?.focus();
+      return;
+    }
+
+    // The form is novalidate (JS drives the flow), so check the email format
+    // ourselves rather than relying on the browser's native validation.
+    const emailField = profileForm.querySelector("#email");
+    if (emailField && !emailField.checkValidity()) {
+      trackAnalyticsEvent("waitlist_profile_submit_error", {
+        section_id: "welcome",
+        error: "invalid_email",
+      });
+      setProfileStatus("Please enter a valid email address.", "error");
+      emailField.focus();
+      return;
+    }
 
     if (!endpoint) {
       trackAnalyticsEvent("waitlist_profile_submit_error", {
@@ -708,15 +751,26 @@ if (profileForm) {
     // lost.
     void submitWaitlist(endpoint, payload, { waitForCompletion: false });
     firePixelConversion("CompleteRegistration", "Lead");
+
+    // Only good-fit alpha candidates see the scheduling link: an iPhone-using
+    // caregiver whose loved one lives alone and has no pets. Everyone else still
+    // has their answers saved but lands on the "you're on the list" panel.
+    const qualifies =
+      payload.phone_type === "iphone" &&
+      payload.lives_alone === "yes" &&
+      payload.has_pets === "no";
+
     trackAnalyticsEvent("waitlist_profile_submit_success", {
       section_id: "welcome",
+      qualified: qualifies,
     });
-    window.grandTrackWebsiteEvent?.("profile_completed");
+    window.grandTrackWebsiteEvent?.("profile_completed", { qualified: qualifies });
 
-    if (doneMessage) {
+    const panel = qualifies ? doneMessage : waitlistedMessage;
+    if (panel) {
       (profileForm.closest("[data-profile-layout]") || profileForm).hidden = true;
-      doneMessage.hidden = false;
-      doneMessage.scrollIntoView({ behavior: "smooth", block: "center" });
+      panel.hidden = false;
+      panel.scrollIntoView({ behavior: "smooth", block: "center" });
     } else {
       setProfileStatus("Thank you — we've got everything we need.", "success");
     }

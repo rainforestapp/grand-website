@@ -8,7 +8,7 @@ const EVENT_SHEET_NAME = "Events";
 // by doGet. Saving code in the Apps Script editor does not update the live web
 // app (that needs Deploy -> Manage deployments -> New version), and until now
 // there was no way to tell the deployed version apart from the committed one.
-const CODE_VERSION = "2026-09-09-ab-variant-2";
+const CODE_VERSION = "2026-09-14-confirmed-delivery-1";
 
 // Separate product lines (gracecompanion, gracephone) share this one endpoint
 // and spreadsheet but land in their own tabs, so their signups/events never mix
@@ -115,6 +115,23 @@ const EVENT_HEADERS = [
   "looks_valid",
   "value_length_bucket",
   "waitlist_variant",
+  // Delivery and first-touch attribution fields used to reconcile a confirmed
+  // browser conversion with the row that was actually written.
+  "candidate_id",
+  "submission_id",
+  "delivery_confirmed",
+  "utm_source",
+  "utm_medium",
+  "utm_campaign",
+  "utm_content",
+  "utm_term",
+  "utm_id",
+  "attribution_type",
+  "initial_referring_domain",
+  "initial_landing_path",
+  "has_fbclid",
+  "has_rdt_cid",
+  "qa_mode",
 ];
 
 function doGet() {
@@ -174,6 +191,7 @@ function doPost(event) {
 function handleWaitlistSignup_(payload) {
   const email = String(payload.email || "").trim().toLowerCase();
   const phone = String(payload.phone || "").trim();
+  const submissionId = candidateId_(payload.submission_id || payload.candidate_id);
 
   // Phone-based signups (Grand phone alpha list) identify by phone number and
   // carry no email. Everything else keeps the existing email contract.
@@ -194,12 +212,22 @@ function handleWaitlistSignup_(payload) {
     const sheet = getSheet_(spreadsheet, sheetNamesForProduct_(payload.product).waitlist);
     ensureHeaders_(sheet, HEADERS);
     ensurePhoneColumnIsText_(sheet);
-    sheet.appendRow(rowForPayload_(email, payload));
+
+    // A confirmed request may be retried after a network interruption. Reuse
+    // the existing candidate row instead of turning a safe retry into a
+    // duplicate lead.
+    const existingRow = submissionId
+      ? findRowByColumn_(sheet, "candidate_id", submissionId)
+      : -1;
+    if (existingRow < 0) sheet.appendRow(rowForPayload_(email, payload));
+    const rowIndex = existingRow > 0 ? existingRow : sheet.getLastRow();
     result = {
       ok: true,
       spreadsheet_url: sheet.getParent().getUrl(),
       sheet_name: sheet.getName(),
-      row: sheet.getLastRow(),
+      row: rowIndex,
+      submission_id: submissionId,
+      duplicate: existingRow > 0,
     };
   } finally {
     lock.releaseLock();
@@ -223,7 +251,7 @@ function handleWaitlistProfile_(payload) {
     profile_completed_at: payload.profile_completed_at || new Date().toISOString(),
   };
 
-  const candidateId = candidateId_(payload.candidate_id);
+  const candidateId = candidateId_(payload.submission_id || payload.candidate_id);
   if (candidateId) profileValues.candidate_id = candidateId;
 
   // The optional second contact method captured on the profile page: the phone
@@ -254,10 +282,9 @@ function handleWaitlistProfile_(payload) {
     lock.releaseLock();
   }
 
-  // The signup is submitted with sendBeacon/keepalive so visitors can leave the
-  // page immediately. If the profile form is submitted right away, give the
-  // signup append a short chance to land before appending a fallback
-  // profile-only row.
+  // Older clients submitted the signup optimistically, so keep a short lookup
+  // retry before appending a fallback profile-only row. Current clients await
+  // the confirmed signup response and normally match on the first attempt.
   const identities = signupIdentities_(candidateId, variant, phone, email);
   const rowIndex = waitForSignupRow_(sheet, identities);
 
@@ -554,7 +581,9 @@ function rowForPayload_(email, payload) {
   // the profile columns. Blank for email signups.
   while (row.length < HEADERS.length) row.push("");
   row[HEADERS.indexOf("phone")] = plainTextPhone_(payload.phone);
-  row[HEADERS.indexOf("candidate_id")] = candidateId_(payload.candidate_id);
+  row[HEADERS.indexOf("candidate_id")] = candidateId_(
+    payload.submission_id || payload.candidate_id,
+  );
   row[HEADERS.indexOf("waitlist_variant")] = variant_(payload.waitlist_variant);
   return row;
 }
@@ -587,6 +616,21 @@ function rowForEventPayload_(payload) {
     valueOrBlank_(payload.looks_valid),
     payload.value_length_bucket || "",
     variant_(payload.waitlist_variant),
+    candidateId_(payload.candidate_id),
+    candidateId_(payload.submission_id || payload.candidate_id),
+    valueOrBlank_(payload.delivery_confirmed),
+    payload.utm_source || "",
+    payload.utm_medium || "",
+    payload.utm_campaign || "",
+    payload.utm_content || "",
+    payload.utm_term || "",
+    payload.utm_id || "",
+    payload.attribution_type || "",
+    payload.initial_referring_domain || "",
+    payload.initial_landing_path || "",
+    valueOrBlank_(payload.has_fbclid),
+    valueOrBlank_(payload.has_rdt_cid),
+    valueOrBlank_(payload.qa_mode),
   ];
 }
 

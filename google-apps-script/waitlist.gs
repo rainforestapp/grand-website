@@ -8,7 +8,7 @@ const EVENT_SHEET_NAME = "Events";
 // by doGet. Saving code in the Apps Script editor does not update the live web
 // app (that needs Deploy -> Manage deployments -> New version), and until now
 // there was no way to tell the deployed version apart from the committed one.
-const CODE_VERSION = "2026-09-09-ab-variant-2";
+const CODE_VERSION = "2026-09-15-confirmed-delivery-2";
 
 // Separate product lines (gracecompanion, gracephone) share this one endpoint
 // and spreadsheet but land in their own tabs, so their signups/events never mix
@@ -115,6 +115,23 @@ const EVENT_HEADERS = [
   "looks_valid",
   "value_length_bucket",
   "waitlist_variant",
+  // Delivery and first-touch attribution fields used to reconcile a confirmed
+  // browser conversion with the row that was actually written.
+  "candidate_id",
+  "submission_id",
+  "delivery_confirmed",
+  "utm_source",
+  "utm_medium",
+  "utm_campaign",
+  "utm_content",
+  "utm_term",
+  "utm_id",
+  "attribution_type",
+  "initial_referring_domain",
+  "initial_landing_path",
+  "has_fbclid",
+  "has_rdt_cid",
+  "qa_mode",
 ];
 
 function doGet() {
@@ -174,6 +191,7 @@ function doPost(event) {
 function handleWaitlistSignup_(payload) {
   const email = String(payload.email || "").trim().toLowerCase();
   const phone = String(payload.phone || "").trim();
+  const submissionId = candidateId_(payload.submission_id);
 
   // Phone-based signups (Grand phone alpha list) identify by phone number and
   // carry no email. Everything else keeps the existing email contract.
@@ -194,12 +212,22 @@ function handleWaitlistSignup_(payload) {
     const sheet = getSheet_(spreadsheet, sheetNamesForProduct_(payload.product).waitlist);
     ensureHeaders_(sheet, HEADERS);
     ensurePhoneColumnIsText_(sheet);
-    sheet.appendRow(rowForPayload_(email, payload));
+
+    // A confirmed request may be retried after a network interruption. Reuse
+    // only a row written by this exact submission, not every row created by the
+    // same browser session/candidate.
+    const existingRow = submissionId
+      ? findRowBySubmissionId_(sheet, submissionId)
+      : -1;
+    if (existingRow < 0) sheet.appendRow(rowForPayload_(email, payload));
+    const rowIndex = existingRow > 0 ? existingRow : sheet.getLastRow();
     result = {
       ok: true,
       spreadsheet_url: sheet.getParent().getUrl(),
       sheet_name: sheet.getName(),
-      row: sheet.getLastRow(),
+      row: rowIndex,
+      submission_id: submissionId,
+      duplicate: existingRow > 0,
     };
   } finally {
     lock.releaseLock();
@@ -224,6 +252,7 @@ function handleWaitlistProfile_(payload) {
   };
 
   const candidateId = candidateId_(payload.candidate_id);
+  const submissionId = candidateId_(payload.submission_id);
   if (candidateId) profileValues.candidate_id = candidateId;
 
   // The optional second contact method captured on the profile page: the phone
@@ -254,11 +283,10 @@ function handleWaitlistProfile_(payload) {
     lock.releaseLock();
   }
 
-  // The signup is submitted with sendBeacon/keepalive so visitors can leave the
-  // page immediately. If the profile form is submitted right away, give the
-  // signup append a short chance to land before appending a fallback
-  // profile-only row.
-  const identities = signupIdentities_(candidateId, variant, phone, email);
+  // Older clients submitted the signup optimistically, so keep a short lookup
+  // retry before appending a fallback profile-only row. Current clients await
+  // the confirmed signup response and normally match on the first attempt.
+  const identities = signupIdentities_(submissionId, candidateId, variant, phone, email);
   const rowIndex = waitForSignupRow_(sheet, identities);
 
   lock.waitLock(10000);
@@ -435,9 +463,26 @@ function findRowByColumn_(sheet, header, value) {
   return -1;
 }
 
+function findRowBySubmissionId_(sheet, submissionId) {
+  const lastRow = sheet.getLastRow();
+  if (lastRow < 2 || !submissionId) return -1;
+
+  const column = HEADERS.indexOf("raw_payload") + 1;
+  const values = sheet.getRange(2, column, lastRow - 1, 1).getValues();
+
+  for (let i = values.length - 1; i >= 0; i--) {
+    try {
+      const payload = JSON.parse(String(values[i][0] || "{}"));
+      if (candidateId_(payload.submission_id) === submissionId) return i + 2;
+    } catch {}
+  }
+
+  return -1;
+}
+
 // Ordered [column, value] pairs to try when matching a profile submission back
 // to its signup row, most reliable first.
-function signupIdentities_(candidateId, variant, phone, email) {
+function signupIdentities_(submissionId, candidateId, variant, phone, email) {
   const identities = [];
   const seen = {};
 
@@ -448,7 +493,11 @@ function signupIdentities_(candidateId, variant, phone, email) {
     identities.push([column, value]);
   }
 
-  // candidate_id first: a random UUID that both the signup and the profile
+  // submission_id is stored inside raw_payload so it can remain independent of
+  // the session-wide candidate_id without occupying a hand-managed sheet column.
+  add("submission_id", submissionId);
+
+  // candidate_id next: a random UUID that both the signup and the profile
   // payload carry verbatim, so it does not depend on which field the A/B
   // variant happened to ask for.
   add("candidate_id", candidateId);
@@ -471,7 +520,9 @@ function signupIdentities_(candidateId, variant, phone, email) {
 
 function findSignupRow_(sheet, identities) {
   for (let i = 0; i < identities.length; i++) {
-    const rowIndex = findRowByColumn_(sheet, identities[i][0], identities[i][1]);
+    const rowIndex = identities[i][0] === "submission_id"
+      ? findRowBySubmissionId_(sheet, identities[i][1])
+      : findRowByColumn_(sheet, identities[i][0], identities[i][1]);
     if (rowIndex > 0) return rowIndex;
   }
 
@@ -587,6 +638,21 @@ function rowForEventPayload_(payload) {
     valueOrBlank_(payload.looks_valid),
     payload.value_length_bucket || "",
     variant_(payload.waitlist_variant),
+    candidateId_(payload.candidate_id),
+    candidateId_(payload.submission_id || payload.candidate_id),
+    valueOrBlank_(payload.delivery_confirmed),
+    payload.utm_source || "",
+    payload.utm_medium || "",
+    payload.utm_campaign || "",
+    payload.utm_content || "",
+    payload.utm_term || "",
+    payload.utm_id || "",
+    payload.attribution_type || "",
+    payload.initial_referring_domain || "",
+    payload.initial_landing_path || "",
+    valueOrBlank_(payload.has_fbclid),
+    valueOrBlank_(payload.has_rdt_cid),
+    valueOrBlank_(payload.qa_mode),
   ];
 }
 

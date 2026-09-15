@@ -73,6 +73,13 @@ function getViewportPayload() {
   };
 }
 
+function getAnalyticsContextPayload() {
+  return {
+    ...(window.grandGetWebsiteAttribution?.() || {}),
+    candidate_id: window.grandGetStoredWebsiteCandidateId?.() || "",
+  };
+}
+
 function getCurrentSectionId() {
   const sections = trackedSections
     .map((id) => document.getElementById(id))
@@ -102,6 +109,7 @@ function trackAnalyticsEvent(eventType, details = {}) {
     referrer: document.referrer || "",
     viewport: getViewportPayload(),
     section_id: getCurrentSectionId(),
+    ...getAnalyticsContextPayload(),
     // Which arm of the homepage waitlist A/B test this session was assigned.
     // Tagging the base payload means every event is comparable by variant,
     // including section_view — so "saw the form" and "signed up" come from one
@@ -428,6 +436,10 @@ async function fetchGeoLocation() {
 // optimize toward signups (previously only PageView/PageVisit fired). Guarded
 // so a blocked or absent pixel never throws.
 function firePixelConversion(metaEvent, redditEvent) {
+  // QA page loads and form checks must not train ad-platform optimization or
+  // appear as paid conversions. Use ?qa=1 or utm_source=qa when testing live.
+  if (window.grandIsWebsiteQaMode?.()) return;
+
   try {
     if (typeof window.fbq === "function") window.fbq("track", metaEvent);
   } catch {}
@@ -436,7 +448,7 @@ function firePixelConversion(metaEvent, redditEvent) {
   } catch {}
 }
 
-function buildWaitlistPayload(identity, candidateId, variant) {
+function buildWaitlistPayload(identity, candidateId, submissionId, variant) {
   const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
 
   return {
@@ -449,6 +461,9 @@ function buildWaitlistPayload(identity, candidateId, variant) {
     email: variant === "email" ? identity : "",
     waitlist_variant: variant,
     candidate_id: candidateId,
+    // A submission-specific UUID makes an interrupted request safe to retry
+    // without treating every signup in this browser session as the same lead.
+    submission_id: submissionId,
     source: "grand-website",
     submitted_at: new Date().toISOString(),
     page_url: window.location.href,
@@ -485,31 +500,60 @@ function buildWaitlistPayload(identity, candidateId, variant) {
         }
       : null,
     geo: cachedGeoLocation,
+    ...(window.grandGetWebsiteAttribution?.() || {}),
   };
 }
 
-function submitWaitlist(endpoint, payload, options = {}) {
-  const { waitForCompletion = true } = options;
+async function submitWaitlist(endpoint, payload) {
   const body = JSON.stringify(payload);
+  const controller = new AbortController();
+  const timeout = window.setTimeout(() => controller.abort(), 10000);
 
-  if (!waitForCompletion && navigator.sendBeacon) {
-    const blob = new Blob([body], { type: "text/plain;charset=UTF-8" });
-    if (navigator.sendBeacon(endpoint, blob)) {
-      return Promise.resolve();
+  try {
+    const response = await fetch(endpoint, {
+      method: "POST",
+      // text/plain is a simple CORS request, and Apps Script's redirect target
+      // returns Access-Control-Allow-Origin: *. Reading that JSON is what lets us
+      // distinguish a written row from a queued-or-rejected beacon.
+      mode: "cors",
+      headers: {
+        "Content-Type": "text/plain;charset=UTF-8",
+      },
+      body,
+      signal: controller.signal,
+    });
+
+    if (!response.ok) {
+      const error = new Error(`waitlist_http_${response.status}`);
+      error.failureReason = "http_error";
+      throw error;
     }
+
+    let result;
+    try {
+      result = await response.json();
+    } catch (error) {
+      if (controller.signal.aborted) throw error;
+      const invalidResponseError = new Error("waitlist_invalid_response");
+      invalidResponseError.failureReason = "invalid_server_response";
+      throw invalidResponseError;
+    }
+
+    if (!result?.ok) {
+      const error = new Error(`waitlist_rejected_${String(result?.error || "unknown")}`);
+      error.failureReason = String(result?.error || "server_rejected").slice(0, 80);
+      throw error;
+    }
+
+    return result;
+  } catch (error) {
+    if (!controller.signal.aborted) throw error;
+    const timeoutError = new Error("waitlist_timeout");
+    timeoutError.failureReason = "timeout";
+    throw timeoutError;
+  } finally {
+    window.clearTimeout(timeout);
   }
-
-  const request = fetch(endpoint, {
-    method: "POST",
-    mode: "no-cors",
-    keepalive: !waitForCompletion,
-    headers: {
-      "Content-Type": "text/plain",
-    },
-    body,
-  });
-
-  return waitForCompletion ? request : request.catch(() => {});
 }
 
 if (waitlistForm) {
@@ -529,6 +573,8 @@ if (waitlistForm) {
   const variantWasAssigned =
     window.grandWaitlistVariant === "phone" || window.grandWaitlistVariant === "email";
   const activeVariant = window.grandWaitlistVariant === "email" ? "email" : "phone";
+  let pendingSubmissionId = "";
+  let pendingSubmissionIdentity = "";
   waitlistForm
     .querySelectorAll(`[data-waitlist-field]:not([data-waitlist-field="${activeVariant}"])`)
     .forEach((field) => field.remove());
@@ -644,14 +690,22 @@ if (waitlistForm) {
     const endpoint = waitlistForm.dataset.waitlistEndpoint?.trim();
     if (!input || !button) return;
 
-    trackAnalyticsEvent("waitlist_submit_attempt", {
-      section_id: "waitlist",
-    });
+    const candidateId = window.grandGetOrCreateWebsiteCandidateId?.() || "";
 
     if (!isEmailVariant) formatPhoneInput(input);
     const identity = isEmailVariant
       ? input.value.trim()
       : getWaitlistPhoneSubmissionValue(input);
+    const submissionIdentity = `${activeVariant}:${identity}`;
+    if (!pendingSubmissionId || pendingSubmissionIdentity !== submissionIdentity) {
+      pendingSubmissionId = window.grandCreateWebsiteSubmissionId?.() || "";
+      pendingSubmissionIdentity = submissionIdentity;
+    }
+
+    trackAnalyticsEvent("waitlist_submit_attempt", {
+      section_id: "waitlist",
+      submission_id: pendingSubmissionId,
+    });
 
     if (!isValidWaitlistValue()) {
       const failureReason = isEmailVariant ? "invalid_email" : "invalid_phone";
@@ -687,17 +741,25 @@ if (waitlistForm) {
     let submitted = false;
 
     try {
-      const candidateId = window.grandGetOrCreateWebsiteCandidateId?.() || "";
       window.grandIdentifyWebsiteCandidate?.(candidateId);
-      const payload = buildWaitlistPayload(identity, candidateId, activeVariant);
-      void submitWaitlist(endpoint, payload, { waitForCompletion: false });
+      const payload = buildWaitlistPayload(
+        identity,
+        candidateId,
+        pendingSubmissionId,
+        activeVariant,
+      );
+      await submitWaitlist(endpoint, payload);
       waitlistForm.reset();
       submitted = true;
       trackAnalyticsEvent("waitlist_submit_success", {
         section_id: "waitlist",
+        submission_id: pendingSubmissionId,
+        delivery_confirmed: true,
       });
       window.grandTrackWebsiteEvent?.("waitlist_signup", {
         form_type: activeVariant,
+        submission_id: pendingSubmissionId,
+        delivery_confirmed: true,
       });
       firePixelConversion("Lead", "SignUp");
       setWaitlistStatus("You're on the list. Taking you to a couple of quick questions...", "success");
@@ -712,6 +774,7 @@ if (waitlistForm) {
           isEmailVariant ? "grand_signup_email" : "grand_signup_phone",
           identity,
         );
+        window.sessionStorage.setItem("grand_signup_submission_id", pendingSubmissionId);
         // Clear the opposite key. welcome.html decides what to ask for from
         // which of these two exists, so leaving a stale value from an earlier
         // ?variant= switch in the same session would make it conclude we
@@ -723,12 +786,15 @@ if (waitlistForm) {
       window.location.assign("welcome.html");
     } catch (error) {
       console.warn(error);
+      const failureReason = error?.failureReason || "network_or_script_error";
       trackAnalyticsEvent("waitlist_submit_error", {
         section_id: "waitlist",
-        error: "network_or_script_error",
+        submission_id: pendingSubmissionId,
+        error: failureReason,
       });
       window.grandTrackWebsiteEvent?.("waitlist_submission_failed", {
-        failure_reason: "network_or_script_error",
+        submission_id: pendingSubmissionId,
+        failure_reason: failureReason,
       });
       setWaitlistStatus("Something went wrong. Please try again.", "error");
     } finally {
@@ -751,10 +817,13 @@ function buildProfilePayload(form) {
   let storedPhone = "";
   let storedEmail = "";
   let candidateId = "";
+  let submissionId = "";
   try {
     storedPhone = window.sessionStorage.getItem("grand_signup_phone") || "";
     storedEmail = window.sessionStorage.getItem("grand_signup_email") || "";
-    candidateId = window.sessionStorage.getItem("grand_website_candidate_id") || "";
+    candidateId = window.grandGetOrCreateWebsiteCandidateId?.() ||
+      window.sessionStorage.getItem("grand_website_candidate_id") || "";
+    submissionId = window.sessionStorage.getItem("grand_signup_submission_id") || "";
   } catch {}
 
   const data = new FormData(form);
@@ -779,6 +848,7 @@ function buildProfilePayload(form) {
     // wrote, instead of guessing phone-then-email and appending a duplicate.
     waitlist_variant: window.grandWaitlistVariant || "",
     candidate_id: candidateId,
+    submission_id: submissionId,
     source: "grand-website",
     full_name: String(data.get("full_name") || "").trim(),
     zipcode: String(data.get("zipcode") || "").trim(),
@@ -788,6 +858,7 @@ function buildProfilePayload(form) {
     has_pets: String(data.get("has_pets") || ""),
     alpha_tester: String(data.get("alpha_tester") || ""),
     profile_completed_at: new Date().toISOString(),
+    ...(window.grandGetWebsiteAttribution?.() || {}),
     page_url: window.location.href,
     referrer: document.referrer || "",
   };
@@ -895,36 +966,64 @@ if (profileForm) {
     }
 
     const payload = buildProfilePayload(profileForm);
-    // Fire-and-forget, like the initial signup capture: sendBeacon (with a
-    // keepalive fetch fallback) so the confirmation shows instantly instead of
-    // blocking on the Apps Script round trip — that call holds a script lock and
-    // runs a signup-row retry loop that can take ~1.4s. The backend appends a
-    // fallback row if the match is missed, so optional profile answers are never
-    // lost.
-    void submitWaitlist(endpoint, payload, { waitForCompletion: false });
-    firePixelConversion("CompleteRegistration", "Lead");
+    const originalLabel = button.textContent;
+    button.disabled = true;
+    button.textContent = "Saving...";
+    setProfileStatus("", "neutral");
+    let submitted = false;
 
-    // Only good-fit alpha candidates see the scheduling link: an iPhone-using
-    // caregiver whose loved one lives alone and has no pets. Everyone else still
-    // has their answers saved but lands on the "you're on the list" panel.
-    const qualifies =
-      payload.phone_type === "iphone" &&
-      payload.lives_alone === "yes" &&
-      payload.has_pets === "no";
+    try {
+      // Do not announce completion until Apps Script has returned `{ ok: true }`.
+      // Profile answers are valuable lead data too, and the old optimistic path
+      // could lose them while still revealing the confirmation panel.
+      await submitWaitlist(endpoint, payload);
+      submitted = true;
+      firePixelConversion("CompleteRegistration", "Lead");
 
-    trackAnalyticsEvent("waitlist_profile_submit_success", {
-      section_id: "welcome",
-      qualified: qualifies,
-    });
-    window.grandTrackWebsiteEvent?.("profile_completed", { qualified: qualifies });
+      // Only good-fit alpha candidates see the scheduling link: an iPhone-using
+      // caregiver whose loved one lives alone and has no pets. Everyone else still
+      // has their answers saved but lands on the "you're on the list" panel.
+      const qualifies =
+        payload.phone_type === "iphone" &&
+        payload.lives_alone === "yes" &&
+        payload.has_pets === "no";
 
-    const panel = qualifies ? doneMessage : waitlistedMessage;
-    if (panel) {
-      (profileForm.closest("[data-profile-layout]") || profileForm).hidden = true;
-      panel.hidden = false;
-      panel.scrollIntoView({ behavior: "smooth", block: "center" });
-    } else {
-      setProfileStatus("Thank you — we've got everything we need.", "success");
+      trackAnalyticsEvent("waitlist_profile_submit_success", {
+        section_id: "welcome",
+        submission_id: payload.submission_id,
+        delivery_confirmed: true,
+        qualified: qualifies,
+      });
+      window.grandTrackWebsiteEvent?.("profile_completed", {
+        submission_id: payload.submission_id,
+        delivery_confirmed: true,
+        qualified: qualifies,
+      });
+
+      const panel = qualifies ? doneMessage : waitlistedMessage;
+      if (panel) {
+        (profileForm.closest("[data-profile-layout]") || profileForm).hidden = true;
+        panel.hidden = false;
+        panel.scrollIntoView({ behavior: "smooth", block: "center" });
+      } else {
+        setProfileStatus("Thank you — we've got everything we need.", "success");
+      }
+    } catch (error) {
+      console.warn(error);
+      const failureReason = error?.failureReason || "network_or_script_error";
+      trackAnalyticsEvent("waitlist_profile_submit_error", {
+        section_id: "welcome",
+        submission_id: payload.submission_id,
+        error: failureReason,
+      });
+      window.grandTrackWebsiteEvent?.("profile_submission_failed", {
+        submission_id: payload.submission_id,
+        failure_reason: failureReason,
+      });
+      setProfileStatus("We couldn't save that yet. Please try again.", "error");
+    } finally {
+      button.textContent = originalLabel;
+      if (!submitted) button.disabled = false;
     }
   });
 }

@@ -5,7 +5,6 @@
   const POSTHOG_API_HOST = "https://us.i.posthog.com";
   const POSTHOG_ASSET_URL = "https://us-assets.i.posthog.com/static/1/array.js";
   const WAITLIST_EXPERIMENT_FLAG_KEY = "homepage-waitlist-contact-field";
-  const CANDIDATE_ID_STORAGE_KEY = "grand_website_candidate_id";
   const queuedEvents = [];
   let posthogReady = false;
   let pendingCandidateId = "";
@@ -14,48 +13,6 @@
     return /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
       String(value || ""),
     );
-  }
-
-  function getStoredCandidateId() {
-    try {
-      const candidateId = window.sessionStorage.getItem(CANDIDATE_ID_STORAGE_KEY) || "";
-      return isCandidateId(candidateId) ? candidateId : "";
-    } catch {
-      return "";
-    }
-  }
-
-  function createCandidateId() {
-    if (typeof window.crypto?.randomUUID === "function") {
-      return window.crypto.randomUUID();
-    }
-
-    if (typeof window.crypto?.getRandomValues !== "function") return "";
-
-    const bytes = window.crypto.getRandomValues(new Uint8Array(16));
-    bytes[6] = (bytes[6] & 0x0f) | 0x40;
-    bytes[8] = (bytes[8] & 0x3f) | 0x80;
-    const hex = Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0"));
-    return `${hex.slice(0, 4).join("")}-${hex.slice(4, 6).join("")}-${hex
-      .slice(6, 8)
-      .join("")}-${hex.slice(8, 10).join("")}-${hex.slice(10).join("")}`;
-  }
-
-  function getOrCreateCandidateId() {
-    try {
-      const storedCandidateId = getStoredCandidateId();
-      if (storedCandidateId) return storedCandidateId;
-
-      const candidateId = createCandidateId();
-      if (!candidateId) return "";
-
-      try {
-        window.sessionStorage.setItem(CANDIDATE_ID_STORAGE_KEY, candidateId);
-      } catch {}
-      return candidateId;
-    } catch {
-      return "";
-    }
   }
 
   function getWebsiteContext() {
@@ -74,6 +31,7 @@
       analytics_surface: "marketing_website",
       website_experience: isGrace ? "grace" : "grand",
       website_page_type: pageType,
+      ...(window.grandGetWebsiteAttribution?.() || {}),
     };
 
     // Which arm of the Grand homepage waitlist A/B test this session is in, as
@@ -141,7 +99,6 @@
   // PostHog SDK directly. The only identity accepted is a random UUID; no form
   // values or other personal data are accepted.
   window.grandTrackWebsiteEvent = captureWebsiteEvent;
-  window.grandGetOrCreateWebsiteCandidateId = getOrCreateCandidateId;
   window.grandIdentifyWebsiteCandidate = identifyWebsiteCandidate;
 
   function getClickLocation(link) {
@@ -207,7 +164,7 @@
       advanced_disable_flags: true,
       loaded: function onPostHogLoaded(posthog) {
         posthogReady = true;
-        const candidateId = pendingCandidateId || getStoredCandidateId();
+        const candidateId = pendingCandidateId || window.grandGetStoredWebsiteCandidateId?.() || "";
         if (candidateId) identifyWebsiteCandidate(candidateId);
         try {
           posthog.register(websiteContext);

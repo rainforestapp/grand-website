@@ -66,13 +66,14 @@ vm.runInNewContext(
     };
     SpreadsheetApp.openById = function openById() { return spreadsheet; };
 
-    const submissionId = "123e4567-e89b-42d3-a456-426614174000";
+    const candidateId = "123e4567-e89b-42d3-a456-426614174000";
+    const submissionId = "223e4567-e89b-42d3-a456-426614174000";
     const payload = {
       type: "waitlist_signup",
       product: "grandphone",
       email: "qa@example.com",
       waitlist_variant: "email",
-      candidate_id: submissionId,
+      candidate_id: candidateId,
       submission_id: submissionId,
     };
     const first = JSON.parse(handleWaitlistSignup_(payload).text);
@@ -82,10 +83,28 @@ vm.runInNewContext(
     assert(second.ok === true && second.duplicate === true, "retry should be idempotent");
     assert(rows.length === 1, "retry appended a duplicate row");
     assert(rows[0].length === HEADERS.length, "signup row/header width mismatch");
+    assert(rows[0][HEADERS.indexOf("candidate_id")] === candidateId, "candidate ID was not preserved");
+
+    const nextSubmission = {
+      ...payload,
+      email: "another@example.com",
+      submission_id: "323e4567-e89b-42d3-a456-426614174000",
+    };
+    const third = JSON.parse(handleWaitlistSignup_(nextSubmission).text);
+    assert(third.ok === true && third.duplicate === false, "new submission should append");
+    assert(rows.length === 2, "session-wide candidate incorrectly swallowed a new signup");
+    const nextIdentities = signupIdentities_(
+      nextSubmission.submission_id,
+      candidateId,
+      "email",
+      "",
+      nextSubmission.email,
+    );
+    assert(findSignupRow_(sheet, nextIdentities) === 3, "profile did not match its submission row");
 
     const eventRow = rowForEventPayload_({
       event_type: "waitlist_submit_success",
-      candidate_id: submissionId,
+      candidate_id: candidateId,
       submission_id: submissionId,
       delivery_confirmed: true,
       utm_source: "reddit",
@@ -100,4 +119,4 @@ vm.runInNewContext(
   { ...context, assert },
 );
 
-console.log("waitlist backend: 9 assertions passed");
+console.log("waitlist backend: 13 assertions passed");

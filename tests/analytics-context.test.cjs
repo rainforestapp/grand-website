@@ -44,10 +44,13 @@ assert.equal(attribution.qa_mode, true);
 const candidateId = window.grandGetOrCreateWebsiteCandidateId();
 assert.match(candidateId, /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
 assert.equal(window.grandGetOrCreateWebsiteCandidateId(), candidateId);
+const submissionId = window.grandCreateWebsiteSubmissionId();
+assert.match(submissionId, /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
+assert.notEqual(submissionId, candidateId);
 
 // Simulate the query-string-free profile page in the same browser tab.
 window.location.search = "";
 assert.equal(window.grandIsWebsiteQaMode(), true);
 assert.equal(window.grandGetWebsiteAttribution().utm_source, "reddit");
 
-console.log("analytics context: 9 assertions passed");
+console.log("analytics context: 11 assertions passed");

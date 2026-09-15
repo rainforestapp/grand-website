@@ -8,7 +8,7 @@ const EVENT_SHEET_NAME = "Events";
 // by doGet. Saving code in the Apps Script editor does not update the live web
 // app (that needs Deploy -> Manage deployments -> New version), and until now
 // there was no way to tell the deployed version apart from the committed one.
-const CODE_VERSION = "2026-09-14-confirmed-delivery-1";
+const CODE_VERSION = "2026-09-15-confirmed-delivery-2";
 
 // Separate product lines (gracecompanion, gracephone) share this one endpoint
 // and spreadsheet but land in their own tabs, so their signups/events never mix
@@ -191,7 +191,7 @@ function doPost(event) {
 function handleWaitlistSignup_(payload) {
   const email = String(payload.email || "").trim().toLowerCase();
   const phone = String(payload.phone || "").trim();
-  const submissionId = candidateId_(payload.submission_id || payload.candidate_id);
+  const submissionId = candidateId_(payload.submission_id);
 
   // Phone-based signups (Grand phone alpha list) identify by phone number and
   // carry no email. Everything else keeps the existing email contract.
@@ -214,10 +214,10 @@ function handleWaitlistSignup_(payload) {
     ensurePhoneColumnIsText_(sheet);
 
     // A confirmed request may be retried after a network interruption. Reuse
-    // the existing candidate row instead of turning a safe retry into a
-    // duplicate lead.
+    // only a row written by this exact submission, not every row created by the
+    // same browser session/candidate.
     const existingRow = submissionId
-      ? findRowByColumn_(sheet, "candidate_id", submissionId)
+      ? findRowBySubmissionId_(sheet, submissionId)
       : -1;
     if (existingRow < 0) sheet.appendRow(rowForPayload_(email, payload));
     const rowIndex = existingRow > 0 ? existingRow : sheet.getLastRow();
@@ -251,7 +251,8 @@ function handleWaitlistProfile_(payload) {
     profile_completed_at: payload.profile_completed_at || new Date().toISOString(),
   };
 
-  const candidateId = candidateId_(payload.submission_id || payload.candidate_id);
+  const candidateId = candidateId_(payload.candidate_id);
+  const submissionId = candidateId_(payload.submission_id);
   if (candidateId) profileValues.candidate_id = candidateId;
 
   // The optional second contact method captured on the profile page: the phone
@@ -285,7 +286,7 @@ function handleWaitlistProfile_(payload) {
   // Older clients submitted the signup optimistically, so keep a short lookup
   // retry before appending a fallback profile-only row. Current clients await
   // the confirmed signup response and normally match on the first attempt.
-  const identities = signupIdentities_(candidateId, variant, phone, email);
+  const identities = signupIdentities_(submissionId, candidateId, variant, phone, email);
   const rowIndex = waitForSignupRow_(sheet, identities);
 
   lock.waitLock(10000);
@@ -462,9 +463,26 @@ function findRowByColumn_(sheet, header, value) {
   return -1;
 }
 
+function findRowBySubmissionId_(sheet, submissionId) {
+  const lastRow = sheet.getLastRow();
+  if (lastRow < 2 || !submissionId) return -1;
+
+  const column = HEADERS.indexOf("raw_payload") + 1;
+  const values = sheet.getRange(2, column, lastRow - 1, 1).getValues();
+
+  for (let i = values.length - 1; i >= 0; i--) {
+    try {
+      const payload = JSON.parse(String(values[i][0] || "{}"));
+      if (candidateId_(payload.submission_id) === submissionId) return i + 2;
+    } catch {}
+  }
+
+  return -1;
+}
+
 // Ordered [column, value] pairs to try when matching a profile submission back
 // to its signup row, most reliable first.
-function signupIdentities_(candidateId, variant, phone, email) {
+function signupIdentities_(submissionId, candidateId, variant, phone, email) {
   const identities = [];
   const seen = {};
 
@@ -475,7 +493,11 @@ function signupIdentities_(candidateId, variant, phone, email) {
     identities.push([column, value]);
   }
 
-  // candidate_id first: a random UUID that both the signup and the profile
+  // submission_id is stored inside raw_payload so it can remain independent of
+  // the session-wide candidate_id without occupying a hand-managed sheet column.
+  add("submission_id", submissionId);
+
+  // candidate_id next: a random UUID that both the signup and the profile
   // payload carry verbatim, so it does not depend on which field the A/B
   // variant happened to ask for.
   add("candidate_id", candidateId);
@@ -498,7 +520,9 @@ function signupIdentities_(candidateId, variant, phone, email) {
 
 function findSignupRow_(sheet, identities) {
   for (let i = 0; i < identities.length; i++) {
-    const rowIndex = findRowByColumn_(sheet, identities[i][0], identities[i][1]);
+    const rowIndex = identities[i][0] === "submission_id"
+      ? findRowBySubmissionId_(sheet, identities[i][1])
+      : findRowByColumn_(sheet, identities[i][0], identities[i][1]);
     if (rowIndex > 0) return rowIndex;
   }
 
@@ -581,9 +605,7 @@ function rowForPayload_(email, payload) {
   // the profile columns. Blank for email signups.
   while (row.length < HEADERS.length) row.push("");
   row[HEADERS.indexOf("phone")] = plainTextPhone_(payload.phone);
-  row[HEADERS.indexOf("candidate_id")] = candidateId_(
-    payload.submission_id || payload.candidate_id,
-  );
+  row[HEADERS.indexOf("candidate_id")] = candidateId_(payload.candidate_id);
   row[HEADERS.indexOf("waitlist_variant")] = variant_(payload.waitlist_variant);
   return row;
 }

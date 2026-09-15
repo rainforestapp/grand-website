@@ -152,5 +152,6 @@
   };
   window.grandGetStoredWebsiteCandidateId = getStoredCandidateId;
   window.grandGetOrCreateWebsiteCandidateId = getOrCreateCandidateId;
+  window.grandCreateWebsiteSubmissionId = createCandidateId;
   window.grandIsWebsiteQaMode = isQaMode;
 })(window, document);

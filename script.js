@@ -7,7 +7,6 @@ const analyticsEndpoint =
 // spreadsheet tabs, keeping them a clean break from the historical email data.
 const PRODUCT = "grandphone";
 const trackedSections = ["problem", "system", "attention", "tracking", "response", "waitlist"];
-const anchorScrollRetries = [0, 120, 360, 760];
 let fallbackSessionId = "";
 let cachedGeoLocation = null;
 let cachedUserAgentData = null;
@@ -195,6 +194,19 @@ function getHashTarget(hash) {
 function scrollToAnchorTarget(target, behavior = "smooth") {
   const top = target.getBoundingClientRect().top + window.scrollY - getStickyHeaderOffset();
 
+  // `behavior: "auto"` is not "jump instantly" — it defers to the CSS
+  // `scroll-behavior`, which is `smooth` (styles.css), so "auto" animates. The
+  // explicit "instant" enum only landed in Safari 15.4 and throws a TypeError
+  // before that, so suppress the animation through the style instead.
+  if (behavior === "instant") {
+    const root = document.documentElement;
+    const previous = root.style.scrollBehavior;
+    root.style.scrollBehavior = "auto";
+    window.scrollTo(0, Math.max(0, top));
+    root.style.scrollBehavior = previous;
+    return;
+  }
+
   window.scrollTo({
     top: Math.max(0, top),
     behavior,
@@ -218,11 +230,7 @@ function setupAnchorScrolling() {
       window.location.hash = hash;
     }
 
-    anchorScrollRetries.forEach((delay, index) => {
-      window.setTimeout(() => {
-        scrollToAnchorTarget(target, index === 0 ? "smooth" : "auto");
-      }, delay);
-    });
+    scrollToAnchorTarget(target, "smooth");
 
     if (!target.hasAttribute("tabindex")) {
       target.setAttribute("tabindex", "-1");
@@ -234,15 +242,29 @@ function setupAnchorScrolling() {
     }
   });
 
-  window.addEventListener("load", () => {
-    const target = getHashTarget(window.location.hash || "");
-    if (!target) return;
+  // The browser has already jumped to the fragment by now, so this only
+  // re-aligns it under the sticky header (`scroll-padding-top` measures that
+  // gap slightly differently). `load` can fire seconds late on mobile, and by
+  // then the visitor may have scrolled somewhere of their own choosing —
+  // moving the page under them is worse than an 8px misalignment, so the first
+  // sign of a deliberate scroll cancels the correction.
+  let visitorTookOver = false;
+  const noteTakeover = () => {
+    visitorTookOver = true;
+  };
+  ["wheel", "touchstart", "keydown"].forEach((eventName) => {
+    window.addEventListener(eventName, noteTakeover, { once: true, passive: true });
+  });
 
-    anchorScrollRetries.forEach((delay) => {
-      window.setTimeout(() => {
-        scrollToAnchorTarget(target, "auto");
-      }, delay);
+  window.addEventListener("load", () => {
+    ["wheel", "touchstart", "keydown"].forEach((eventName) => {
+      window.removeEventListener(eventName, noteTakeover);
     });
+
+    const target = getHashTarget(window.location.hash || "");
+    if (!target || visitorTookOver) return;
+
+    scrollToAnchorTarget(target, "instant");
   });
 }
 

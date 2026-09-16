@@ -642,9 +642,16 @@ h3 {
     max-width: 760px;
   }
 
+  /* `margin: 0 auto` cancels a grid item's default `stretch`, leaving the
+     showcase shrink-to-fit. Its tracks then size to the phone screenshots'
+     max-content width, and those images are `loading="lazy"` — so the grid is
+     narrower until they arrive and snaps wider once they do, shoving the
+     waitlist section ~800px down the page. `width: 100%` gives the tracks a
+     definite basis that does not depend on the images having loaded. */
   .screen-showcase {
     margin: 0 auto;
     max-width: 760px;
+    width: 100%;
   }
 }
 
@@ -1709,14 +1716,18 @@ html[data-profile-ask="phone"] [data-profile-field="email"] {
     grid-template-columns: 1fr;
   }
 
+  /* Same trap one level down: the auto margins make each figure shrink-to-fit,
+     so a `max-width` alone leaves its used width at the lazy image's
+     max-content size. A definite `width` centres identically but holds the
+     column steady from first paint. */
   .phone-shot {
     margin-left: auto;
     margin-right: auto;
-    max-width: min(260px, 78vw);
+    width: min(260px, 78vw);
   }
 
   .phone-shot--status {
-    max-width: min(280px, 82vw);
+    width: min(280px, 82vw);
   }
 
   .phone-shot--status,

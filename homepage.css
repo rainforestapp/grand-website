@@ -66,15 +66,34 @@ input::placeholder{color:var(--muted-2)}
 .photo{width:100%;object-fit:cover;border-radius:6px}
 .photo-4x5{aspect-ratio:4/5}.photo-4x3{aspect-ratio:4/3}
 
-/* hero */
-.hero .wrap{padding-top:56px;padding-bottom:72px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:56px;align-items:end}
-.hero-copy{padding-bottom:24px}
-.hero-actions{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
-/* The source is 3:2 landscape with her head in the right half, so a centred
-   crop into this portrait frame clips the right side of her face. Bias the
-   focal point right to keep the whole head in frame; the remaining space falls
-   on the left, which is the direction she's looking. */
-.hero-photo{max-height:min(600px,62vh);object-position:90% 30%}
+/* hero — headline sits in the photo's negative space, at her eye line */
+.hero .wrap{padding-top:24px;padding-bottom:0}
+.hero-media{position:relative;border-radius:6px;overflow:hidden;aspect-ratio:16/9;max-height:min(720px,84vh);background:#8d8d8a}
+.hero-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:100% 28%}
+/* Scrim carries the white copy. Stops are set so the dark coverage still holds
+   at the right edge of the text block (~50% of the media), where her hair and
+   the window blow out; the original 38%/66% stops dropped the lede's last
+   lines under 4:1. */
+.hero-media::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(20,19,17,.72) 0%,rgba(20,19,17,.56) 40%,rgba(20,19,17,0) 74%)}
+.hero-copy{position:absolute;z-index:1;left:clamp(40px,6.5vw,96px);top:50%;transform:translateY(-50%);width:min(560px,42%);color:#fff;gap:32px}
+.hero-copy .display{color:#fff}
+.hero-copy .accent{color:#fff}
+.hero-copy .lede{color:rgba(255,255,255,.9);max-width:440px}
+.hero-copy .link-ul{color:#fff;border-bottom-color:rgba(255,255,255,.7)}
+.hero-copy .btn{background:#fff;color:var(--ink)}
+.hero-copy .btn:hover{background:#e8e8e5;color:var(--ink)}
+.hero-actions{display:flex;gap:20px;flex-wrap:wrap;align-items:center}
+/* Below 1000px the copy can no longer sit inside the photo without crowding
+   her face, so the overlay unwinds into a stacked photo-then-copy layout. */
+@media(max-width:1000px){
+ .hero-media{aspect-ratio:auto;max-height:none;overflow:visible;border-radius:0;background:none;display:flex;flex-direction:column;gap:32px}
+ .hero-media::after{display:none}
+ .hero-photo{position:static;height:auto;aspect-ratio:3/2;border-radius:6px;object-position:80% 25%}
+ .hero-copy{position:static;transform:none;width:auto;max-width:640px;color:var(--ink)}
+ .hero-copy .display{color:var(--ink)}.hero-copy .accent{color:var(--green)}.hero-copy .lede{color:var(--ink-3);max-width:480px}
+ .hero-copy .link-ul{color:var(--ink);border-bottom-color:var(--ink)}
+ .hero-copy .btn{background:var(--green);color:#fff}.hero-copy .btn:hover{background:var(--green-dark)}
+}
 
 /* worry */
 .worry .wrap{padding-top:96px}
@@ -188,11 +207,12 @@ a:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid #b68b
  .brand{font-size:26px}
  .brand small,.nav-links>a:not(.btn){display:none}
  .nav-links{gap:0;flex-wrap:nowrap}
- /* hero: photo first (4:3), headline, full-width CTA, centered secondary link */
- .hero .wrap{padding-top:20px;padding-bottom:48px;gap:24px}
- .hero .wrap>.stack-12{order:-1}
- .hero-copy{padding-bottom:0;gap:24px}
- .hero-photo{aspect-ratio:4/3;max-height:none;object-position:90% 25%}
+ /* hero: photo first (4:3), copy below on white, full-width CTA */
+ .hero .wrap{padding-top:20px;padding-bottom:48px}
+ .hero-media{gap:24px}
+ .hero-photo{aspect-ratio:4/3}
+ .hero-copy{max-width:none;gap:24px}
+ .hero-copy .lede{max-width:none}
  .hero-actions{flex-direction:column;align-items:center;gap:14px}
  .hero-actions .btn{width:100%;text-align:center}
  .hero-actions .link-ul{padding:4px 0;font-size:15px}

@@ -4,6 +4,8 @@ Static landing-page wireframe for Grand.
 
 ## Status
 
+- **Restored the approved homepage copy into the editorial redesign.** The redesign (PR #69) shipped a new visual design *and* rewrote nearly every line of copy on the homepage; the whole PR was reverted (#70) to protect the words, then reapplied here with the original copy put back. Section eyebrows, the hub/sensor and routine-tile kickers, the three-item caregiver list, and the `#response` intro paragraph all returned; the redesign's `01`–`04` numerals gave way to the original text labels. **Why:** the homepage copy is approved, research-backed writing, and the design brief never covered it. **Design work must not rewrite `index.html` copy** — treat the words as fixed input and fit the layout around them. Three invented claims were removed in the process: "No audio is ever sent to the cloud", "a real person from Grand reaches out to confirm she's okay" (see the `#response` note below — there is no human in the loop), and "We never share your number/email". The `<noscript>` fallback and the 45-second signup timeout message were kept, since they accompany a real bug fix rather than a positioning change.
+
 - Restyled `welcome.html` with the shared homepage header, footer, Newsreader/Figtree typography, green form controls, and `welcome.css`. Mobile puts the questionnaire ahead of the supporting image. Both contact variants, validation feedback, and scheduling/waitlist completion states retain the existing behavior.
 
 - Fixed signup errors caused by the 10-second client timeout: a live QA retry confirmed the backend can take about 20 seconds and that the original signup had already saved. Signup and profile requests now wait up to 45 seconds for a confirmed JSON response; a timeout explains that confirmation is uncertain and signup retry preserves the submission ID to avoid duplicates.
@@ -193,17 +195,19 @@ The same Apps Script endpoint also receives anonymous interaction analytics. For
 
 ## Current Sections
 
-Every content section leads with a standardized eyebrow (uppercase, 12px, clay `--status-clay`) above its title. The hero itself has no eyebrow — the headline leads directly. The `.eyebrow` is excluded from the `> p` intro-paragraph rules so it always renders at the base 12px.
+Every content section leads with a standardized eyebrow (`.eyebrow`, uppercase, 13px, green `--green`) above its title. The hero itself has no eyebrow — the headline leads directly. Cards and routine tiles use a quieter second-tier kicker (`.kicker`, uppercase, 12px, `--muted`) so they never compete with the section eyebrow. On the dark waitlist band the eyebrow is lifted to `--band-soft`; the green token is illegible there.
+
+`.eyebrow` carries no margin of its own — spacing comes from the parent `.stack` gap. `homepage.css` is shared with the legal pages, and `legal.css` sets its own `.legal-header .eyebrow` margin, so adding one here double-spaces those headers.
 
 - Hero promise ("You'll know she's okay.") with a primary "See how Grand works" CTA and a secondary "Be first to know" waitlist CTA.
 - "The worry" problem section: a two-column narrative with the independence/worry copy on the left and an iMessage-style multi-day concern graphic on the right, followed by a compact strikethrough list dismissing pendants/watches, call-for-help buttons, in-home carers, and cameras with one-line stories.
 - "How Grand works" section titled as such, with a combined lead ("There's a better way to know they're okay. A small hub and a few sensors. No cameras, nothing to wear, nothing to charge.") and two product cards, each showing a real product photo: `assets/grand-sensor.jpg` (sensor in a wall outlet) and `assets/grand-hub.jpg` (hub on a kitchen counter), both optimized to ~120–210KB JPGs. The `.card-media` slot renders a cover-fit image via `:has(img)`, falling back to a dashed placeholder when no image is present.
 - "What Grand pays attention to": everyday activity, the kitchen (meals), and a call for help.
 - "Caregiver experience": the daily "she's okay" app view with real iOS app screens, plus a parent-perspective dignity note.
-- "The Grand call center" (`#response`): what happens in an emergency — a mirrored two-column section (photo left, copy right) with a four-step numbered process (real person calls through the hub/sensors, confirms she's safe, calls EMS if not, family stays notified and can join the call). Step numerals are bare clay Georgia counters via CSS `counter()`; the photo slot falls back to the standard dashed placeholder if the image is removed.
+- "When something's wrong" (`#response`): what happens in an emergency — a two-column section (copy left, caregiver photo right) with a three-step numbered process (Grand pings the caregiver circle → you talk to her directly through the hub and sensors → you decide if emergency services are needed, with Grand surfacing the right local number). **There is no human in the loop:** Grand alerts the circle, the family makes the call. Any copy describing a Grand agent who phones the parent or dials EMS is wrong — see the "no call center" entry in the changelog above.
 - Waitlist form with validation and Google Sheets handoff. On success it redirects to the post-signup profile page.
 - Post-signup profile page (`welcome.html`, `noindex`): optional full name, ZIP, reason for interest, whether the person Grand is for lives alone, and alpha-tester interest, styled with `homepage.css` and the `welcome.css` `.profile-*` rules.
-- Site footer: a top row ("Contact us" label + `hello@grandeldercare.com` on the left, nav links — including Privacy Policy and Terms of Service — as a right-aligned single column) above a bottom bar with the `grand.` logo bottom-left and the copyright bottom-right.
+- Site footer: a top row ("Contact us" label + `hello@grandeldercare.com` on the left, nav links — including Privacy Policy and Terms of Service — as a right-aligned single column) above a bottom bar with the `grand` wordmark bottom-left (linked home) and the copyright bottom-right. The footer now sits on the dark `--band` surface, so it uses the text wordmark rather than `assets/grand-logo.png` — that PNG is dark artwork drawn for the old cream footer and would be invisible here.
 
 ## Grace Product Subpage
 

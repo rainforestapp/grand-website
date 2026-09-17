@@ -192,6 +192,9 @@ function getHashTarget(hash) {
 }
 
 function scrollToAnchorTarget(target, behavior = "smooth") {
+  if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
+    behavior = "instant";
+  }
   const top = target.getBoundingClientRect().top + window.scrollY - getStickyHeaderOffset();
 
   // `behavior: "auto"` is not "jump instantly" — it defers to the CSS

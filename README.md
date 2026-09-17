@@ -4,6 +4,10 @@ Static landing-page wireframe for Grand.
 
 ## Status
 
+- Rebuilt the homepage from the September 2026 editorial white design handoff: Newsreader/Figtree typography, green CTAs, product photos, framed app screenshots, routine explanations, and dark signup/footer band.
+- Homepage styling now lives in `homepage.css`; `styles.css` continues to serve the existing welcome and legal pages. The live Google Apps Script signup, phone/email experiment, attribution, analytics, and `welcome.html` handoff remain connected. Original section anchors are retained for existing links and reporting.
+- Added the handoff's cropped iMessage image, removed its fictional photo caption and mock success handler, and added compact mobile navigation, keyboard focus, reduced-motion styling, and accessible signup feedback.
+
 - Added a first-pass one-page wireframe for the public landing page.
 - Positioning is companion-first for the older person, with family reassurance as the buyer story.
 - The wireframe uses the existing Grand product language: warm surfaces, sage/clay accents, editorial type moments, privacy by default, and no surveillance framing.
@@ -108,6 +112,10 @@ The deliberate website events are `website_cta_clicked`, `website_contact_clicke
 **PostHog project dependency:** in the shared PostHog project's **Project settings → Web analytics**, enable **Cookieless server hash mode** before deploying this integration. Web vitals are enabled explicitly in the JavaScript SDK configuration, so they work while the general autocapture and remote feature-flag requests remain disabled.
 
 ## Open Locally
+
+The redesigned homepage uses `index.html`, `homepage.css`, and `assets/imessage-screen.png` alongside the existing assets and signup scripts. Preview it with a local HTTP server, for example `python3 -m http.server 8765`, then open `http://localhost:8765/?qa=1`. Add `&variant=phone` or `&variant=email` to inspect either signup arm.
+
+Redesign validation: checked desktop, tablet, and mobile layouts (including 320px width), image loading and section links, both form variants, mocked signup success and error/retry, and the welcome-page handoff. The existing analytics-context and waitlist-backend tests pass. QA used mocked signup responses; no live signup was submitted.
 
 Open `index.html` in a browser. No build step is required.
 

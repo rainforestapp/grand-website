@@ -4,6 +4,8 @@ Static landing-page wireframe for Grand.
 
 ## Status
 
+- Restyled `welcome.html` with the shared homepage header, footer, Newsreader/Figtree typography, green form controls, and `welcome.css`. Mobile puts the questionnaire ahead of the supporting image. Both contact variants, validation feedback, and scheduling/waitlist completion states retain the existing behavior.
+
 - Fixed signup errors caused by the 10-second client timeout: a live QA retry confirmed the backend can take about 20 seconds and that the original signup had already saved. Signup and profile requests now wait up to 45 seconds for a confirmed JSON response; a timeout explains that confirmation is uncertain and signup retry preserves the submission ID to avoid duplicates.
 
 - Updated Privacy and Terms to share the new homepage header, footer, fonts, and colors, with a dedicated readable legal layout in `legal.css`. Legal wording and effective dates are unchanged; mobile spacing, keyboard skip links, and long-link wrapping are included.
@@ -13,7 +15,7 @@ Static landing-page wireframe for Grand.
 - Refined the narrow-screen hero with a fluid, balanced headline, a dedicated line for “she's okay.”, smaller supporting copy, and consistently stacked actions. Desktop typography stays unchanged.
 
 - Rebuilt the homepage from the September 2026 editorial white design handoff: Newsreader/Figtree typography, green CTAs, product photos, framed app screenshots, routine explanations, and dark signup/footer band.
-- Homepage styling now lives in `homepage.css`; `styles.css` continues to serve the existing welcome page; legal pages now use `homepage.css` and `legal.css`. The live Google Apps Script signup, phone/email experiment, attribution, analytics, and `welcome.html` handoff remain connected. Original section anchors are retained for existing links and reporting.
+- Homepage styling now lives in `homepage.css`; welcome and legal pages share `homepage.css` with their respective `welcome.css` and `legal.css` layouts. The live Google Apps Script signup, phone/email experiment, attribution, analytics, and `welcome.html` handoff remain connected. Original section anchors are retained for existing links and reporting.
 - Added the handoff's cropped iMessage image, removed its fictional photo caption and mock success handler, and added compact mobile navigation, keyboard focus, reduced-motion styling, and accessible signup feedback.
 
 - Added a first-pass one-page wireframe for the public landing page.
@@ -200,7 +202,7 @@ Every content section leads with a standardized eyebrow (uppercase, 12px, clay `
 - "Caregiver experience": the daily "she's okay" app view with real iOS app screens, plus a parent-perspective dignity note.
 - "The Grand call center" (`#response`): what happens in an emergency — a mirrored two-column section (photo left, copy right) with a four-step numbered process (real person calls through the hub/sensors, confirms she's safe, calls EMS if not, family stays notified and can join the call). Step numerals are bare clay Georgia counters via CSS `counter()`; the photo slot falls back to the standard dashed placeholder if the image is removed.
 - Waitlist form with validation and Google Sheets handoff. On success it redirects to the post-signup profile page.
-- Post-signup profile page (`welcome.html`, `noindex`): optional full name, ZIP, reason for interest, whether the person Grand is for lives alone, and alpha-tester interest, styled with the shared `styles.css` `.profile-*` rules.
+- Post-signup profile page (`welcome.html`, `noindex`): optional full name, ZIP, reason for interest, whether the person Grand is for lives alone, and alpha-tester interest, styled with `homepage.css` and the `welcome.css` `.profile-*` rules.
 - Site footer: a top row ("Contact us" label + `hello@grandeldercare.com` on the left, nav links — including Privacy Policy and Terms of Service — as a right-aligned single column) above a bottom bar with the `grand.` logo bottom-left and the copyright bottom-right.
 
 ## Grace Product Subpage

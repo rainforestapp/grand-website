@@ -54,11 +54,10 @@ input::placeholder{color:var(--muted-2)}
 
 /* sections */
 .section{border-top:1px solid var(--rule)}
-/* Section head that stacks its intro under the heading rather than parking it
-   in a second column. 560px keeps it clearly narrower than the headline: at
-   680px it landed within ~35px of the h2's width, and that near-miss read as a
-   mistake rather than a deliberate standfirst. */
-.section-head .body-lg{max-width:560px}
+/* Section head stacks its intro under the heading and lets it run the full
+   section width, so it wraps on the section's edges rather than stopping short
+   of them. */
+.section-head .body-lg{max-width:none}
 .section .wrap{padding-top:var(--section-pad);padding-bottom:var(--section-pad)}
 .grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,400px),1fr));gap:64px;align-items:center}
 .grid-2.tight{gap:48px;align-items:end}
@@ -148,10 +147,18 @@ input::placeholder{color:var(--muted-2)}
 .row-step h3{font-size:19px;font-weight:600;letter-spacing:-.01em}
 
 /* app */
-.screens{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:32px}
-.screens figure{margin:0;display:flex;flex-direction:column;gap:20px;align-items:stretch}
-.screens .phone{margin:0 auto}
-.screens figcaption{display:flex;flex-direction:column;gap:6px}
+/* Always three across or one down, never two: auto-fit found room for two
+   columns between ~700 and 840px and orphaned the third screenshot. */
+.screens{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:32px}
+@media(max-width:860px){.screens{grid-template-columns:1fr;gap:44px}}
+/* Caption is capped to the phone's width and centred with it, so its left edge
+   lines up with the screenshot instead of hanging off to the left. Both read
+   one variable: the global mobile rule shrinks .phone to 220px, which would
+   otherwise leave the caption wider than the screenshot it belongs to. */
+.screens{--phone-w:260px}
+.screens figure{margin:0;display:flex;flex-direction:column;gap:20px;align-items:center}
+.screens .phone{max-width:var(--phone-w)}
+.screens figcaption{display:flex;flex-direction:column;gap:6px;width:100%;max-width:var(--phone-w)}
 .screens figcaption b{font-family:var(--serif);font-weight:500;font-size:22px;letter-spacing:-.01em}
 .screens figcaption span{font-size:15px;line-height:1.5;color:var(--ink-3)}
 
@@ -265,15 +272,6 @@ a:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid #b68b
  #response .grid-2>.stack>h2{order:-1}
  #response .grid-2>.stack>.rows{order:1}
  /* app: horizontal snap row */
- /* The wrap drops its gutter so .screens can bleed edge to edge as a snap
-    carousel; every other child gets it back. Targeting "not .screens" rather
-    than naming one layout class, so restructuring this section can't leave a
-    block flush against the viewport edge. */
- #tracking .wrap{padding-left:0;padding-right:0}
- #tracking .wrap>:not(.screens){padding:0 var(--gutter)}
- .screens{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:20px;padding:0 var(--gutter) 8px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
- .screens::-webkit-scrollbar{display:none}
- .screens figure{flex:0 0 220px;scroll-snap-align:center}
  /* waitlist + footer */
  .waitlist .h2{font-size:38px}
  .card{padding:24px;gap:16px}

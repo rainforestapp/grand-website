@@ -55,9 +55,10 @@ input::placeholder{color:var(--muted-2)}
 /* sections */
 .section{border-top:1px solid var(--rule)}
 /* Section head that stacks its intro under the heading rather than parking it
-   in a second column. Cap the intro at a readable measure so it doesn't run
-   the full content width. */
-.section-head .body-lg{max-width:680px}
+   in a second column. 560px keeps it clearly narrower than the headline: at
+   680px it landed within ~35px of the h2's width, and that near-miss read as a
+   mistake rather than a deliberate standfirst. */
+.section-head .body-lg{max-width:560px}
 .section .wrap{padding-top:var(--section-pad);padding-bottom:var(--section-pad)}
 .grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,400px),1fr));gap:64px;align-items:center}
 .grid-2.tight{gap:48px;align-items:end}
@@ -133,9 +134,6 @@ input::placeholder{color:var(--muted-2)}
    rule below and keep the row two-up on phones. */
 .rows-wide .body{max-width:620px}
 .row-alt .name{font-family:var(--serif);font-size:22px;text-decoration:line-through;text-decoration-color:var(--green);text-decoration-thickness:1.5px;color:var(--muted)}
-/* Heading beside its description, for full-width lists. Same rhythm as
-   .row-alt but without the struck-through treatment. */
-.row-split{grid-template-columns:minmax(180px,260px) minmax(0,1fr)}
 /* Routine tiles: a 2x2 grid of bordered cards, carrying over the tile
    treatment from the pre-redesign site. The fall tile is emphasised, as it was
    there, so the one urgent signal doesn't read as a peer of the routine ones. */
@@ -151,8 +149,11 @@ input::placeholder{color:var(--muted-2)}
 
 /* app */
 .screens{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:32px}
-.screens figure{margin:0;display:flex;flex-direction:column;gap:16px;align-items:center}
-.screens figcaption{display:flex;flex-direction:column;gap:4px;text-align:center}
+.screens figure{margin:0;display:flex;flex-direction:column;gap:20px;align-items:stretch}
+.screens .phone{margin:0 auto}
+.screens figcaption{display:flex;flex-direction:column;gap:6px}
+.screens figcaption b{font-family:var(--serif);font-weight:500;font-size:22px;letter-spacing:-.01em}
+.screens figcaption span{font-size:15px;line-height:1.5;color:var(--ink-3)}
 
 /* waitlist + footer */
 .waitlist{background:var(--band);color:#fff}
@@ -249,8 +250,6 @@ a:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid #b68b
  /* lists */
  .row-alt{grid-template-columns:1fr;gap:6px;padding:18px 0}
  .row-alt .name{font-size:20px}
- .row-split{grid-template-columns:1fr;gap:8px;padding:18px 0}
- .row-split .h4{font-size:22px}
  .tiles{grid-template-columns:1fr;gap:12px}
  .tile{min-height:0}
  .tile .kicker{margin-bottom:14px}

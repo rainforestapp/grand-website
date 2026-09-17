@@ -63,7 +63,11 @@ input::placeholder{color:var(--muted-2)}
 .hero .wrap{padding-top:56px;padding-bottom:72px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:56px;align-items:end}
 .hero-copy{padding-bottom:24px}
 .hero-actions{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
-.hero-photo{max-height:min(600px,62vh);object-position:center 30%}
+/* The source is 3:2 landscape with her head in the right half, so a centred
+   crop into this portrait frame clips the right side of her face. Bias the
+   focal point right to keep the whole head in frame; the remaining space falls
+   on the left, which is the direction she's looking. */
+.hero-photo{max-height:min(600px,62vh);object-position:90% 30%}
 
 /* worry */
 .worry .wrap{padding-top:96px}
@@ -171,7 +175,7 @@ a:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid #b68b
  .hero .wrap{padding-top:20px;padding-bottom:48px;gap:24px}
  .hero .wrap>.stack-12{order:-1}
  .hero-copy{padding-bottom:0;gap:24px}
- .hero-photo{aspect-ratio:4/3;max-height:none;object-position:center 25%}
+ .hero-photo{aspect-ratio:4/3;max-height:none;object-position:90% 25%}
  .hero-actions{flex-direction:column;align-items:center;gap:14px}
  .hero-actions .btn{width:100%;text-align:center}
  .hero-actions .link-ul{padding:4px 0;font-size:15px}

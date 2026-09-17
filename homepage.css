@@ -43,7 +43,7 @@ input::placeholder{color:var(--muted-2)}
 .brand{text-decoration:none;font-family:var(--serif);font-size:28px;font-weight:500;letter-spacing:-.02em;display:flex;align-items:baseline;gap:10px;color:var(--ink)}
 .brand small{font-family:var(--sans);font-size:13px;color:var(--muted);letter-spacing:0}
 .nav-links{display:flex;gap:28px;align-items:center;font-size:14px;font-weight:500;flex-wrap:wrap;justify-content:flex-end}
-.nav-links a{text-decoration:none;color:var(--ink-2)}
+.nav-links a:not(.btn){text-decoration:none;color:var(--ink-2)}
 
 /* sections */
 .section{border-top:1px solid var(--rule)}
@@ -138,23 +138,56 @@ a:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid #b68b
  .brand small,.nav-links>a:not(.btn){display:none}
  .nav-links{gap:0;flex-wrap:nowrap}
 }
+/* ---- Mobile (≤700px) — from "Grand A - Mobile" design, Sept 2026 ---- */
 @media(max-width:700px){
- :root{--gutter:22px;--section-pad:72px}
- .site-header nav{gap:14px;padding-top:14px;padding-bottom:14px}
+ :root{--gutter:20px;--section-pad:56px}
+ .section .wrap{padding-bottom:64px}
+ .display{font-size:44px;line-height:1}
+ .h2{font-size:34px}.h2-sm{font-size:30px}.h3{font-size:28px}.h4{font-size:24px}
+ .lede{font-size:17px;max-width:none}.body-lg{font-size:16px}.body{font-size:15px;line-height:1.55}
+ .grid-2,.grid-2.tight,.grid-2.wide{gap:28px;align-items:start}
+ /* header: static (not sticky), brand + CTA only */
+ .site-header{position:static;background:#fff;backdrop-filter:none}
+ .site-header nav{gap:14px;padding-top:12px;padding-bottom:12px}
+ .brand{font-size:26px}
  .brand small,.nav-links>a:not(.btn){display:none}
  .nav-links{gap:0;flex-wrap:nowrap}
- .hero .wrap{padding-top:40px;padding-bottom:48px;gap:32px}
- .hero-copy{padding-bottom:0;gap:22px}
- .hero .display{font-size:clamp(40px,11vw,56px);line-height:1.04;text-wrap:balance;max-width:14ch}
- .hero .display .accent{display:block}
- .hero .lede{font-size:18px;line-height:1.5;text-wrap:pretty}
- .hero-actions{flex-direction:column;align-items:flex-start;gap:8px}
- .hero-actions .link-ul{padding:12px 0}
- .hero-photo{max-height:520px}
- .grid-2,.grid-2.tight{gap:36px}
- .worry .wrap{padding-top:64px}
- .row-alt{grid-template-columns:1fr;gap:8px}
- .card{padding:24px}
- .site-footer nav{gap:16px 24px}
+ /* hero: photo first (4:3), headline, full-width CTA, centered secondary link */
+ .hero .wrap{padding-top:20px;padding-bottom:48px;gap:24px}
+ .hero .wrap>.stack-12{order:-1}
+ .hero-copy{padding-bottom:0;gap:24px}
+ .hero-photo{aspect-ratio:4/3;max-height:none;object-position:center 25%}
+ .hero-actions{flex-direction:column;align-items:center;gap:14px}
+ .hero-actions .btn{width:100%;text-align:center}
+ .hero-actions .link-ul{padding:4px 0;font-size:15px}
+ /* worry: copy above the phone */
+ .worry .wrap{padding-top:56px}
+ .worry .grid-2{gap:32px}
+ .phone-col{order:2}
+ .phone,.phone.lg{max-width:220px}
+ /* lists */
+ .row-alt{grid-template-columns:1fr;gap:6px;padding:18px 0}
+ .row-alt .name{font-size:20px}
+ .row-routine{grid-template-columns:40px minmax(0,1fr);gap:14px;padding:20px 0}
+ .row-routine .num{font-size:20px;padding-top:2px}.row-routine h3{font-size:22px}
+ .row-step{grid-template-columns:36px minmax(0,1fr);gap:14px;padding:18px 0}
+ .row-step .num{width:30px;height:30px;font-size:13px}.row-step h3{font-size:17px}
+ /* emergency: heading → photo → steps */
+ #response .grid-2>img{order:0;aspect-ratio:4/3}
+ #response .grid-2>.stack{display:contents}
+ #response .grid-2>.stack>h2{order:-1}
+ #response .grid-2>.stack>.rows{order:1}
+ /* app: horizontal snap row */
+ #tracking .wrap{padding-left:0;padding-right:0}
+ #tracking .grid-2{padding:0 var(--gutter)}
+ .screens{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:20px;padding:0 var(--gutter) 8px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+ .screens::-webkit-scrollbar{display:none}
+ .screens figure{flex:0 0 220px;scroll-snap-align:center}
+ .screens figcaption b{font-size:20px}.screens figcaption span{font-size:14px}
+ /* waitlist + footer */
+ .waitlist .h2{font-size:38px}
+ .card{padding:24px;gap:16px}
+ .site-footer .wrap{flex-direction:column;align-items:flex-start;gap:20px;padding:32px var(--gutter) 40px}
+ .site-footer nav{display:grid;grid-template-columns:1fr 1fr;gap:12px 16px}
 }
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.btn{transition:none}}

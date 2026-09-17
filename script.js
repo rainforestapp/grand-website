@@ -172,6 +172,8 @@ function setupClickTracking() {
 function getStickyHeaderOffset() {
   const header = document.querySelector(".site-header");
   if (!header) return 0;
+  const position = window.getComputedStyle(header).position;
+  if (position != "sticky" && position != "fixed") return 0;
 
   return Math.ceil(header.getBoundingClientRect().height) + 12;
 }

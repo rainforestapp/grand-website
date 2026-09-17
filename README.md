@@ -4,6 +4,8 @@ Static landing-page wireframe for Grand.
 
 ## Status
 
+- Applied the supplied September mobile layout: photo-first hero, full-width primary CTA, copy-first worry section, compact typography and section spacing, horizontally scrollable app screenshots, reordered emergency section, and a two-column footer. The mobile header is now static; anchor scrolling only reserves header space when the header is sticky or fixed. This supersedes the earlier narrow-screen hero adjustment below.
+
 - Refined the narrow-screen hero with a fluid, balanced headline, a dedicated line for “she's okay.”, smaller supporting copy, and consistently stacked actions. Desktop typography stays unchanged.
 
 - Rebuilt the homepage from the September 2026 editorial white design handoff: Newsreader/Figtree typography, green CTAs, product photos, framed app screenshots, routine explanations, and dark signup/footer band.

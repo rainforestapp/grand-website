@@ -57,7 +57,10 @@ input::placeholder{color:var(--muted-2)}
 .section .wrap{padding-top:var(--section-pad);padding-bottom:var(--section-pad)}
 .grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,400px),1fr));gap:64px;align-items:center}
 .grid-2.tight{gap:48px;align-items:end}
-.grid-2.wide{grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr))}
+/* Both users of this put a split list or a card grid in the right column, so
+   the column is subdivided again. A 380px minimum let that second split fall
+   to ~175px around 900-1100px; hold out for 500px before going two-up. */
+.grid-2.wide{grid-template-columns:repeat(auto-fit,minmax(min(100%,500px),1fr))}
 .stack{display:flex;flex-direction:column}
 .stack-8{gap:8px}.stack-12{gap:12px}.stack-16{gap:16px}.stack-18{gap:18px}.stack-20{gap:20px}.stack-22{gap:22px}.stack-28{gap:28px}.stack-56{gap:56px}
 .photo{width:100%;object-fit:cover;border-radius:6px}
@@ -108,10 +111,6 @@ input::placeholder{color:var(--muted-2)}
 .tile h3{font-family:var(--serif);font-weight:500;font-size:clamp(23px,2vw,28px);line-height:1.1;letter-spacing:-.01em;margin-bottom:10px}
 .tile--urgent{background:rgba(31,90,63,.05);border-color:rgba(31,90,63,.34)}
 .tile--urgent .kicker,.tile--urgent h3{color:var(--green)}
-/* Above 880px the outer grid is two columns, so this one is only half the
-   content width; below 1120px that leaves the tiles under ~250px. Drop to a
-   single column through that band rather than squeezing four headings. */
-@media(min-width:880px) and (max-width:1119px){.tiles{grid-template-columns:1fr}}
 .row-step{grid-template-columns:40px minmax(0,1fr);gap:16px;padding:20px 0}
 .row-step .num{width:32px;height:32px;border-radius:50%;background:var(--band);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600}
 .row-step h3{font-size:19px;font-weight:600;letter-spacing:-.01em}

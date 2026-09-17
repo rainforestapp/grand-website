@@ -4,12 +4,14 @@ Static landing-page wireframe for Grand.
 
 ## Status
 
+- Updated Privacy and Terms to share the new homepage header, footer, fonts, and colors, with a dedicated readable legal layout in `legal.css`. Legal wording and effective dates are unchanged; mobile spacing, keyboard skip links, and long-link wrapping are included.
+
 - Applied the supplied September mobile layout: photo-first hero, full-width primary CTA, copy-first worry section, compact typography and section spacing, horizontally scrollable app screenshots, reordered emergency section, and a two-column footer. The mobile header is now static; anchor scrolling only reserves header space when the header is sticky or fixed. This supersedes the earlier narrow-screen hero adjustment below.
 
 - Refined the narrow-screen hero with a fluid, balanced headline, a dedicated line for “she's okay.”, smaller supporting copy, and consistently stacked actions. Desktop typography stays unchanged.
 
 - Rebuilt the homepage from the September 2026 editorial white design handoff: Newsreader/Figtree typography, green CTAs, product photos, framed app screenshots, routine explanations, and dark signup/footer band.
-- Homepage styling now lives in `homepage.css`; `styles.css` continues to serve the existing welcome and legal pages. The live Google Apps Script signup, phone/email experiment, attribution, analytics, and `welcome.html` handoff remain connected. Original section anchors are retained for existing links and reporting.
+- Homepage styling now lives in `homepage.css`; `styles.css` continues to serve the existing welcome page; legal pages now use `homepage.css` and `legal.css`. The live Google Apps Script signup, phone/email experiment, attribution, analytics, and `welcome.html` handoff remain connected. Original section anchors are retained for existing links and reporting.
 - Added the handoff's cropped iMessage image, removed its fictional photo caption and mock success handler, and added compact mobile navigation, keyboard focus, reduced-motion styling, and accessible signup feedback.
 
 - Added a first-pass one-page wireframe for the public landing page.
@@ -255,7 +257,7 @@ version** so the endpoint URL stays identical.
 
 ## Legal Pages
 
-`privacy.html` and `terms.html` are standalone pages sharing the site header, footer, and stylesheet. They use the `.legal-*` rules in `styles.css`: a centered 760px reading column, an `.legal-header` block (eyebrow, title, "Last updated" line, intro paragraph), and `.legal-body` prose with serif Georgia section headings, `--ink-soft` body text, clay underlined links, and a `.legal-contact` call-out card at the end.
+`privacy.html` and `terms.html` share the homepage header, footer, fonts, and `homepage.css`. Their `legal.css` layout uses a centered 760px reading column, Newsreader headings, Figtree body text, green links, and a contact section separated by a hairline rule. Legal wording and effective dates are preserved.
 
 - **Privacy Policy** covers what's collected (waitlist email; optional full-name/ZIP/reason/lives-alone/alpha-tester answers; automatic technical data; cookies/pixels), how it's used and shared, retention, security, children's privacy, and GDPR/CCPA-style choices. Its "Advertising and conversion tracking" section states plainly that **joining the waitlist is treated as a conversion event and shared with advertising partners (Meta, Reddit)** to measure campaigns — the fact the team asked to disclose.
 - **Terms of Service** is pre-launch boilerplate: it makes clear the product/service is not yet available and the waitlist is not a purchase or a guarantee, plus eligibility, acceptable use, IP, an explicit "not an emergency/medical service" clause, disclaimers, limitation of liability, and Delaware governing law.

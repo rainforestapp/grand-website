@@ -4,6 +4,8 @@ Static landing-page wireframe for Grand.
 
 ## Status
 
+- Applied handoff v2: a wide desktop hero with white text over a left-side gradient, stacked photo/copy at 1000px and below, and a static shared header with muted navigation and an underlined CTA. Original website copy, the italicized worry question, signup wiring, and footer remain intact.
+
 - Restored the pre-redesign homepage copy from `4209c40` within the new editorial desktop/mobile design: original hero and CTAs, section labels, product and routine descriptions, caregiver features, screenshot captions, response copy, signup text, and footer wording. Signup behavior and the 45-second confirmation timeout are retained.
 
 - Restyled `welcome.html` with the shared homepage header, footer, Newsreader/Figtree typography, green form controls, and `welcome.css`. Mobile puts the questionnaire ahead of the supporting image. Both contact variants, validation feedback, and scheduling/waitlist completion states retain the existing behavior.

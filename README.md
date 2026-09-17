@@ -4,6 +4,8 @@ Static landing-page wireframe for Grand.
 
 ## Status
 
+- Restored the pre-redesign homepage copy from `4209c40` within the new editorial desktop/mobile design: original hero and CTAs, section labels, product and routine descriptions, caregiver features, screenshot captions, response copy, signup text, and footer wording. Signup behavior and the 45-second confirmation timeout are retained.
+
 - Restyled `welcome.html` with the shared homepage header, footer, Newsreader/Figtree typography, green form controls, and `welcome.css`. Mobile puts the questionnaire ahead of the supporting image. Both contact variants, validation feedback, and scheduling/waitlist completion states retain the existing behavior.
 
 - Fixed signup errors caused by the 10-second client timeout: a live QA retry confirmed the backend can take about 20 seconds and that the original signup had already saved. Signup and profile requests now wait up to 45 seconds for a confirmed JSON response; a timeout explains that confirmation is uncertain and signup retry preserves the submission ID to avoid duplicates.

@@ -125,7 +125,7 @@ Full-page review captures are saved in [`docs/screenshots/homepage`](docs/screen
 
 The redesigned homepage uses `index.html`, `homepage.css`, and `assets/imessage-screen.png` alongside the existing assets and signup scripts. Preview it with a local HTTP server, for example `python3 -m http.server 8765`, then open `http://localhost:8765/?qa=1`. Add `&variant=phone` or `&variant=email` to inspect either signup arm.
 
-Redesign validation: checked desktop, tablet, and mobile layouts (including 320px width), image loading and section links, both form variants, mocked signup success and error/retry, and the welcome-page handoff. The existing analytics-context and waitlist-backend tests pass. QA used mocked signup responses; no live signup was submitted.
+Redesign validation: checked desktop, tablet, and mobile layouts (including 320px width), image loading and section links, both form variants, mocked signup success and error/retry, and the welcome-page handoff. The existing analytics-context and waitlist-backend tests pass. Initial layout QA used mocked signup responses. Subsequent live QA reproduced and fixed the signup timeout using a marked example.com test entry; retry confirmed the existing row without duplication.
 
 Open `index.html` in a browser. No build step is required.
 

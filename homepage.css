@@ -144,7 +144,12 @@ a:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid #b68b
  .brand small,.nav-links>a:not(.btn){display:none}
  .nav-links{gap:0;flex-wrap:nowrap}
  .hero .wrap{padding-top:40px;padding-bottom:48px;gap:32px}
- .hero-copy{padding-bottom:0}
+ .hero-copy{padding-bottom:0;gap:22px}
+ .hero .display{font-size:clamp(40px,11vw,56px);line-height:1.04;text-wrap:balance;max-width:14ch}
+ .hero .display .accent{display:block}
+ .hero .lede{font-size:18px;line-height:1.5;text-wrap:pretty}
+ .hero-actions{flex-direction:column;align-items:flex-start;gap:8px}
+ .hero-actions .link-ul{padding:12px 0}
  .hero-photo{max-height:520px}
  .grid-2,.grid-2.tight{gap:36px}
  .worry .wrap{padding-top:64px}

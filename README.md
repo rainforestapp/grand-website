@@ -4,6 +4,8 @@ Static landing-page wireframe for Grand.
 
 ## Status
 
+- Refined the narrow-screen hero with a fluid, balanced headline, a dedicated line for “she's okay.”, smaller supporting copy, and consistently stacked actions. Desktop typography stays unchanged.
+
 - Rebuilt the homepage from the September 2026 editorial white design handoff: Newsreader/Figtree typography, green CTAs, product photos, framed app screenshots, routine explanations, and dark signup/footer band.
 - Homepage styling now lives in `homepage.css`; `styles.css` continues to serve the existing welcome and legal pages. The live Google Apps Script signup, phone/email experiment, attribution, analytics, and `welcome.html` handoff remain connected. Original section anchors are retained for existing links and reporting.
 - Added the handoff's cropped iMessage image, removed its fictional photo caption and mock success handler, and added compact mobile navigation, keyboard focus, reduced-motion styling, and accessible signup feedback.

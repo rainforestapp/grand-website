@@ -4,6 +4,8 @@ Static landing-page wireframe for Grand.
 
 ## Status
 
+- Fixed signup errors caused by the 10-second client timeout: a live QA retry confirmed the backend can take about 20 seconds and that the original signup had already saved. Signup and profile requests now wait up to 45 seconds for a confirmed JSON response; a timeout explains that confirmation is uncertain and signup retry preserves the submission ID to avoid duplicates.
+
 - Updated Privacy and Terms to share the new homepage header, footer, fonts, and colors, with a dedicated readable legal layout in `legal.css`. Legal wording and effective dates are unchanged; mobile spacing, keyboard skip links, and long-link wrapping are included.
 
 - Applied the supplied September mobile layout: photo-first hero, full-width primary CTA, copy-first worry section, compact typography and section spacing, horizontally scrollable app screenshots, reordered emergency section, and a two-column footer. The mobile header is now static; anchor scrolling only reserves header space when the header is sticky or fixed. This supersedes the earlier narrow-screen hero adjustment below.

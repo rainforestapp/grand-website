@@ -534,7 +534,9 @@ function buildWaitlistPayload(identity, candidateId, submissionId, variant) {
 async function submitWaitlist(endpoint, payload) {
   const body = JSON.stringify(payload);
   const controller = new AbortController();
-  const timeout = window.setTimeout(() => controller.abort(), 10000);
+  // Apps Script can take around 20 seconds to confirm a saved row.
+  // Keep awaiting its JSON receipt rather than reporting a saved signup as failed.
+  const timeout = window.setTimeout(() => controller.abort(), 45000);
 
   try {
     const response = await fetch(endpoint, {
@@ -823,7 +825,12 @@ if (waitlistForm) {
         submission_id: pendingSubmissionId,
         failure_reason: failureReason,
       });
-      setWaitlistStatus("Something went wrong. Please try again.", "error");
+      setWaitlistStatus(
+        failureReason === "timeout"
+          ? "We couldn’t confirm your signup in time. Please try again — we’ll avoid adding it twice."
+          : "Something went wrong. Please try again.",
+        "error",
+      );
     } finally {
       delete waitlistForm.dataset.submitting;
       button.textContent = originalLabel;

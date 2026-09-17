@@ -85,6 +85,12 @@ input::placeholder{color:var(--muted-2)}
 .rows{display:grid}
 .row{display:grid;gap:24px;padding:22px 0;border-top:1px solid var(--rule)}
 .row-alt{grid-template-columns:minmax(140px,200px) minmax(0,1fr)}
+/* This list runs the full content width, so cap the description at a readable
+   measure instead of letting it stretch to ~120 characters. Capping the text
+   rather than the grid track on purpose: an #alternatives-scoped
+   grid-template-columns would outrank the single-column mobile rule below and
+   keep the row two-up on phones. */
+#alternatives .row-alt .body{max-width:620px}
 .row-alt .name{font-family:var(--serif);font-size:22px;text-decoration:line-through;text-decoration-color:var(--green);text-decoration-thickness:1.5px;color:var(--muted)}
 .row-routine{grid-template-columns:56px minmax(0,1fr);gap:20px;padding:28px 0}
 .row-routine .num{font-family:var(--serif);font-size:22px;color:var(--green);padding-top:4px}

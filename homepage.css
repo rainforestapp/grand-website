@@ -89,13 +89,16 @@ input::placeholder{color:var(--muted-2)}
 .rows{display:grid}
 .row{display:grid;gap:24px;padding:22px 0;border-top:1px solid var(--rule)}
 .row-alt{grid-template-columns:minmax(140px,200px) minmax(0,1fr)}
-/* This list runs the full content width, so cap the description at a readable
-   measure instead of letting it stretch to ~120 characters. Capping the text
-   rather than the grid track on purpose: an #alternatives-scoped
-   grid-template-columns would outrank the single-column mobile rule below and
-   keep the row two-up on phones. */
-#alternatives .row-alt .body{max-width:620px}
+/* Lists that span the full content width cap their prose at a readable measure
+   instead of letting it stretch to ~120 characters; the hairlines still run
+   the full width. Capping the text rather than the grid track on purpose: a
+   grid-template-columns override here would outrank the single-column mobile
+   rule below and keep the row two-up on phones. */
+.rows-wide .body{max-width:620px}
 .row-alt .name{font-family:var(--serif);font-size:22px;text-decoration:line-through;text-decoration-color:var(--green);text-decoration-thickness:1.5px;color:var(--muted)}
+/* Heading beside its description, for full-width lists. Same rhythm as
+   .row-alt but without the struck-through treatment. */
+.row-split{grid-template-columns:minmax(180px,260px) minmax(0,1fr)}
 .row-routine{grid-template-columns:56px minmax(0,1fr);gap:20px;padding:28px 0}
 .row-routine .num{font-family:var(--serif);font-size:22px;color:var(--green);padding-top:4px}
 /* Routine tiles label their rows with text rather than a numeral, so there is
@@ -197,6 +200,8 @@ a:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid #b68b
  /* lists */
  .row-alt{grid-template-columns:1fr;gap:6px;padding:18px 0}
  .row-alt .name{font-size:20px}
+ .row-split{grid-template-columns:1fr;gap:8px;padding:18px 0}
+ .row-split .h4{font-size:22px}
  .row-routine{grid-template-columns:40px minmax(0,1fr);gap:14px;padding:20px 0}
  .row-routine .num{font-size:20px;padding-top:2px}.row-routine h3{font-size:22px}
  .row-step{grid-template-columns:36px minmax(0,1fr);gap:14px;padding:18px 0}
@@ -211,8 +216,12 @@ a:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid #b68b
  #response .grid-2>.stack>h2{order:-1}
  #response .grid-2>.stack>.rows{order:1}
  /* app: horizontal snap row */
+ /* The wrap drops its gutter so .screens can bleed edge to edge as a snap
+    carousel; every other child gets it back. Targeting "not .screens" rather
+    than naming one layout class, so restructuring this section can't leave a
+    block flush against the viewport edge. */
  #tracking .wrap{padding-left:0;padding-right:0}
- #tracking .grid-2{padding:0 var(--gutter)}
+ #tracking .wrap>:not(.screens){padding:0 var(--gutter)}
  .screens{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:20px;padding:0 var(--gutter) 8px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
  .screens::-webkit-scrollbar{display:none}
  .screens figure{flex:0 0 220px;scroll-snap-align:center}

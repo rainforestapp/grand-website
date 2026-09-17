@@ -172,6 +172,8 @@ function setupClickTracking() {
 function getStickyHeaderOffset() {
   const header = document.querySelector(".site-header");
   if (!header) return 0;
+  const position = window.getComputedStyle(header).position;
+  if (position != "sticky" && position != "fixed") return 0;
 
   return Math.ceil(header.getBoundingClientRect().height) + 12;
 }
@@ -192,6 +194,9 @@ function getHashTarget(hash) {
 }
 
 function scrollToAnchorTarget(target, behavior = "smooth") {
+  if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
+    behavior = "instant";
+  }
   const top = target.getBoundingClientRect().top + window.scrollY - getStickyHeaderOffset();
 
   // `behavior: "auto"` is not "jump instantly" — it defers to the CSS
@@ -529,7 +534,9 @@ function buildWaitlistPayload(identity, candidateId, submissionId, variant) {
 async function submitWaitlist(endpoint, payload) {
   const body = JSON.stringify(payload);
   const controller = new AbortController();
-  const timeout = window.setTimeout(() => controller.abort(), 10000);
+  // Apps Script can take around 20 seconds to confirm a saved row.
+  // Keep awaiting its JSON receipt rather than reporting a saved signup as failed.
+  const timeout = window.setTimeout(() => controller.abort(), 45000);
 
   try {
     const response = await fetch(endpoint, {
@@ -818,7 +825,12 @@ if (waitlistForm) {
         submission_id: pendingSubmissionId,
         failure_reason: failureReason,
       });
-      setWaitlistStatus("Something went wrong. Please try again.", "error");
+      setWaitlistStatus(
+        failureReason === "timeout"
+          ? "We couldn’t confirm your signup in time. Please try again — we’ll avoid adding it twice."
+          : "Something went wrong. Please try again.",
+        "error",
+      );
     } finally {
       delete waitlistForm.dataset.submitting;
       button.textContent = originalLabel;

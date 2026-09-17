@@ -4,6 +4,22 @@ Static landing-page wireframe for Grand.
 
 ## Status
 
+- **Restored the approved homepage copy into the editorial redesign.** The redesign (PR #69) shipped a new visual design *and* rewrote nearly every line of copy on the homepage; the whole PR was reverted (#70) to protect the words, then reapplied here with the original copy put back. Section eyebrows, the hub/sensor and routine-tile kickers, the three-item caregiver list, and the `#response` intro paragraph all returned; the redesign's `01`–`04` numerals gave way to the original text labels. **Why:** the homepage copy is approved, research-backed writing, and the design brief never covered it. **Design work must not rewrite `index.html` copy** — treat the words as fixed input and fit the layout around them. Three invented claims were removed in the process: "No audio is ever sent to the cloud", "a real person from Grand reaches out to confirm she's okay" (see the `#response` note below — there is no human in the loop), and "We never share your number/email". The `<noscript>` fallback and the 45-second signup timeout message were kept, since they accompany a real bug fix rather than a positioning change.
+
+- Restyled `welcome.html` with the shared homepage header, footer, Newsreader/Figtree typography, green form controls, and `welcome.css`. Mobile puts the questionnaire ahead of the supporting image. Both contact variants, validation feedback, and scheduling/waitlist completion states retain the existing behavior.
+
+- Fixed signup errors caused by the 10-second client timeout: a live QA retry confirmed the backend can take about 20 seconds and that the original signup had already saved. Signup and profile requests now wait up to 45 seconds for a confirmed JSON response; a timeout explains that confirmation is uncertain and signup retry preserves the submission ID to avoid duplicates.
+
+- Updated Privacy and Terms to share the new homepage header, footer, fonts, and colors, with a dedicated readable legal layout in `legal.css`. Legal wording and effective dates are unchanged; mobile spacing, keyboard skip links, and long-link wrapping are included.
+
+- Applied the supplied September mobile layout: photo-first hero, full-width primary CTA, copy-first worry section, compact typography and section spacing, horizontally scrollable app screenshots, reordered emergency section, and a two-column footer. The mobile header is now static; anchor scrolling only reserves header space when the header is sticky or fixed. This supersedes the earlier narrow-screen hero adjustment below.
+
+- Refined the narrow-screen hero with a fluid, balanced headline, a dedicated line for “she's okay.”, smaller supporting copy, and consistently stacked actions. Desktop typography stays unchanged.
+
+- Rebuilt the homepage from the September 2026 editorial white design handoff: Newsreader/Figtree typography, green CTAs, product photos, framed app screenshots, routine explanations, and dark signup/footer band.
+- Homepage styling now lives in `homepage.css`; welcome and legal pages share `homepage.css` with their respective `welcome.css` and `legal.css` layouts. The live Google Apps Script signup, phone/email experiment, attribution, analytics, and `welcome.html` handoff remain connected. Original section anchors are retained for existing links and reporting.
+- Added the handoff's cropped iMessage image, removed its fictional photo caption and mock success handler, and added compact mobile navigation, keyboard focus, reduced-motion styling, and accessible signup feedback.
+
 - Added a first-pass one-page wireframe for the public landing page.
 - Positioning is companion-first for the older person, with family reassurance as the buyer story.
 - The wireframe uses the existing Grand product language: warm surfaces, sage/clay accents, editorial type moments, privacy by default, and no surveillance framing.
@@ -109,6 +125,12 @@ The deliberate website events are `website_cta_clicked`, `website_contact_clicke
 
 ## Open Locally
 
+Full-page review captures are saved in [`docs/screenshots/homepage`](docs/screenshots/homepage): desktop at 1440px and mobile at 390px, including the supplied mobile layout.
+
+The redesigned homepage uses `index.html`, `homepage.css`, and `assets/imessage-screen.png` alongside the existing assets and signup scripts. Preview it with a local HTTP server, for example `python3 -m http.server 8765`, then open `http://localhost:8765/?qa=1`. Add `&variant=phone` or `&variant=email` to inspect either signup arm.
+
+Redesign validation: checked desktop, tablet, and mobile layouts (including 320px width), image loading and section links, both form variants, mocked signup success and error/retry, and the welcome-page handoff. The existing analytics-context and waitlist-backend tests pass. Initial layout QA used mocked signup responses. Subsequent live QA reproduced and fixed the signup timeout using a marked example.com test entry; retry confirmed the existing row without duplication.
+
 Open `index.html` in a browser. No build step is required.
 
 ## Production
@@ -173,17 +195,19 @@ The same Apps Script endpoint also receives anonymous interaction analytics. For
 
 ## Current Sections
 
-Every content section leads with a standardized eyebrow (uppercase, 12px, clay `--status-clay`) above its title. The hero itself has no eyebrow — the headline leads directly. The `.eyebrow` is excluded from the `> p` intro-paragraph rules so it always renders at the base 12px.
+Every content section leads with a standardized eyebrow (`.eyebrow`, uppercase, 13px, green `--green`) above its title. The hero itself has no eyebrow — the headline leads directly. Cards and routine tiles use a quieter second-tier kicker (`.kicker`, uppercase, 12px, `--muted`) so they never compete with the section eyebrow. On the dark waitlist band the eyebrow is lifted to `--band-soft`; the green token is illegible there.
+
+`.eyebrow` carries no margin of its own — spacing comes from the parent `.stack` gap. `homepage.css` is shared with the legal pages, and `legal.css` sets its own `.legal-header .eyebrow` margin, so adding one here double-spaces those headers.
 
 - Hero promise ("You'll know she's okay.") with a primary "See how Grand works" CTA and a secondary "Be first to know" waitlist CTA.
 - "The worry" problem section: a two-column narrative with the independence/worry copy on the left and an iMessage-style multi-day concern graphic on the right, followed by a compact strikethrough list dismissing pendants/watches, call-for-help buttons, in-home carers, and cameras with one-line stories.
 - "How Grand works" section titled as such, with a combined lead ("There's a better way to know they're okay. A small hub and a few sensors. No cameras, nothing to wear, nothing to charge.") and two product cards, each showing a real product photo: `assets/grand-sensor.jpg` (sensor in a wall outlet) and `assets/grand-hub.jpg` (hub on a kitchen counter), both optimized to ~120–210KB JPGs. The `.card-media` slot renders a cover-fit image via `:has(img)`, falling back to a dashed placeholder when no image is present.
 - "What Grand pays attention to": everyday activity, the kitchen (meals), and a call for help.
 - "Caregiver experience": the daily "she's okay" app view with real iOS app screens, plus a parent-perspective dignity note.
-- "The Grand call center" (`#response`): what happens in an emergency — a mirrored two-column section (photo left, copy right) with a four-step numbered process (real person calls through the hub/sensors, confirms she's safe, calls EMS if not, family stays notified and can join the call). Step numerals are bare clay Georgia counters via CSS `counter()`; the photo slot falls back to the standard dashed placeholder if the image is removed.
+- "When something's wrong" (`#response`): what happens in an emergency — a two-column section (copy left, caregiver photo right) with a three-step numbered process (Grand pings the caregiver circle → you talk to her directly through the hub and sensors → you decide if emergency services are needed, with Grand surfacing the right local number). **There is no human in the loop:** Grand alerts the circle, the family makes the call. Any copy describing a Grand agent who phones the parent or dials EMS is wrong — see the "no call center" entry in the changelog above.
 - Waitlist form with validation and Google Sheets handoff. On success it redirects to the post-signup profile page.
-- Post-signup profile page (`welcome.html`, `noindex`): optional full name, ZIP, reason for interest, whether the person Grand is for lives alone, and alpha-tester interest, styled with the shared `styles.css` `.profile-*` rules.
-- Site footer: a top row ("Contact us" label + `hello@grandeldercare.com` on the left, nav links — including Privacy Policy and Terms of Service — as a right-aligned single column) above a bottom bar with the `grand.` logo bottom-left and the copyright bottom-right.
+- Post-signup profile page (`welcome.html`, `noindex`): optional full name, ZIP, reason for interest, whether the person Grand is for lives alone, and alpha-tester interest, styled with `homepage.css` and the `welcome.css` `.profile-*` rules.
+- Site footer: a top row ("Contact us" label + `hello@grandeldercare.com` on the left, nav links — including Privacy Policy and Terms of Service — as a right-aligned single column) above a bottom bar with the `grand` wordmark bottom-left (linked home) and the copyright bottom-right. The footer now sits on the dark `--band` surface, so it uses the text wordmark rather than `assets/grand-logo.png` — that PNG is dark artwork drawn for the old cream footer and would be invisible here.
 
 ## Grace Product Subpage
 
@@ -241,7 +265,7 @@ version** so the endpoint URL stays identical.
 
 ## Legal Pages
 
-`privacy.html` and `terms.html` are standalone pages sharing the site header, footer, and stylesheet. They use the `.legal-*` rules in `styles.css`: a centered 760px reading column, an `.legal-header` block (eyebrow, title, "Last updated" line, intro paragraph), and `.legal-body` prose with serif Georgia section headings, `--ink-soft` body text, clay underlined links, and a `.legal-contact` call-out card at the end.
+`privacy.html` and `terms.html` share the homepage header, footer, fonts, and `homepage.css`. Their `legal.css` layout uses a centered 760px reading column, Newsreader headings, Figtree body text, green links, and a contact section separated by a hairline rule. Legal wording and effective dates are preserved.
 
 - **Privacy Policy** covers what's collected (waitlist email; optional full-name/ZIP/reason/lives-alone/alpha-tester answers; automatic technical data; cookies/pixels), how it's used and shared, retention, security, children's privacy, and GDPR/CCPA-style choices. Its "Advertising and conversion tracking" section states plainly that **joining the waitlist is treated as a conversion event and shared with advertising partners (Meta, Reddit)** to measure campaigns — the fact the team asked to disclose.
 - **Terms of Service** is pre-launch boilerplate: it makes clear the product/service is not yet available and the waitlist is not a purchase or a guarantee, plus eligibility, acceptable use, IP, an explicit "not an emergency/medical service" clause, disclaimers, limitation of liability, and Delaware governing law.

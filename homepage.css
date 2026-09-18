@@ -115,6 +115,11 @@ input::placeholder{color:var(--muted-2)}
  .hero-media::after{display:none}
 }
 
+/* Keep overlaid copy legible as the photo and text converge on tablets. */
+@media(min-width:701px) and (max-width:1000px){
+ .hero-media::after{display:block;background:linear-gradient(90deg,rgba(20,19,17,.6) 0%,rgba(20,19,17,.5) 58%,transparent 90%)}
+}
+
 /* worry */
 .worry .wrap{padding-top:96px}
 .phone-col{display:flex;justify-content:center}

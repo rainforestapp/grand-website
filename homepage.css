@@ -29,11 +29,11 @@ input::placeholder{color:var(--muted-2)}
 .lede{font-size:20px;line-height:1.5;color:var(--ink-3);max-width:480px;text-wrap:pretty}
 .body-lg{font-size:18px;line-height:1.6;color:var(--ink-3);text-wrap:pretty}
 .body{font-size:16px;line-height:1.6;color:var(--ink-3);text-wrap:pretty}
-/* Eyebrows use --green-dark, not --green: it stops the near-miss against the
-   --band greens elsewhere on the page while still reading as green at 13px.
-   --band itself was tried and goes near-black at this size, which costs the
-   label its accent quality. */
-.eyebrow{font-size:13px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--green-dark)}
+/* Eyebrows stay on --green. Both darker tokens were tried here and neither
+   reads as green at 13px uppercase: --band goes near-black, --green-dark is
+   close behind. The label needs to carry color more than it needs to match the
+   dark bands elsewhere on the page. */
+.eyebrow{font-size:13px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--green)}
 /* Card/tile label. Muted rather than green so the section eyebrow stays the
    dominant kicker, matching the original .card-label/.signal-label hierarchy. */
 .kicker{font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}

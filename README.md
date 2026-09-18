@@ -4,13 +4,17 @@ Static landing-page wireframe for Grand.
 
 ## Status
 
+- Swapped the worry section’s desktop columns to place its copy on the left and the phone image on the right; mobile continues to show copy before the phone.
+
+- Removed the tagline beside the Grand wordmark from the shared menu header across the homepage, welcome, privacy, and terms pages.
+
 - Unified green accents and CTA backgrounds on the footer’s original dark green (`#1e2a24`), with a shared darker button hover color.
 
 - Matched the “When something’s wrong” steps to the numbered routine list: shared serif headings, green two-digit numerals, dividers, and spacing. Mobile retains the response photo before the steps.
 
 - Restyled the “How it works” routine section as four numbered rows with green serif numerals, serif headings, and fine dividers. Desktop pairs the introduction with the list; tablet and mobile stack them. Current descriptions and caregiver-circle emergency wording are preserved.
 
-- Aligned the shared menu and hero with the sections’ 1200px container and responsive gutters. On desktop, the cropped hero photo fades into a full-width muted background, with the overlaid copy aligned to the menu and section content edges; mobile retains the stacked photo and copy.
+- Aligned the shared menu and hero with the sections’ 1200px container and responsive gutters. The desktop hero uses a rounded frame, a cropped photo fading into a muted background, and inset copy. Mobile retains the stacked photo and copy with a rounded photo. Section divider lines are removed; list dividers remain.
 
 - **Restored the approved homepage copy into the editorial redesign.** The redesign (PR #69) shipped a new visual design *and* rewrote nearly every line of copy on the homepage; the whole PR was reverted (#70) to protect the words, then reapplied here with the original copy put back. Section eyebrows, the hub/sensor and routine-tile kickers, the three-item caregiver list, and the `#response` intro paragraph all returned; the redesign's `01`–`04` numerals gave way to the original text labels. **Why:** the homepage copy is approved, research-backed writing, and the design brief never covered it. **Design work must not rewrite `index.html` copy** — treat the words as fixed input and fit the layout around them. Three invented claims were removed in the process: "No audio is ever sent to the cloud", "a real person from Grand reaches out to confirm she's okay" (see the `#response` note below — there is no human in the loop), and "We never share your number/email". The `<noscript>` fallback and the 45-second signup timeout message were kept, since they accompany a real bug fix rather than a positioning change.
 
@@ -203,14 +207,14 @@ The same Apps Script endpoint also receives anonymous interaction analytics. For
 
 ## Current Sections
 
-Every content section leads with a standardized eyebrow (`.eyebrow`, uppercase, 13px, green `--green`) above its title. The hero itself has no eyebrow — the headline leads directly. Cards and routine tiles use a quieter second-tier kicker (`.kicker`, uppercase, 12px, `--muted`) so they never compete with the section eyebrow. On the dark waitlist band the eyebrow is lifted to `--band-soft`; the green token is illegible there.
+Every content section leads with a standardized eyebrow (`.eyebrow`, uppercase, 13px, green `--green`) above its title. The hero itself has no eyebrow — the headline leads directly. Product cards use a quieter second-tier kicker (`.kicker`, uppercase, 12px, `--muted`); routine and emergency-response rows use green numbered labels. On the dark waitlist band the eyebrow is lifted to `--band-soft`; the green token is illegible there.
 
 `.eyebrow` carries no margin of its own — spacing comes from the parent `.stack` gap. `homepage.css` is shared with the legal pages, and `legal.css` sets its own `.legal-header .eyebrow` margin, so adding one here double-spaces those headers.
 
-- Hero promise ("You'll know she's okay.") with a primary "See how Grand works" CTA and a secondary "Be first to know" waitlist CTA.
+- Hero promise ("You'll know she's okay.") with a primary "See how Grand works" CTA and a secondary "Become a tester" waitlist CTA.
 - "The worry" problem section: a two-column narrative with the independence/worry copy on the left and an iMessage-style multi-day concern graphic on the right, followed by a compact strikethrough list dismissing pendants/watches, call-for-help buttons, in-home carers, and cameras with one-line stories.
 - "How Grand works" section titled as such, with a combined lead ("There's a better way to know they're okay. A small hub and a few sensors. No cameras, nothing to wear, nothing to charge.") and two product cards, each showing a real product photo: `assets/grand-sensor.jpg` (sensor in a wall outlet) and `assets/grand-hub.jpg` (hub on a kitchen counter), both optimized to ~120–210KB JPGs. The `.card-media` slot renders a cover-fit image via `:has(img)`, falling back to a dashed placeholder when no image is present.
-- "What Grand pays attention to": everyday activity, the kitchen (meals), and a call for help.
+- "How it works" (`#attention`): four numbered routine rows covering wake-up time, meals, bathroom visits, and indicators of a potential fall.
 - "Caregiver experience": the daily "she's okay" app view with real iOS app screens, plus a parent-perspective dignity note.
 - "When something's wrong" (`#response`): what happens in an emergency — a two-column section (copy left, caregiver photo right) with a three-step numbered process (Grand pings the caregiver circle → you talk to her directly through the hub and sensors → you decide if emergency services are needed, with Grand surfacing the right local number). **There is no human in the loop:** Grand alerts the circle, the family makes the call. Any copy describing a Grand agent who phones the parent or dials EMS is wrong — see the "no call center" entry in the changelog above.
 - Waitlist form with validation and Google Sheets handoff. On success it redirects to the post-signup profile page.

@@ -4,6 +4,10 @@ Static landing-page wireframe for Grand.
 
 ## Status
 
+- Restyled the “How it works” routine section as four numbered rows with green serif numerals, serif headings, and fine dividers. Desktop pairs the introduction with the list; tablet and mobile stack them. Current descriptions and caregiver-circle emergency wording are preserved.
+
+- Aligned the shared menu and hero with the sections’ 1200px container and responsive gutters. On desktop, the cropped hero photo fades into a full-width muted background, with the overlaid copy aligned to the menu and section content edges; mobile retains the stacked photo and copy.
+
 - **Restored the approved homepage copy into the editorial redesign.** The redesign (PR #69) shipped a new visual design *and* rewrote nearly every line of copy on the homepage; the whole PR was reverted (#70) to protect the words, then reapplied here with the original copy put back. Section eyebrows, the hub/sensor and routine-tile kickers, the three-item caregiver list, and the `#response` intro paragraph all returned; the redesign's `01`–`04` numerals gave way to the original text labels. **Why:** the homepage copy is approved, research-backed writing, and the design brief never covered it. **Design work must not rewrite `index.html` copy** — treat the words as fixed input and fit the layout around them. Three invented claims were removed in the process: "No audio is ever sent to the cloud", "a real person from Grand reaches out to confirm she's okay" (see the `#response` note below — there is no human in the loop), and "We never share your number/email". The `<noscript>` fallback and the 45-second signup timeout message were kept, since they accompany a real bug fix rather than a positioning change.
 
 - Restyled `welcome.html` with the shared homepage header, footer, Newsreader/Figtree typography, green form controls, and `welcome.css`. Mobile puts the questionnaire ahead of the supporting image. Both contact variants, validation feedback, and scheduling/waitlist completion states retain the existing behavior.

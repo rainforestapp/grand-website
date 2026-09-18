@@ -4,6 +4,8 @@ Static landing-page wireframe for Grand.
 
 ## Status
 
+- Matched the “When something’s wrong” steps to the numbered routine list: shared serif headings, green two-digit numerals, dividers, and spacing. Mobile retains the response photo before the steps.
+
 - Restyled the “How it works” routine section as four numbered rows with green serif numerals, serif headings, and fine dividers. Desktop pairs the introduction with the list; tablet and mobile stack them. Current descriptions and caregiver-circle emergency wording are preserved.
 
 - Aligned the shared menu and hero with the sections’ 1200px container and responsive gutters. On desktop, the cropped hero photo fades into a full-width muted background, with the overlaid copy aligned to the menu and section content edges; mobile retains the stacked photo and copy.

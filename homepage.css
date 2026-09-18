@@ -147,9 +147,6 @@ input::placeholder{color:var(--muted-2)}
 .routine-copy h3{font-family:var(--serif);font-weight:400;font-size:32px;line-height:1.15;letter-spacing:-.02em}
 .routine-copy .body{font-size:18px;line-height:1.6}
 @media(max-width:1000px){.routine-layout{grid-template-columns:1fr;gap:32px}}
-.row-step{grid-template-columns:40px minmax(0,1fr);gap:16px;padding:20px 0}
-.row-step .num{width:32px;height:32px;border-radius:50%;background:var(--band);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600}
-.row-step h3{font-size:19px;font-weight:600;letter-spacing:-.01em}
 
 /* app */
 /* Always three across or one down, never two: auto-fit found room for two
@@ -265,8 +262,6 @@ a:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid #b68b
  .routine-copy{gap:10px}
  .routine-copy h3{font-size:24px}
  .routine-copy .body{font-size:16px;line-height:1.6}
- .row-step{grid-template-columns:36px minmax(0,1fr);gap:14px;padding:18px 0}
- .row-step .num{width:30px;height:30px;font-size:13px}.row-step h3{font-size:17px}
  /* emergency: eyebrow → heading → intro → photo → steps.
     The stack is dissolved with display:contents, so its children become grid
     items and need explicit order. Without the eyebrow rule it would default to
@@ -275,7 +270,7 @@ a:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid #b68b
  #response .grid-2>.stack{display:contents}
  #response .grid-2>.stack>.eyebrow{order:-2}
  #response .grid-2>.stack>h2{order:-1}
- #response .grid-2>.stack>.rows{order:1}
+ #response .grid-2>.stack>.routine-list{order:1}
  /* app: horizontal snap row */
  /* waitlist + footer */
  .waitlist .h2{font-size:38px}

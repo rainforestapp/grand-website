@@ -29,7 +29,11 @@ input::placeholder{color:var(--muted-2)}
 .lede{font-size:20px;line-height:1.5;color:var(--ink-3);max-width:480px;text-wrap:pretty}
 .body-lg{font-size:18px;line-height:1.6;color:var(--ink-3);text-wrap:pretty}
 .body{font-size:16px;line-height:1.6;color:var(--ink-3);text-wrap:pretty}
-.eyebrow{font-size:13px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--green)}
+/* Eyebrows use --green-dark, not --green: it stops the near-miss against the
+   --band greens elsewhere on the page while still reading as green at 13px.
+   --band itself was tried and goes near-black at this size, which costs the
+   label its accent quality. */
+.eyebrow{font-size:13px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--green-dark)}
 /* Card/tile label. Muted rather than green so the section eyebrow stays the
    dominant kicker, matching the original .card-label/.signal-label hierarchy. */
 .kicker{font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
@@ -242,10 +246,13 @@ a:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid #b68b
  .hero-photo{position:static;height:auto;aspect-ratio:4/3;border-radius:6px;object-position:80% 25%}
  .hero-copy{position:static;transform:none;left:auto;top:auto;width:auto;max-width:none;gap:24px}
  .hero-copy .display{color:var(--ink);font-size:44px}
- .hero-copy .accent{color:var(--green)}
+ /* Accent and primary CTA take the header CTA's darker green (--band) rather
+    than --green: on the stacked mobile hero they sit directly under the
+    "Become a tester" pill, and the two greens read as a mismatch side by side. */
+ .hero-copy .accent{color:var(--band)}
  .hero-copy .lede{color:var(--ink-3);font-size:17px;max-width:none}
  .hero-copy .link-ul{color:var(--ink);border-bottom-color:var(--ink)}
- .hero-copy .btn{background:var(--green);color:#fff}.hero-copy .btn:hover{background:var(--green-dark)}
+ .hero-copy .btn{background:var(--band);color:#fff}.hero-copy .btn:hover{background:var(--ink-2)}
  .hero-actions{flex-direction:column;align-items:center;gap:14px}
  .hero-actions .btn{width:100%;text-align:center}
  .hero-actions .link-ul{padding:4px 0;font-size:15px}

@@ -1,12 +1,11 @@
 /* Grand — homepage styles. Fonts: Newsreader (display), Figtree (body). */
 :root{
   --ink:#141311;--ink-2:#333230;--ink-3:#45443f;--muted:#6a6964;--muted-2:#8e8d88;
-  --rule:#e4e5e1;--field:#d4d5d0;--green:#1f5a3f;--green-dark:#164531;
-  --band:#1e2a24;--band-text:#b9c2bc;--band-soft:#e3efe7;
+  --rule:#e4e5e1;--field:#d4d5d0;--green:#1e2a24;--green-dark:#141d18;
+  --band:var(--green);--band-text:#b9c2bc;--band-soft:#e3efe7;
   --serif:"Newsreader",Georgia,serif;--sans:"Figtree",system-ui,sans-serif;
   --max:1200px;--gutter:28px;--section-pad:112px;
-  /* Fluid window edge for the full-bleed band (header + hero), mirroring the
-     live site. Sections stay capped at --max. */
+  /* Inset for desktop copy within the hero photo. */
   --edge:clamp(20px,5vw,72px);
 }
 *{box-sizing:border-box}
@@ -40,12 +39,11 @@ input::placeholder{color:var(--muted-2)}
 .btn{display:inline-block;text-decoration:none;border:0;cursor:pointer;font-family:inherit;font-weight:600;font-size:16px;border-radius:999px;padding:16px 26px;color:#fff;background:var(--green);transition:background .15s}
 .btn:hover{background:var(--green-dark);color:#fff}
 .btn-sm{padding:10px 18px;font-size:14px;font-weight:500;background:var(--band)}
-.btn-sm:hover{background:var(--ink-2)}
+.btn-sm:hover{background:var(--green-dark)}
 .link-ul{text-decoration:none;color:var(--ink);padding:16px 8px;font-weight:500;font-size:16px;border-bottom:1px solid var(--ink)}
 
 /* header */
 .site-header{position:sticky;top:0;z-index:10;background:rgba(255,255,255,.9);backdrop-filter:blur(10px);border-bottom:1px solid var(--rule)}
-.site-header .wrap{max-width:none;padding-left:var(--edge);padding-right:var(--edge)}
 .site-header nav{display:flex;align-items:center;justify-content:space-between;gap:24px;padding-top:18px;padding-bottom:18px}
 .brand{text-decoration:none;font-family:var(--serif);font-size:28px;font-weight:500;letter-spacing:-.02em;display:flex;align-items:baseline;gap:10px;color:var(--ink)}
 .brand small{font-family:var(--sans);font-size:13px;color:var(--muted);letter-spacing:0}
@@ -53,7 +51,7 @@ input::placeholder{color:var(--muted-2)}
 .nav-links a:not(.btn){text-decoration:none;color:var(--ink-2)}
 
 /* sections */
-.section{border-top:1px solid var(--rule)}
+.section{border:0}
 /* Section head stacks its intro under the heading and lets it run the full
    section width, so it wraps on the section's edges rather than stopping short
    of them. */
@@ -71,10 +69,8 @@ input::placeholder{color:var(--muted-2)}
 .photo-4x5{aspect-ratio:4/5}.photo-4x3{aspect-ratio:4/3}
 
 /* hero — headline sits in the photo's negative space, at her eye line */
-.hero .wrap{max-width:none;padding:0}
-/* Explicit height, not aspect-ratio: aspect-ratio combined with a max-height
-   shrinks the element's WIDTH to preserve the ratio, which breaks the bleed.
-   56.25vw is the 16:9 height; the caps take over on tall/wide screens. */
+/* Explicit height keeps the image at the full content width while leaving
+   enough vertical space for the overlaid copy. */
 .hero-media{position:relative;overflow:hidden;width:100%;height:min(56.25vw,720px,84vh);background:#8d8d8a}
 .hero-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:100% 28%}
 /* Scrim carries the white copy. Stops are set so the dark coverage still holds
@@ -110,6 +106,20 @@ input::placeholder{color:var(--muted-2)}
  .hero-copy .lede{font-size:16px}
 }
 
+/* Blend the cropped photo inside the rounded hero frame. */
+@media(min-width:701px){
+ .hero{padding-top:24px}
+ .hero-copy{left:clamp(28px,4vw,56px)}
+ .hero-media{background:#4b4d46;border-radius:24px}
+ .hero-photo{object-position:85% 28%;mask-image:linear-gradient(90deg,transparent 0%,rgba(0,0,0,.25) 30%,#000 58%,#000 88%,transparent 100%)}
+ .hero-media::after{display:none}
+}
+
+/* Keep overlaid copy legible as the photo and text converge on tablets. */
+@media(min-width:701px) and (max-width:1000px){
+ .hero-media::after{display:block;background:linear-gradient(90deg,rgba(20,19,17,.6) 0%,rgba(20,19,17,.5) 58%,transparent 90%)}
+}
+
 /* worry */
 .worry .wrap{padding-top:96px}
 .phone-col{display:flex;justify-content:center}
@@ -133,18 +143,15 @@ input::placeholder{color:var(--muted-2)}
    rule below and keep the row two-up on phones. */
 .rows-wide .body{max-width:620px}
 .row-alt .name{font-family:var(--serif);font-size:22px;text-decoration:line-through;text-decoration-color:var(--green);text-decoration-thickness:1.5px;color:var(--muted)}
-/* Routine tiles: a 2x2 grid of bordered cards, carrying over the tile
-   treatment from the pre-redesign site. The fall tile is emphasised, as it was
-   there, so the one urgent signal doesn't read as a peer of the routine ones. */
-.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
-.tile{display:flex;flex-direction:column;min-height:230px;padding:clamp(20px,2.4vw,28px);border:1px solid var(--rule);border-radius:8px}
-.tile .kicker{margin-bottom:26px}
-.tile h3{font-family:var(--serif);font-weight:500;font-size:clamp(23px,2vw,28px);line-height:1.1;letter-spacing:-.01em;margin-bottom:10px}
-.tile--urgent{background:rgba(31,90,63,.05);border-color:rgba(31,90,63,.34)}
-.tile--urgent .kicker,.tile--urgent h3{color:var(--green)}
-.row-step{grid-template-columns:40px minmax(0,1fr);gap:16px;padding:20px 0}
-.row-step .num{width:32px;height:32px;border-radius:50%;background:var(--band);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600}
-.row-step h3{font-size:19px;font-weight:600;letter-spacing:-.01em}
+/* Numbered routine rows: editorial type and fine dividers. */
+.routine-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:72px;align-items:start}
+.routine-list{list-style:none;margin:0;padding:0;counter-reset:routine}
+.routine-item{counter-increment:routine;display:grid;grid-template-columns:44px minmax(0,1fr);gap:20px;padding:28px 0;border-top:1px solid var(--rule)}
+.routine-item::before{content:counter(routine,decimal-leading-zero);font-family:var(--serif);font-size:28px;line-height:1.2;color:var(--green)}
+.routine-copy{display:flex;flex-direction:column;gap:12px}
+.routine-copy h3{font-family:var(--serif);font-weight:400;font-size:32px;line-height:1.15;letter-spacing:-.02em}
+.routine-copy .body{font-size:18px;line-height:1.6}
+@media(max-width:1000px){.routine-layout{grid-template-columns:1fr;gap:32px}}
 
 /* app */
 /* Always three across or one down, never two: auto-fit found room for two
@@ -176,7 +183,7 @@ input::placeholder{color:var(--muted-2)}
 .card input{flex:1;min-width:0;padding:14px 16px;border:1px solid var(--field);border-radius:6px;font-size:16px;font-family:inherit;background:#fff;color:var(--ink);outline:none}
 .card input:focus{border-color:var(--green)}
 .card .btn{border-radius:6px;padding:16px;background:var(--band)}
-.card .btn:hover{background:var(--ink-2)}
+.card .btn:hover{background:var(--green-dark)}
 .fine{font-size:13px;color:var(--muted);line-height:1.5}
 .thanks{display:none}
 .card.is-done .form{display:none}.card.is-done .thanks{display:flex;flex-direction:column;gap:18px}
@@ -218,8 +225,7 @@ a:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid #b68b
 }
 /* ---- Mobile (≤700px) — from "Grand A - Mobile" design, Sept 2026 ---- */
 @media(max-width:700px){
- /* below 700 the fluid edge collapses to the gutter so the header, hero copy
-    and every section share one left edge */
+ /* Header, hero and sections share the mobile gutter. */
  :root{--gutter:20px;--section-pad:56px;--edge:20px}
  .section .wrap{padding-bottom:64px}
  .display{font-size:44px;line-height:1}
@@ -234,12 +240,12 @@ a:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid #b68b
  .nav-links{gap:0;flex-wrap:nowrap}
  /* hero: too narrow to host the copy over the photo — unwind the overlay to
     photo first (4:3), copy below on white, full-width CTA */
- /* photo still bleeds edge to edge; the copy below it takes the gutter */
- .hero .wrap{padding:0 0 48px}
- .hero-copy{padding:0 var(--edge)}
+ .hero{padding-top:16px}
+ .hero .wrap{padding-bottom:48px}
+ .hero-copy{padding:0}
  .hero-media{height:auto;overflow:visible;background:none;display:flex;flex-direction:column;gap:24px}
  .hero-media::after{display:none}
- .hero-photo{position:static;height:auto;aspect-ratio:4/3;border-radius:6px;object-position:80% 25%}
+ .hero-photo{position:static;height:auto;aspect-ratio:4/3;border-radius:20px;object-position:80% 25%}
  .hero-copy{position:static;transform:none;left:auto;top:auto;width:auto;max-width:none;gap:24px}
  .hero-copy .display{color:var(--ink);font-size:44px}
  .hero-copy .accent{color:var(--green)}
@@ -257,11 +263,11 @@ a:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid #b68b
  /* lists */
  .row-alt{grid-template-columns:1fr;gap:6px;padding:18px 0}
  .row-alt .name{font-size:20px}
- .tiles{grid-template-columns:1fr;gap:12px}
- .tile{min-height:0}
- .tile .kicker{margin-bottom:14px}
- .row-step{grid-template-columns:36px minmax(0,1fr);gap:14px;padding:18px 0}
- .row-step .num{width:30px;height:30px;font-size:13px}.row-step h3{font-size:17px}
+ .routine-item{grid-template-columns:40px minmax(0,1fr);gap:14px;padding:22px 0}
+ .routine-item::before{font-size:22px}
+ .routine-copy{gap:10px}
+ .routine-copy h3{font-size:24px}
+ .routine-copy .body{font-size:16px;line-height:1.6}
  /* emergency: eyebrow → heading → intro → photo → steps.
     The stack is dissolved with display:contents, so its children become grid
     items and need explicit order. Without the eyebrow rule it would default to
@@ -270,7 +276,7 @@ a:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid #b68b
  #response .grid-2>.stack{display:contents}
  #response .grid-2>.stack>.eyebrow{order:-2}
  #response .grid-2>.stack>h2{order:-1}
- #response .grid-2>.stack>.rows{order:1}
+ #response .grid-2>.stack>.routine-list{order:1}
  /* app: horizontal snap row */
  /* waitlist + footer */
  .waitlist .h2{font-size:38px}

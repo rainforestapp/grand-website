@@ -1,8 +1,8 @@
 /* Grand — homepage styles. Fonts: Newsreader (display), Figtree (body). */
 :root{
   --ink:#141311;--ink-2:#333230;--ink-3:#45443f;--muted:#6a6964;--muted-2:#8e8d88;
-  --rule:#e4e5e1;--field:#d4d5d0;--green:#1f5a3f;--green-dark:#164531;
-  --band:#1e2a24;--band-text:#b9c2bc;--band-soft:#e3efe7;
+  --rule:#e4e5e1;--field:#d4d5d0;--green:#1e2a24;--green-dark:#141d18;
+  --band:var(--green);--band-text:#b9c2bc;--band-soft:#e3efe7;
   --serif:"Newsreader",Georgia,serif;--sans:"Figtree",system-ui,sans-serif;
   --max:1200px;--gutter:28px;--section-pad:112px;
   /* Inset for desktop copy within the hero photo. */
@@ -39,7 +39,7 @@ input::placeholder{color:var(--muted-2)}
 .btn{display:inline-block;text-decoration:none;border:0;cursor:pointer;font-family:inherit;font-weight:600;font-size:16px;border-radius:999px;padding:16px 26px;color:#fff;background:var(--green);transition:background .15s}
 .btn:hover{background:var(--green-dark);color:#fff}
 .btn-sm{padding:10px 18px;font-size:14px;font-weight:500;background:var(--band)}
-.btn-sm:hover{background:var(--ink-2)}
+.btn-sm:hover{background:var(--green-dark)}
 .link-ul{text-decoration:none;color:var(--ink);padding:16px 8px;font-weight:500;font-size:16px;border-bottom:1px solid var(--ink)}
 
 /* header */
@@ -178,7 +178,7 @@ input::placeholder{color:var(--muted-2)}
 .card input{flex:1;min-width:0;padding:14px 16px;border:1px solid var(--field);border-radius:6px;font-size:16px;font-family:inherit;background:#fff;color:var(--ink);outline:none}
 .card input:focus{border-color:var(--green)}
 .card .btn{border-radius:6px;padding:16px;background:var(--band)}
-.card .btn:hover{background:var(--ink-2)}
+.card .btn:hover{background:var(--green-dark)}
 .fine{font-size:13px;color:var(--muted);line-height:1.5}
 .thanks{display:none}
 .card.is-done .form{display:none}.card.is-done .thanks{display:flex;flex-direction:column;gap:18px}

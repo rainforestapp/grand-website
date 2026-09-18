@@ -4,6 +4,8 @@ Static landing-page wireframe for Grand.
 
 ## Status
 
+- Unified green accents and CTA backgrounds on the footer’s original dark green (`#1e2a24`), with a shared darker button hover color.
+
 - Matched the “When something’s wrong” steps to the numbered routine list: shared serif headings, green two-digit numerals, dividers, and spacing. Mobile retains the response photo before the steps.
 
 - Restyled the “How it works” routine section as four numbered rows with green serif numerals, serif headings, and fine dividers. Desktop pairs the introduction with the list; tablet and mobile stack them. Current descriptions and caregiver-circle emergency wording are preserved.

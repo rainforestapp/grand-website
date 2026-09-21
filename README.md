@@ -4,6 +4,12 @@ Static landing-page wireframe for Grand.
 
 ## Status
 
+- Slightly increased section spacing: standard desktop/tablet padding from 160px to 176px and mobile from 80px to 88px, with matching increases to the tighter alternatives and mobile section overrides. Hero centering is preserved.
+
+- Increased the gap above Mom’s reply so its Tapback clears the preceding message, while retaining the compact Tuesday message stack.
+
+- Reused the exact pink-heart Tapback artwork from the original `assets/imessage-screen.png` in the worry thread, using an SVG clipping window to retain its native heart, shading, reaction bubble, and trailing dots. Removed the substitute emoji and hand-drawn red heart.
+
 - Added tablet connector lines from the full house image into the hub/sensor caption band, ending below the devices. The tablet “What Grand learns” introduction now spans the full content width above the routine list.
 
 - Split the mobile “How Grand works” scene into two stacked versions of the original rounded photo-and-dark-caption layout: one zoomed house-image crop for the hub and one for the kitchen sensor. Desktop/tablet retain the full scene and existing captions.

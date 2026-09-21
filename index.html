@@ -124,7 +124,7 @@
 <section id="top" class="hero">
   <div class="wrap">
     <div class="hero-media">
-      <img class="hero-photo" src="assets/hero-pexels-moe-magners-5335290.jpg" srcset="assets/hero-pexels-moe-magners-5335290-mobile.jpg 900w, assets/hero-pexels-moe-magners-5335290.jpg 2400w" sizes="(max-width: 1200px) calc(100vw - 56px), 1144px" fetchpriority="high" alt="An older woman smiling at home">
+      <img class="hero-photo" src="assets/hero-pexels-moe-magners-5335290.jpg" srcset="assets/hero-pexels-moe-magners-5335290-mobile.jpg 900w, assets/hero-pexels-moe-magners-5335290.jpg 2400w" sizes="(max-width: 700px) calc(100vw - 40px), (max-width: 1224px) calc(95vw - 23px), 1193px" fetchpriority="high" alt="An older woman smiling at home">
       <div class="stack stack-28 hero-copy">
         <h1 class="display">You&rsquo;ll know <em class="accent">she&rsquo;s okay.</em></h1>
         <p class="lede">A few discreet sensors to flag when something&rsquo;s off &mdash; no cameras, no wearables, nothing to charge.</p>
@@ -142,14 +142,23 @@
     <div class="grid-2">
       <div class="stack stack-22">
         <p class="eyebrow">The worry</p>
-        <h2 class="h2">Everything is probably fine... right?</h2>
+        <h2 class="h3">Everything is probably fine... right?</h2>
         <p class="body-lg">Your mom lives alone and that&rsquo;s not going to change. She&rsquo;s doing great! She has more friends than you do, book club, hobbies... But she did have a fall last year. Every morning there&rsquo;s a nagging thought in the back of your mind. <em class="serif" style="font-size:20px">What if something happened and you just don&rsquo;t know it yet?</em></p>
       </div>
-      <div class="phone-col">
-        <div class="phone lg" aria-label="A text conversation over several days where messages are delivered but not answered.">
-          <div class="phone-screen">
-            <img src="assets/imessage-screen.png" alt="An iPhone Messages conversation with Mom showing a Monday reply, then Wednesday and Thursday messages marked delivered without replies.">
-          </div>
+      <div class="thread-col">
+        <div class="thread" role="img" aria-label="A text conversation with Mom: a cheerful reply on Monday, then three messages on Tuesday morning delivered but not answered.">
+          <p class="thread-day">Monday <span>8:12 AM</span></p>
+          <div class="bubble me">Morning Mom. How are you feeling today?</div>
+          <div class="bubble them"><span class="tapback" aria-hidden="true">&#10084;&#65039;</span>Doing great. Breakfast with Margaret this morning, then I&rsquo;m going to spend a few hours in the garden.</div>
+          <p class="thread-day">Tuesday <span>8:04 AM</span></p>
+          <div class="bubble me">Morning. Just checking in before work.</div>
+          <p class="thread-status">Delivered</p>
+          <p class="thread-day"><span>8:34 AM</span></p>
+          <div class="bubble me">Tried calling. Everything okay?</div>
+          <p class="thread-status">Delivered</p>
+          <p class="thread-day"><span>9:04 AM</span></p>
+          <div class="bubble me">Mom? Can you call me when you see this?</div>
+          <p class="thread-status">Delivered</p>
         </div>
       </div>
     </div>
@@ -161,7 +170,7 @@
     <div class="grid-2 wide tight" style="align-items:start">
       <div class="stack stack-16">
         <p class="eyebrow">The alternatives</p>
-        <h3 class="h3">You&rsquo;ve probably already thought about&hellip;</h3>
+        <h2 class="h3">You&rsquo;ve probably already thought about&hellip;</h2>
       </div>
       <div class="rows rows-wide" aria-label="Solutions families have already tried">
         <div class="row row-alt">
@@ -186,70 +195,72 @@
 </section>
 
 <section id="system" class="section">
-  <div class="wrap stack stack-56">
+  <div class="wrap system-head-wrap">
     <div class="stack stack-20 section-head">
       <div class="stack stack-16">
-        <p class="eyebrow">The setup</p>
-        <h2 class="h2">How Grand works</h2>
+        <p class="eyebrow">How Grand works</p>
+        <h2 class="h3">A small hub, a few sensors, and a sense of what an ordinary day looks like.</h2>
       </div>
-      <p class="body-lg">There&rsquo;s a better way to know they&rsquo;re okay. A small hub and a few sensors. No cameras, nothing to wear, nothing to charge.</p>
+      <p class="body-lg">Grand sits quietly in the home and uses motion and audio signals to learn your parent&rsquo;s normal routine &mdash; then flags when something seems off. No cameras, nothing to wear, nothing to charge.</p>
     </div>
-    <div class="grid-2" style="gap:24px;align-items:start">
-      <div class="stack stack-18">
-        <img class="photo photo-4x3" src="assets/grand-sensor.jpg" alt="A Grand sensor plugged into a wall outlet at home.">
-        <div class="stack stack-12">
-          <p class="kicker">The sensors</p>
+  </div>
+  <div class="wrap system-scene-wrap">
+    <figure class="scene" aria-label="A living room with Grand installed">
+      <img src="assets/grand-hub-and-sensors-home-v3.webp" width="1536" height="1024" loading="lazy" decoding="async" alt="A living room with the Grand hub on a side table beside the sofa, one Grand sensor in a bedroom outlet through the doorway, and another in the kitchen beyond.">
+      <!-- Leader lines: coordinates are % of the photo (x y). Card anchors → points just below each device. -->
+      <svg class="scene-leaders" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+        <polyline points="32,70 34.7,70 34.7,50"></polyline>
+        <polyline points="61,66 61,43"></polyline>
+        <polyline points="81,66 81,54 83.7,54 83.7,45"></polyline>
+      </svg>
+      <span class="note-dot" style="left:34.7%;top:50%" aria-hidden="true"></span>
+      <span class="note-dot" style="left:61%;top:43%" aria-hidden="true"></span>
+      <span class="note-dot" style="left:83.7%;top:45%" aria-hidden="true"></span>
+      <div class="scene-notes">
+        <div class="scene-note note-hub stack stack-12">
+          <h3 class="h4">Grand hub</h3>
+          <p class="body">This small device processes signals from the sensors and lets you know that your parent is safe, or pings you when something is off.</p>
+        </div>
+        <div class="scene-note note-sensor stack stack-12">
           <h3 class="h4">Grand sensors</h3>
           <p class="body">A few small sensors that plug into any outlet and connect to the hub over Wi&#8209;Fi. They use motion and audio detection to make sure your loved one is safe and healthy.</p>
         </div>
       </div>
-      <div class="stack stack-18">
-        <img class="photo photo-4x3" src="assets/grand-hub.jpg" alt="The Grand hub, a small fabric-covered device, on a kitchen counter.">
-        <div class="stack stack-12">
-          <p class="kicker">The hub</p>
-          <h3 class="h4">Grand hub</h3>
-          <p class="body">This small device processes signals from the sensors and lets you know that your parent is safe, or pings you when something is off.</p>
-        </div>
-      </div>
-    </div>
+    </figure>
   </div>
-</section>
-
-<section id="attention" class="section">
-  <div class="wrap">
-    <div class="routine-layout">
-      <div class="stack stack-16">
-        <p class="eyebrow">How it works</p>
-        <h2 class="h2-sm">Grand learns what an ordinary day looks like and flags when something seems off.</h2>
-        <p class="body">Grand uses motion and audio signals to build a picture of your parent&rsquo;s normal routine, then watches for changes that might mean it&rsquo;s time to check in. Grand can also notify you if something more serious may be happening, so you have peace of mind without putting a camera in the home.</p>
+  <div class="wrap system-routine-wrap" id="attention">
+      <div class="routine-layout">
+        <div class="stack stack-16">
+          <h3 class="h3">What Grand learns</h3>
+          <p class="body">Over the first few weeks Grand builds a picture of your parent&rsquo;s normal routine, then watches for the changes that might mean it&rsquo;s time to check in &mdash; and can notify you if something more serious may be happening.</p>
+        </div>
+        <ol class="routine-list" aria-label="Examples of routine signals Grand can understand">
+          <li class="routine-item">
+            <div class="routine-copy">
+              <h3>Getting up in the morning</h3>
+              <p class="body">Grand can recognize when a wakeup time seems significantly different from the usual routine.</p>
+            </div>
+          </li>
+          <li class="routine-item">
+            <div class="routine-copy">
+              <h3>Mealtimes</h3>
+              <p class="body">Grand can identify the audio and motion signals that typically accompany meal time.</p>
+            </div>
+          </li>
+          <li class="routine-item">
+            <div class="routine-copy">
+              <h3>Trips to the bathroom</h3>
+              <p class="body">Grand can keep tabs on trips to the restroom without invading privacy with a camera.</p>
+            </div>
+          </li>
+          <li class="routine-item">
+            <div class="routine-copy">
+              <h3>Indicators of a potential fall</h3>
+              <p class="body">Most importantly, Grand can notice sudden changes in motion or audio activity that may indicate an emergency. When that happens, Grand alerts the caregiver circle so they can check in.</p>
+            </div>
+          </li>
+        </ol>
       </div>
-      <ol class="routine-list" aria-label="Examples of routine signals Grand can understand">
-        <li class="routine-item">
-          <div class="routine-copy">
-            <h3>Getting up in the morning</h3>
-            <p class="body">Grand can recognize when a wakeup time seems significantly different from the usual routine.</p>
-          </div>
-        </li>
-        <li class="routine-item">
-          <div class="routine-copy">
-            <h3>Mealtimes</h3>
-            <p class="body">Grand can identify the audio and motion signals that typically accompany meal time.</p>
-          </div>
-        </li>
-        <li class="routine-item">
-          <div class="routine-copy">
-            <h3>Trips to the bathroom</h3>
-            <p class="body">Grand can keep tabs on trips to the restroom without invading privacy with a camera.</p>
-          </div>
-        </li>
-        <li class="routine-item">
-          <div class="routine-copy">
-            <h3>Indicators of a potential fall</h3>
-            <p class="body">Most importantly, Grand can notice sudden changes in motion or audio activity that may indicate an emergency. When that happens, Grand alerts the caregiver circle so they can check in.</p>
-          </div>
-        </li>
-      </ol>
-    </div>
   </div>
 </section>
 
@@ -258,7 +269,7 @@
     <div class="stack stack-20 section-head">
       <div class="stack stack-16">
         <p class="eyebrow">Caregiver experience</p>
-        <h2 class="h2">Feel secure knowing she&rsquo;s okay</h2>
+        <h2 class="h3">Feel secure knowing she&rsquo;s okay</h2>
       </div>
       <p class="body-lg">Open the app and you see today at a glance: is the day broadly normal, or is there something worth a check&#8209;in? And in the worst&#8209;case scenario, everyone in the caregiver circle is alerted so they can check on her directly.</p>
     </div>
@@ -296,7 +307,7 @@
     <div class="grid-2">
       <div class="stack stack-28">
         <p class="eyebrow">When something&rsquo;s wrong</p>
-        <h2 class="h2">You decide what happens next.</h2>
+        <h2 class="h3">You decide what happens next.</h2>
         <p class="body-lg">When Grand notices something you&rsquo;ve asked it to watch for &mdash; a fall, or a change in her daily routine &mdash; it pings everyone in your caregiver circle right away. From there, what happens next is up to you.</p>
         <ol class="routine-list" aria-label="Emergency response steps">
           <li class="routine-item">
@@ -328,7 +339,7 @@
   <div class="wrap grid-2" style="padding-top:var(--section-pad);padding-bottom:var(--section-pad)">
     <div class="stack stack-20">
       <p class="eyebrow">Early access</p>
-      <h2 class="h2">Peace of mind when you can&rsquo;t be there</h2>
+      <h2 class="h3">Peace of mind when you can&rsquo;t be there</h2>
       <p class="body-lg">Grand will officially launch to the public later this year, but we are accepting prototype testers today (completely free). Sign up to learn more.</p>
     </div>
     <form class="card" id="tester-form" data-waitlist-form data-waitlist-endpoint="https://script.google.com/macros/s/AKfycbznF16TQs1AShix3v0rp6DCZVs7P844Cp0KCfeCoApbPh2FF2sCC6M97vKxu_s2YmuY/exec" novalidate>
@@ -377,5 +388,6 @@
   </div>
 </footer>
 
+<script>(function(){var h=document.querySelector(".site-header"),t=document.querySelector(".hero-media");if(!h||!t||!("IntersectionObserver" in window))return;var io=new IntersectionObserver(function(e){h.classList.toggle("is-scrolled",!e[0].isIntersecting)},{rootMargin:"-"+h.offsetHeight+"px 0px 0px 0px",threshold:0});io.observe(t)})();</script>
 </body>
 </html>

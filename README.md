@@ -4,6 +4,25 @@ Static landing-page wireframe for Grand.
 
 ## Status
 
+- Removed the mint background from “The alternatives”; retained the open, square-edged layout, spacing, and shared content alignment.
+
+- Changed “The alternatives” to a full-width mint band with square edges, retaining the shared content alignment and responsive comparison layout. This supersedes the restored rounded panel below.
+
+- Restored the v3 rounded, tinted alternatives panel after reverting the experimental ruled layout.
+
+- Moved the product-photo connector dots and line endpoints just below the hub and both sensors so the annotations no longer cover the devices.
+
+- Expanded the “How Grand works” title and introduction to the full content width, removing the 720px heading-group cap.
+
+- Implemented the September 21 v3 homepage handoff on `codex/website-updates-20260918`: wider hero and alternatives panels, HTML message thread, updated headings and spacing, and a combined “How Grand works” section with responsive hub/sensor captions. Both `#system` and `#attention` anchors remain available. Preserved production metadata, analytics, waitlist scripts, and responsive image variants.
+- Integrated the v3 product scene as `assets/grand-hub-and-sensors-home-v3.webp` (163 KB, down from a 2.1 MB PNG), with lazy loading and device-aligned leader lines. Captions move under the photo at 1000px and stack at 700px. Verified layout at 390–2560px and all 20 existing tests pass. Safari has not been separately tested.
+
+- Added `assets/grand-hub-and-sensors-home-v3.png`: revised product lifestyle image places the hub in the living room and satellites in a separate bedroom and kitchen, visible through distinct doorways. This image is now used by the homepage via an optimized WebP; earlier versions remain for comparison.
+
+- Added `assets/grand-hub-and-sensors-home-v2.png`, a cleanup pass on the home product scene targeting texture artifacts, product lettering, and edges while retaining the composition. Original retained for comparison; neither image is wired into the website.
+
+- Generated `assets/grand-hub-and-sensors-home.png`: a natural living-room scene with the Grand hub and two plug-in wall sensors, using the existing product photos as design references. Available as a new asset; not yet placed on the website.
+
 - Swapped the worry section’s desktop columns to place its copy on the left and the phone image on the right; mobile continues to show copy before the phone.
 
 - Removed the tagline beside the Grand wordmark from the shared menu header across the homepage, welcome, privacy, and terms pages.
@@ -213,8 +232,8 @@ Every content section leads with a standardized eyebrow (`.eyebrow`, uppercase, 
 
 - Hero promise ("You'll know she's okay.") with a primary "See how Grand works" CTA and a secondary "Become a tester" waitlist CTA.
 - "The worry" problem section: a two-column narrative with the independence/worry copy on the left and an iMessage-style multi-day concern graphic on the right, followed by a compact strikethrough list dismissing pendants/watches, call-for-help buttons, in-home carers, and cameras with one-line stories.
-- "How Grand works" section titled as such, with a combined lead ("There's a better way to know they're okay. A small hub and a few sensors. No cameras, nothing to wear, nothing to charge.") and two product cards, each showing a real product photo: `assets/grand-sensor.jpg` (sensor in a wall outlet) and `assets/grand-hub.jpg` (hub on a kitchen counter), both optimized to ~120–210KB JPGs. The `.card-media` slot renders a cover-fit image via `:has(img)`, falling back to a dashed placeholder when no image is present.
-- "How it works" (`#attention`): four numbered routine rows covering wake-up time, meals, bathroom visits, and indicators of a potential fall.
+- Historical product-card layout (superseded by the v3 combined scene): with a combined lead ("There's a better way to know they're okay. A small hub and a few sensors. No cameras, nothing to wear, nothing to charge.") and two product cards, each showing a real product photo: `assets/grand-sensor.jpg` (sensor in a wall outlet) and `assets/grand-hub.jpg` (hub on a kitchen counter), both optimized to ~120–210KB JPGs. The `.card-media` slot renders a cover-fit image via `:has(img)`, falling back to a dashed placeholder when no image is present.
+- “How Grand works” (`#system`): a wide home scene with floating hub/sensor captions on desktop and a dark caption band on tablet/mobile. “What Grand learns” (`#attention`) follows within the same section, covering wake-up time, meals, bathroom visits, and indicators of a potential fall.
 - "Caregiver experience": the daily "she's okay" app view with real iOS app screens, plus a parent-perspective dignity note.
 - "When something's wrong" (`#response`): what happens in an emergency — a two-column section (copy left, caregiver photo right) with a three-step numbered process (Grand pings the caregiver circle → you talk to her directly through the hub and sensors → you decide if emergency services are needed, with Grand surfacing the right local number). **There is no human in the loop:** Grand alerts the circle, the family makes the call. Any copy describing a Grand agent who phones the parent or dials EMS is wrong — see the "no call center" entry in the changelog above.
 - Waitlist form with validation and Google Sheets handoff. On success it redirects to the post-signup profile page.

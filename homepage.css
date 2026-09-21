@@ -219,10 +219,10 @@ input::placeholder{color:var(--muted-2)}
 
 /* app */
 #tracking{background:#f3f5f2}
-/* Always three across or one down, never two: auto-fit found room for two
-   columns between ~700 and 840px and orphaned the third screenshot. */
+/* Keep all three app screens together on tablet and desktop. */
 .screens{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:32px}
-@media(max-width:860px){.screens{grid-template-columns:1fr;gap:44px}}
+@media(min-width:701px) and (max-width:1000px){.screens{gap:20px}}
+@media(max-width:700px){.screens{grid-template-columns:1fr;gap:44px}}
 /* Caption is capped to the phone's width and centred with it, so its left edge
    lines up with the screenshot instead of hanging off to the left. Both read
    one variable: the global mobile rule shrinks .phone to 220px, which would
@@ -233,6 +233,17 @@ input::placeholder{color:var(--muted-2)}
 .screens figcaption{display:flex;flex-direction:column;gap:6px;width:100%;max-width:var(--phone-w)}
 .screens figcaption b{font-family:var(--serif);font-weight:500;font-size:22px;letter-spacing:-.01em}
 .screens figcaption span{font-size:15px;line-height:1.5;color:var(--ink-3)}
+
+/* Tablet response: full-width introduction, then steps beside the photo. */
+@media(min-width:701px) and (max-width:1000px){
+ #response .grid-2{grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:24px 32px;align-items:start}
+ #response .grid-2>.stack{display:contents}
+ #response .grid-2>.stack>.eyebrow,
+ #response .grid-2>.stack>h2,
+ #response .grid-2>.stack>.body-lg{grid-column:1/-1}
+ #response .routine-list{grid-column:1;grid-row:4}
+ #response .grid-2>img{grid-column:2;grid-row:4;align-self:start}
+}
 
 /* waitlist + footer */
 .waitlist{background:var(--band);color:#fff}

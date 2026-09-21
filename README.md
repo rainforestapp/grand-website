@@ -4,6 +4,10 @@ Static landing-page wireframe for Grand.
 
 ## Status
 
+- Updated full-page homepage screenshots in `docs/screenshots/homepage/`: desktop at 1440px, tablet at 768px, and mobile at 390px, documenting the final design and tablet refinements for PR #74.
+
+- Refined the tablet layout (701–1000px): caregiver app screenshots remain three across; the emergency section places its introduction above a paired layout of response steps and a compact photo, instead of letting the photo expand beneath the section.
+
 - Removed the mint background from “The alternatives”; retained the open, square-edged layout, spacing, and shared content alignment.
 
 - Changed “The alternatives” to a full-width mint band with square edges, retaining the shared content alignment and responsive comparison layout. This supersedes the restored rounded panel below.

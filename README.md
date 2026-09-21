@@ -4,6 +4,56 @@ Static landing-page wireframe for Grand.
 
 ## Status
 
+- Added tablet connector lines from the full house image into the hub/sensor caption band, ending below the devices. The tablet “What Grand learns” introduction now spans the full content width above the routine list.
+
+- Split the mobile “How Grand works” scene into two stacked versions of the original rounded photo-and-dark-caption layout: one zoomed house-image crop for the hub and one for the kitchen sensor. Desktop/tablet retain the full scene and existing captions.
+
+- Animated the worry thread from Tuesday onward: the day label, three unanswered messages, and Delivered status appear in sequence once the conversation enters view. Monday stays visible, space is reserved to avoid layout shifts, and reduced-motion/no-JavaScript visitors see the full thread immediately.
+
+- Removed sticky positioning from the “What Grand learns” introduction so it scrolls normally alongside the routine list.
+
+- Grouped Tuesday’s unanswered iMessage bubbles into a compact stack with 6px gaps and a single Delivered label beneath the final message; removed the intervening timestamp/status rows.
+
+- Removed the caregiver experience section’s tinted background so it uses the page’s white background.
+
+- Desktop navigation is a distinct translucent white menu bar with a subtle backdrop blur directly above the hero. The hero image itself is vertically centered on load, with the menu above it excluded from the centering calculation, and the menu sticks to the viewport top when scrolling reaches it, with a compact, darker shadow while pinned (1px offset, 2px blur, 12% opacity). Tablet/mobile and secondary-page navigation are unchanged.
+
+- Vertically centered the desktop hero within the initial viewport below the header, with equal top/bottom space and no automatic scrolling. Tablet and mobile layouts retain their existing behavior.
+
+- Updated full-page homepage screenshots in `docs/screenshots/homepage/`: desktop at 1440px, tablet at 768px, and mobile at 390px, documenting the final design and tablet refinements for PR #74.
+
+- Refined the tablet layout (701–1000px): caregiver app screenshots remain three across; the emergency section places its introduction above a paired layout of response steps and a compact photo, instead of letting the photo expand beneath the section.
+
+- Removed the mint background from “The alternatives”; retained the open, square-edged layout, spacing, and shared content alignment.
+
+- Changed “The alternatives” to a full-width mint band with square edges, retaining the shared content alignment and responsive comparison layout. This supersedes the restored rounded panel below.
+
+- Restored the v3 rounded, tinted alternatives panel after reverting the experimental ruled layout.
+
+- Moved the product-photo connector dots and line endpoints just below the hub and both sensors so the annotations no longer cover the devices.
+
+- Expanded the “How Grand works” title and introduction to the full content width, removing the 720px heading-group cap.
+
+- Implemented the September 21 v3 homepage handoff on `codex/website-updates-20260918`: wider hero and alternatives panels, HTML message thread, updated headings and spacing, and a combined “How Grand works” section with responsive hub/sensor captions. Both `#system` and `#attention` anchors remain available. Preserved production metadata, analytics, waitlist scripts, and responsive image variants.
+- Integrated the v3 product scene as `assets/grand-hub-and-sensors-home-v3.webp` (163 KB, down from a 2.1 MB PNG), with lazy loading and device-aligned leader lines. Captions move under the photo at 1000px and stack at 700px. Verified layout at 390–2560px and all 20 existing tests pass. Safari has not been separately tested.
+
+- Added `assets/grand-hub-and-sensors-home-v3.png`: revised product lifestyle image places the hub in the living room and satellites in a separate bedroom and kitchen, visible through distinct doorways. This image is now used by the homepage via an optimized WebP; earlier versions remain for comparison.
+
+- Added `assets/grand-hub-and-sensors-home-v2.png`, a cleanup pass on the home product scene targeting texture artifacts, product lettering, and edges while retaining the composition. Original retained for comparison; neither image is wired into the website.
+
+- Generated `assets/grand-hub-and-sensors-home.png`: a natural living-room scene with the Grand hub and two plug-in wall sensors, using the existing product photos as design references. Available as a new asset; not yet placed on the website.
+
+- Swapped the worry section’s desktop columns to place its copy on the left and the phone image on the right; mobile continues to show copy before the phone.
+
+- Removed the tagline beside the Grand wordmark from the shared menu header across the homepage, welcome, privacy, and terms pages.
+
+- Unified green accents and CTA backgrounds on the footer’s original dark green (`#1e2a24`), with a shared darker button hover color.
+
+- Matched the “When something’s wrong” steps to the numbered routine list: shared serif headings, green two-digit numerals, dividers, and spacing. Mobile retains the response photo before the steps.
+
+- Restyled the “How it works” routine section as four numbered rows with green serif numerals, serif headings, and fine dividers. Desktop pairs the introduction with the list; tablet and mobile stack them. Current descriptions and caregiver-circle emergency wording are preserved.
+
+- Aligned the shared menu and hero with the sections’ 1200px container and responsive gutters. The desktop hero uses a rounded frame, a cropped photo fading into a muted background, and inset copy. Mobile retains the stacked photo and copy with a rounded photo. Section divider lines are removed; list dividers remain.
 - Matched the mobile hero's green to the header CTA: the "she's okay." accent and the "See how Grand works" button now use `--band` (`#1e2a24`) instead of `--green` (`#1f5a3f`). **Why:** on the stacked mobile hero they sit directly below the dark "Become a tester" pill, and the two greens read as a mismatch rather than one brand color. Desktop is unchanged (the hero copy there is white over the photo). Section eyebrows (`.eyebrow`) were darkened for the same reason and then put back to `--green`: both `--band` and `--green-dark` stop reading as green at 13px uppercase, and the eyebrow needs to carry color more than it needs to match the dark bands. `--green` still carries eyebrows, links, input focus, and the `.tile--urgent` accents.
 
 - **Restored the approved homepage copy into the editorial redesign.** The redesign (PR #69) shipped a new visual design *and* rewrote nearly every line of copy on the homepage; the whole PR was reverted (#70) to protect the words, then reapplied here with the original copy put back. Section eyebrows, the hub/sensor and routine-tile kickers, the three-item caregiver list, and the `#response` intro paragraph all returned; the redesign's `01`–`04` numerals gave way to the original text labels. **Why:** the homepage copy is approved, research-backed writing, and the design brief never covered it. **Design work must not rewrite `index.html` copy** — treat the words as fixed input and fit the layout around them. Three invented claims were removed in the process: "No audio is ever sent to the cloud", "a real person from Grand reaches out to confirm she's okay" (see the `#response` note below — there is no human in the loop), and "We never share your number/email". The `<noscript>` fallback and the 45-second signup timeout message were kept, since they accompany a real bug fix rather than a positioning change.
@@ -197,14 +247,14 @@ The same Apps Script endpoint also receives anonymous interaction analytics. For
 
 ## Current Sections
 
-Every content section leads with a standardized eyebrow (`.eyebrow`, uppercase, 13px, green `--green`) above its title. The hero itself has no eyebrow — the headline leads directly. Cards and routine tiles use a quieter second-tier kicker (`.kicker`, uppercase, 12px, `--muted`) so they never compete with the section eyebrow. On the dark waitlist band the eyebrow is lifted to `--band-soft`; the green token is illegible there.
+Every content section leads with a standardized eyebrow (`.eyebrow`, uppercase, 13px, green `--green`) above its title. The hero itself has no eyebrow — the headline leads directly. Product cards use a quieter second-tier kicker (`.kicker`, uppercase, 12px, `--muted`); routine and emergency-response rows use green numbered labels. On the dark waitlist band the eyebrow is lifted to `--band-soft`; the green token is illegible there.
 
 `.eyebrow` carries no margin of its own — spacing comes from the parent `.stack` gap. `homepage.css` is shared with the legal pages, and `legal.css` sets its own `.legal-header .eyebrow` margin, so adding one here double-spaces those headers.
 
-- Hero promise ("You'll know she's okay.") with a primary "See how Grand works" CTA and a secondary "Be first to know" waitlist CTA.
+- Hero promise ("You'll know she's okay.") with a primary "See how Grand works" CTA and a secondary "Become a tester" waitlist CTA.
 - "The worry" problem section: a two-column narrative with the independence/worry copy on the left and an iMessage-style multi-day concern graphic on the right, followed by a compact strikethrough list dismissing pendants/watches, call-for-help buttons, in-home carers, and cameras with one-line stories.
-- "How Grand works" section titled as such, with a combined lead ("There's a better way to know they're okay. A small hub and a few sensors. No cameras, nothing to wear, nothing to charge.") and two product cards, each showing a real product photo: `assets/grand-sensor.jpg` (sensor in a wall outlet) and `assets/grand-hub.jpg` (hub on a kitchen counter), both optimized to ~120–210KB JPGs. The `.card-media` slot renders a cover-fit image via `:has(img)`, falling back to a dashed placeholder when no image is present.
-- "What Grand pays attention to": everyday activity, the kitchen (meals), and a call for help.
+- Historical product-card layout (superseded by the v3 combined scene): with a combined lead ("There's a better way to know they're okay. A small hub and a few sensors. No cameras, nothing to wear, nothing to charge.") and two product cards, each showing a real product photo: `assets/grand-sensor.jpg` (sensor in a wall outlet) and `assets/grand-hub.jpg` (hub on a kitchen counter), both optimized to ~120–210KB JPGs. The `.card-media` slot renders a cover-fit image via `:has(img)`, falling back to a dashed placeholder when no image is present.
+- “How Grand works” (`#system`): a wide home scene with floating hub/sensor captions on desktop and a dark caption band on tablet/mobile. “What Grand learns” (`#attention`) follows within the same section, covering wake-up time, meals, bathroom visits, and indicators of a potential fall.
 - "Caregiver experience": the daily "she's okay" app view with real iOS app screens, plus a parent-perspective dignity note.
 - "When something's wrong" (`#response`): what happens in an emergency — a two-column section (copy left, caregiver photo right) with a three-step numbered process (Grand pings the caregiver circle → you talk to her directly through the hub and sensors → you decide if emergency services are needed, with Grand surfacing the right local number). **There is no human in the loop:** Grand alerts the circle, the family makes the call. Any copy describing a Grand agent who phones the parent or dials EMS is wrong — see the "no call center" entry in the changelog above.
 - Waitlist form with validation and Google Sheets handoff. On success it redirects to the post-signup profile page.

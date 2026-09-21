@@ -4,6 +4,22 @@ Static landing-page wireframe for Grand.
 
 ## Status
 
+- Added tablet connector lines from the full house image into the hub/sensor caption band, ending below the devices. The tablet “What Grand learns” introduction now spans the full content width above the routine list.
+
+- Split the mobile “How Grand works” scene into two stacked versions of the original rounded photo-and-dark-caption layout: one zoomed house-image crop for the hub and one for the kitchen sensor. Desktop/tablet retain the full scene and existing captions.
+
+- Animated the worry thread from Tuesday onward: the day label, three unanswered messages, and Delivered status appear in sequence once the conversation enters view. Monday stays visible, space is reserved to avoid layout shifts, and reduced-motion/no-JavaScript visitors see the full thread immediately.
+
+- Removed sticky positioning from the “What Grand learns” introduction so it scrolls normally alongside the routine list.
+
+- Grouped Tuesday’s unanswered iMessage bubbles into a compact stack with 6px gaps and a single Delivered label beneath the final message; removed the intervening timestamp/status rows.
+
+- Removed the caregiver experience section’s tinted background so it uses the page’s white background.
+
+- Desktop navigation is a distinct translucent white menu bar with a subtle backdrop blur directly above the hero. The hero image itself is vertically centered on load, with the menu above it excluded from the centering calculation, and the menu sticks to the viewport top when scrolling reaches it, with a compact, darker shadow while pinned (1px offset, 2px blur, 12% opacity). Tablet/mobile and secondary-page navigation are unchanged.
+
+- Vertically centered the desktop hero within the initial viewport below the header, with equal top/bottom space and no automatic scrolling. Tablet and mobile layouts retain their existing behavior.
+
 - Updated full-page homepage screenshots in `docs/screenshots/homepage/`: desktop at 1440px, tablet at 768px, and mobile at 390px, documenting the final design and tablet refinements for PR #74.
 
 - Refined the tablet layout (701–1000px): caregiver app screenshots remain three across; the emergency section places its introduction above a paired layout of response steps and a compact photo, instead of letting the photo expand beneath the section.

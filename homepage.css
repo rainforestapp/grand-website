@@ -43,8 +43,9 @@ input::placeholder{color:var(--muted-2)}
 .link-ul{text-decoration:none;color:var(--ink);padding:16px 8px;font-weight:500;font-size:16px;border-bottom:1px solid var(--ink)}
 
 /* header */
-.site-header{position:sticky;top:0;z-index:10;background:rgba(255,255,255,.88);backdrop-filter:blur(12px);border-bottom:1px solid transparent;transition:border-color .2s}
+.site-header{position:sticky;top:0;z-index:10;background:rgba(255,255,255,.88);backdrop-filter:blur(12px);border-bottom:1px solid transparent;transition:border-color .2s,box-shadow .2s}
 .site-header.is-scrolled{border-bottom-color:var(--rule)}
+.site-header.is-stuck{box-shadow:0 1px 2px rgba(20,29,24,.12)}
 .site-header nav{display:flex;align-items:center;justify-content:space-between;gap:24px;padding-top:18px;padding-bottom:18px}
 .brand{text-decoration:none;font-family:var(--serif);font-size:28px;font-weight:500;letter-spacing:-.02em;display:flex;align-items:baseline;gap:10px;color:var(--ink)}
 .brand small{font-family:var(--sans);font-size:13px;color:var(--muted);letter-spacing:0}
@@ -119,6 +120,15 @@ input::placeholder{color:var(--muted-2)}
  .hero-media::after{display:none}
 }
 
+/* Center the hero itself; reserve room above it for the sticky menu. */
+@media(min-width:1101px){
+ .homepage{--desktop-hero-height:clamp(540px,calc(100svh - 158px),780px);padding-top:max(0px,calc((100svh - var(--desktop-hero-height))/2 - 79px))}
+ .homepage .site-header{position:sticky;top:0;background:rgba(255,255,255,.82);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-bottom-color:transparent}
+ .hero{padding:0 0 max(79px,calc((100svh - var(--desktop-hero-height))/2))}
+ .hero .wrap{width:100%;padding-bottom:0}
+ .hero-media{height:var(--desktop-hero-height)}
+}
+
 /* Keep overlaid copy legible as the photo and text converge on tablets. */
 @media(min-width:701px) and (max-width:1000px){
  .hero-media::after{display:block;background:linear-gradient(90deg,rgba(20,19,17,.6) 0%,rgba(20,19,17,.5) 58%,transparent 90%)}
@@ -139,6 +149,12 @@ input::placeholder{color:var(--muted-2)}
 .bubble.them{align-self:flex-start;background:#e9e9eb;color:#141311;border-bottom-left-radius:6px;margin-top:14px}
 .tapback{position:absolute;top:-22px;right:-10px;width:36px;height:36px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.18);display:flex;align-items:center;justify-content:center;font-size:15px}
 .thread-status{margin:5px 6px 0 0;align-self:flex-end;font-size:12px;color:#8a8a8e}
+/* Reserve the conversation's height while Tuesday's messages arrive once. */
+@media(prefers-reduced-motion:no-preference){
+ .thread-animated [data-thread-reveal]{opacity:0;transform:translateY(8px)}
+ .thread-animated.is-playing [data-thread-reveal]{animation:thread-arrive .36s ease-out var(--message-delay,0ms) both}
+}
+@keyframes thread-arrive{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 @media(max-width:1000px){.worry .grid-2{gap:48px}}
 
 /* Alternatives: open layout with content on the shared column. */
@@ -161,10 +177,13 @@ input::placeholder{color:var(--muted-2)}
 .scene>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .scene-leaders{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
 .scene-leaders polyline{fill:none;stroke:#fff;stroke-width:1.5;stroke-linejoin:round;vector-effect:non-scaling-stroke;filter:drop-shadow(0 0 1px rgba(0,0,0,.35))}
+.scene-tablet-leaders{display:none;pointer-events:none}
+.scene-tablet-leaders ellipse{fill:#fff}
 .note-dot{position:absolute;width:10px;height:10px;margin:-5px 0 0 -5px;border-radius:50%;background:#fff;box-shadow:0 0 0 3px rgba(255,255,255,.35),0 1px 3px rgba(0,0,0,.3)}
 .scene-note{position:absolute;padding:20px 22px;border-radius:14px;background:rgba(255,255,255,.94);color:var(--ink);box-shadow:0 8px 30px rgba(20,26,22,.18);backdrop-filter:blur(6px)}
 .note-hub{left:6%;top:64%;width:26%}
 .note-sensor{left:56%;top:66%;width:28%}
+.device-porthole{display:none}
 .scene-note .h4{font-size:22px}
 .scene-note .body{font-size:15px;line-height:1.5}
 @media(min-width:701px){#system .system-scene-wrap{max-width:none;padding-left:var(--frame-left);padding-right:var(--frame-left)}}
@@ -179,10 +198,29 @@ input::placeholder{color:var(--muted-2)}
  .scene-note .h4{color:#fff}
  .scene-note .body{color:rgba(255,255,255,.9)}
 }
+@media(min-width:701px) and (max-width:1000px){
+ .scene-tablet-leaders{display:block;height:auto;aspect-ratio:3/2}
+ .scene-notes{position:relative}
+ .scene-notes::before,.scene-notes::after{content:"";position:absolute;top:0;height:24px;width:1.5px;background:#fff;transform:translateX(-50%)}
+ .scene-notes::before{left:25%}
+ .scene-notes::after{left:75%}
+}
+@media(min-width:701px) and (max-width:1100px){
+ #system .routine-layout{grid-template-columns:1fr;gap:32px}
+ #system .routine-layout>.stack .body{max-width:none}
+}
 @media(max-width:700px){
  #system .system-routine-wrap{padding-top:56px}
- .scene{border-radius:20px}
- .scene-notes{grid-template-columns:1fr;padding:28px 20px 32px;gap:28px}
+ .scene{border-radius:0;background:none;overflow:visible}
+ .scene>img{display:none}
+ .scene-notes{grid-template-columns:1fr;padding:0;gap:32px;background:none}
+ .scene-note{gap:0;background:var(--band);border-radius:20px;overflow:hidden}
+ .scene-note .h4{color:#fff;margin:28px 20px 12px}
+ .scene-note .body{color:rgba(255,255,255,.9);margin:0 20px 32px}
+ .device-porthole{display:block;position:relative;width:100%;aspect-ratio:3/2;overflow:hidden;margin:0;background:#e9ece7}
+ .device-porthole img{position:absolute;left:50%;top:50%;max-width:none;height:auto}
+ .porthole-hub img{width:400%;transform:translate(-34.7%,-40.5%)}
+ .porthole-sensor img{width:750%;transform:translate(-83.7%,-39.5%)}
 }
 @media(max-width:700px){#alternatives .wrap{padding-top:40px;padding-bottom:40px}}
 
@@ -214,11 +252,9 @@ input::placeholder{color:var(--muted-2)}
 .routine-copy{display:flex;flex-direction:column;gap:8px}
 .routine-copy h3{font-family:var(--serif);font-weight:400;font-size:24px;line-height:1.2;letter-spacing:-.015em}
 .routine-copy .body{font-size:16px;line-height:1.6;max-width:560px}
-.routine-layout>.stack{position:sticky;top:112px}
-@media(max-width:1000px){.routine-layout{grid-template-columns:1fr;gap:32px}.routine-layout>.stack{position:static}}
+@media(max-width:1000px){.routine-layout{grid-template-columns:1fr;gap:32px}}
 
 /* app */
-#tracking{background:#f3f5f2}
 /* Keep all three app screens together on tablet and desktop. */
 .screens{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:32px}
 @media(min-width:701px) and (max-width:1000px){.screens{gap:20px}}

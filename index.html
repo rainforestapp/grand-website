@@ -135,6 +135,10 @@
       </div>
     </div>
   </div>
+  <a class="scroll-hint" href="#problem">
+    <span>Scroll to explore</span>
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 4v15m-5-5 5 5 5-5"/></svg>
+  </a>
 </section>
 
 <section id="problem" class="section worry">
@@ -406,6 +410,17 @@
   var header = document.querySelector(".site-header");
   var hero = document.querySelector(".hero-media");
   if (!header || !hero) return;
+
+  function revealMenu() {
+    header.classList.add("menu-revealed");
+    hero.closest(".hero").classList.add("hero-revealed");
+  }
+  // Scroll intent also reveals the menu when already at the page boundary.
+  ["scroll", "wheel", "touchmove"].forEach(function (eventName) {
+    window.addEventListener(eventName, revealMenu, { passive: true, once: true });
+  });
+  header.addEventListener("focusin", revealMenu, { once: true });
+  if (window.scrollY > 0) revealMenu();
 
   function updateMenuShadow() {
     var sticky = window.getComputedStyle(header).position === "sticky";

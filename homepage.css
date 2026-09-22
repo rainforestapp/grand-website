@@ -50,6 +50,13 @@ input::placeholder{color:var(--muted-2)}
 .site-header{position:sticky;top:0;z-index:10;background:rgba(255,255,255,.88);backdrop-filter:blur(12px);border-bottom:1px solid transparent;transition:border-color .2s,box-shadow .2s}
 .site-header.is-scrolled{border-bottom-color:var(--rule)}
 .site-header.is-stuck{box-shadow:0 1px 2px rgba(20,29,24,.12)}
+/* Animate only menu content; the translucent header surface stays stationary. */
+@media(prefers-reduced-motion:no-preference){
+ .homepage .site-header>nav{animation:menu-dissolve 1.6s cubic-bezier(.22,1,.36,1) 2s backwards}
+ .homepage .site-header:focus-within>nav,
+ .homepage .site-header.menu-revealed>nav{animation:none}
+}
+@keyframes menu-dissolve{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 .site-header nav{display:flex;align-items:center;justify-content:space-between;gap:24px;padding-top:18px;padding-bottom:18px}
 .brand{text-decoration:none;font-family:var(--serif);font-size:28px;font-weight:500;letter-spacing:-.02em;display:flex;align-items:baseline;gap:10px;color:var(--ink)}
 .brand small{font-family:var(--sans);font-size:13px;color:var(--muted);letter-spacing:0}
@@ -74,6 +81,18 @@ input::placeholder{color:var(--muted-2)}
 .photo{width:100%;object-fit:cover;border-radius:6px}
 .photo-4x5{aspect-ratio:4/5}.photo-4x3{aspect-ratio:4/3}
 
+/* The scroll cue occupies the existing space beneath the hero. */
+.hero{position:relative}
+.scroll-hint{position:absolute;bottom:4px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:44px;padding:2px 12px;color:var(--muted);font-size:12px;letter-spacing:.03em;text-decoration:none;white-space:nowrap}
+.scroll-hint svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
+@media(min-width:1101px){.scroll-hint{bottom:16px}}
+@media(prefers-reduced-motion:no-preference){
+ .scroll-hint{animation:scroll-hint-appear 1.6s cubic-bezier(.22,1,.36,1) 2s backwards}
+ .scroll-hint svg{animation:scroll-hint-nudge 1.6s ease-in-out 3.6s 3}
+}
+@keyframes scroll-hint-appear{from{opacity:0}to{opacity:1}}
+@keyframes scroll-hint-nudge{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}
+
 /* hero — headline sits in the photo's negative space, at her eye line */
 /* Explicit height keeps the image at the full content width while leaving
    enough vertical space for the overlaid copy. */
@@ -93,6 +112,14 @@ input::placeholder{color:var(--muted-2)}
 .hero-copy .btn{background:#fff;color:var(--ink)}
 .hero-copy .btn:hover{background:#e8e8e5;color:var(--ink)}
 .hero-actions{display:flex;gap:20px;flex-wrap:wrap;align-items:center}
+/* Build the message in three beats before the navigation finishes arriving. */
+@media(prefers-reduced-motion:no-preference){
+ .hero-copy>h1{animation:hero-copy-arrive 1.2s cubic-bezier(.22,1,.36,1) .15s backwards}
+ .hero-copy>.lede{animation:hero-copy-arrive 1.2s cubic-bezier(.22,1,.36,1) .55s backwards}
+ .hero-copy>.hero-actions{animation:hero-copy-arrive 1.2s cubic-bezier(.22,1,.36,1) .95s backwards}
+ .hero-copy:focus-within>*,.hero.hero-revealed .hero-copy>*{animation:none}
+}
+@keyframes hero-copy-arrive{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 /* The overlay holds as the window narrows rather than bailing to a stacked
    layout: the copy column takes a slightly larger share, moves closer to the
    edge, and the headline scales down, so it stays clear of her face. It only

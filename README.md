@@ -4,6 +4,24 @@ Static landing-page wireframe for Grand.
 
 ## Status
 
+- Replaced the iPhone product-card house crops with the dedicated `grand-hub.jpg` and `grand-sensor.jpg` photos, with each device centered in its image frame. Desktop/tablet keep the full house scene.
+
+- Disabled menu, hero, and message-thread entrance animations at phone widths (700px and below); all content is visible immediately. Tablet and desktop retain their animations.
+
+- Limited the “Scroll to learn more” hint to desktop widths above 1100px; hidden on tablet and mobile.
+
+- Fade the “Scroll to learn more” cue out over 400ms after 48px of scrolling, and fade it back in on returning to the top. The initial entrance delay only runs on load; reduced-motion users get immediate visibility changes.
+
+- Darkened the alternatives labels to the primary ink color and descriptions to dark charcoal for clearer contrast.
+
+- Top-aligned the worry section’s text and message thread on desktop and tablet.
+
+- Added a staggered hero-text entrance: headline, supporting copy, and actions fade upward in sequence, with 400ms between starts. Scrolling or focusing the hero controls reveals the text immediately; reduced-motion users see it without animation.
+
+- Added a small “Scroll to learn more” link and downward arrow beneath the hero, using existing whitespace to preserve its centering. Its fade-in matches the menu’s two-second pause and 1.6-second entrance. The arrow then gently moves three times, respects reduced motion, and links to the worry section.
+
+- Added a two-second pause followed by a 1.6-second menu fade and 16px upward slide from the hero on initial homepage load. Scrolling or keyboard focus reveals the menu immediately and cancels the entrance; reduced-motion users see it immediately. Only the menu content animates; the translucent header background stays stationary and page layout stays fixed.
+
 - Slightly increased section spacing: standard desktop/tablet padding from 160px to 176px and mobile from 80px to 88px, with matching increases to the tighter alternatives and mobile section overrides. Hero centering is preserved.
 
 - Increased the gap above Mom’s reply so its Tapback clears the preceding message, while retaining the compact Tuesday message stack.

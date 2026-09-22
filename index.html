@@ -136,7 +136,7 @@
     </div>
   </div>
   <a class="scroll-hint" href="#problem">
-    <span>Scroll to explore</span>
+    <span>Scroll to learn more</span>
     <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 4v15m-5-5 5 5 5-5"/></svg>
   </a>
 </section>
@@ -230,14 +230,14 @@
       <div class="scene-notes">
         <div class="scene-note note-hub stack stack-12">
           <div class="device-porthole porthole-hub">
-            <img src="assets/grand-hub-and-sensors-home-v3.webp" width="1536" height="1024" loading="lazy" decoding="async" alt="Close-up of the Grand hub on a living-room side table.">
+            <img src="assets/grand-hub.jpg" width="1086" height="1448" loading="lazy" decoding="async" alt="The Grand hub on a kitchen counter.">
           </div>
           <h3 class="h4">Grand hub</h3>
           <p class="body">This small device processes signals from the sensors and lets you know that your parent is safe, or pings you when something is off.</p>
         </div>
         <div class="scene-note note-sensor stack stack-12">
           <div class="device-porthole porthole-sensor">
-            <img src="assets/grand-hub-and-sensors-home-v3.webp" width="1536" height="1024" loading="lazy" decoding="async" alt="Close-up of a Grand sensor plugged into the kitchen wall outlet.">
+            <img src="assets/grand-sensor.jpg" width="1024" height="1536" loading="lazy" decoding="async" alt="A Grand sensor plugged into a wall outlet beside a sofa.">
           </div>
           <h3 class="h4">Grand sensors</h3>
           <p class="body">A few small sensors that plug into any outlet and connect to the hub over Wi&#8209;Fi. They use motion and audio detection to make sure your loved one is safe and healthy.</p>
@@ -409,6 +409,7 @@
 (function () {
   var header = document.querySelector(".site-header");
   var hero = document.querySelector(".hero-media");
+  var scrollHint = document.querySelector(".scroll-hint");
   if (!header || !hero) return;
 
   function revealMenu() {
@@ -423,6 +424,18 @@
   if (window.scrollY > 0) revealMenu();
 
   function updateMenuShadow() {
+    if (scrollHint) {
+      if (window.scrollY > 0) scrollHint.classList.add("has-scrolled");
+      if (window.scrollY > 48) scrollHint.classList.add("is-dismissed");
+      else if (window.scrollY <= 8) scrollHint.classList.remove("is-dismissed");
+      if (scrollHint.classList.contains("is-dismissed")) {
+        scrollHint.setAttribute("tabindex", "-1");
+        scrollHint.setAttribute("aria-hidden", "true");
+      } else {
+        scrollHint.removeAttribute("tabindex");
+        scrollHint.removeAttribute("aria-hidden");
+      }
+    }
     var sticky = window.getComputedStyle(header).position === "sticky";
     header.classList.toggle("is-stuck", sticky && window.scrollY > 0 && header.getBoundingClientRect().top <= 0);
   }
@@ -438,7 +451,7 @@
 })();
 (function () {
   var thread = document.querySelector(".thread");
-  if (!thread || !("IntersectionObserver" in window) || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  if (!thread || !("IntersectionObserver" in window) || window.matchMedia("(prefers-reduced-motion: reduce), (max-width: 700px)").matches) return;
 
   var delays = [0, 450, 1450, 2450, 2900];
   thread.querySelectorAll("[data-thread-reveal]").forEach(function (item, index) {

@@ -4,6 +4,8 @@ Static landing-page wireframe for Grand.
 
 ## Status
 
+- Darkened the alternatives labels to the primary ink color and descriptions to dark charcoal for clearer contrast.
+
 - Top-aligned the worry section’s text and message thread on desktop and tablet.
 
 - Added a staggered hero-text entrance: headline, supporting copy, and actions fade upward in sequence, with 400ms between starts. Scrolling or focusing the hero controls reveals the text immediately; reduced-motion users see it without animation.

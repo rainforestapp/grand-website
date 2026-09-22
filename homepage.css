@@ -274,7 +274,8 @@ input::placeholder{color:var(--muted-2)}
    grid-template-columns override here would outrank the single-column mobile
    rule below and keep the row two-up on phones. */
 .rows-wide .body{max-width:620px}
-.row-alt .name{font-family:var(--serif);font-size:22px;text-decoration:line-through;text-decoration-color:rgba(30,42,36,.42);text-decoration-thickness:1px;color:var(--muted)}
+.row-alt .name{font-family:var(--serif);font-size:22px;text-decoration:line-through;text-decoration-color:rgba(30,42,36,.42);text-decoration-thickness:1px;color:var(--ink)}
+#alternatives .row-alt .body{color:var(--ink-2)}
 /* Numbered routine rows: editorial type and fine dividers. */
 .routine-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:72px;align-items:start}
 .routine-list{list-style:none;margin:0;padding:0;counter-reset:routine}

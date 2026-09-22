@@ -4,6 +4,8 @@ Static landing-page wireframe for Grand.
 
 ## Status
 
+- Top-aligned the worry section’s text and message thread on desktop and tablet.
+
 - Added a staggered hero-text entrance: headline, supporting copy, and actions fade upward in sequence, with 400ms between starts. Scrolling or focusing the hero controls reveals the text immediately; reduced-motion users see it without animation.
 
 - Added a small “Scroll to explore” link and downward arrow beneath the hero, using existing whitespace to preserve its centering. Its fade-in matches the menu’s two-second pause and 1.6-second entrance. The arrow then gently moves three times, respects reduced motion, and links to the worry section.

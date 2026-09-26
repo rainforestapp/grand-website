@@ -4,6 +4,8 @@ Static landing-page wireframe for Grand.
 
 ## Status
 
+- Made the homepage waitlist phone field's country code editable. It was a fixed `+1` label, which left anyone outside the US with nowhere to put their country code and no way to know whether typing it into the number field would work — a silent dead end in the arm that collects phone numbers. The box still defaults to `+1`, so the US path is unchanged: same `(555) 123-4567` formatting, same 10-digit rule. Pick another country and the number is normalized to bare digits instead (we do not carry per-country grouping rules) and validated against the same 10–15 total digits the Apps Script endpoint enforces, so nothing the field accepts is rejected server-side. Pasted international dialing prefixes (`0044`, `01144`) resolve to `+44`. The submitted value becomes `<country code> <number>`, e.g. `+44 7700900123`. A `waitlist_country_code_edit` event fires the first time the code is changed, so we can see whether anyone actually uses it. The optional phone field on `welcome.html` is unchanged and still US-only.
+
 - Added tablet connector lines from the full house image into the hub/sensor caption band, ending below the devices. The tablet “What Grand learns” introduction now spans the full content width above the routine list.
 
 - Split the mobile “How Grand works” scene into two stacked versions of the original rounded photo-and-dark-caption layout: one zoomed house-image crop for the hub and one for the kitchen sensor. Desktop/tablet retain the full scene and existing captions.

@@ -295,9 +295,12 @@ input::placeholder{color:var(--muted-2)}
 .card{background:#fff;color:var(--ink);border-radius:8px;padding:36px;display:flex;flex-direction:column;gap:18px}
 .card label{font-size:14px;font-weight:600;color:var(--ink-2)}
 .field{display:flex;gap:10px}
-.prefix{display:flex;align-items:center;padding:0 14px;border:1px solid var(--field);border-radius:6px;font-size:16px;color:var(--muted);background:#fff}
 .card input{flex:1;min-width:0;padding:14px 16px;border:1px solid var(--field);border-radius:6px;font-size:16px;font-family:inherit;background:#fff;color:var(--ink);outline:none}
 .card input:focus{border-color:var(--green)}
+/* The country code is an input now, not a label. It keeps the old prefix's
+   size and quiet weight so the row still reads as one field, but it must not
+   take the even share of the row that `.card input`'s flex:1 would give it. */
+.card input.prefix{flex:0 0 72px;width:72px;padding:14px 8px;text-align:center}
 .card .btn{border-radius:6px;padding:16px;background:var(--band)}
 .card .btn:hover{background:var(--green-dark)}
 .fine{font-size:13px;color:var(--muted);line-height:1.5}

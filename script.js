@@ -310,6 +310,46 @@ function setWaitlistStatus(message, type = "neutral") {
   status.dataset.status = type;
 }
 
+// The homepage phone arm ships an editable country code next to the number, so
+// every helper below resolves the code from the DOM instead of assuming +1.
+// A phone field without a country input (welcome.html's optional second
+// contact method) falls back to this default and behaves exactly as before.
+const DEFAULT_COUNTRY_CODE = "+1";
+// E.164 caps a full number at 15 digits, country code included.
+const MAX_PHONE_DIGITS = 15;
+
+// "The phone number input" everywhere, never the country code box beside it.
+const PHONE_INPUT_SELECTOR = "input[type='tel']:not([data-phone-country])";
+
+function getCountryCodeDigits(value) {
+  const digits = String(value || "").replace(/\D/g, "");
+  // People paste the number the way they would dial it, which often carries an
+  // international access prefix ("00 44" from Europe, "011 44" from the US).
+  // Neither is part of the country code, and keeping it would turn +44 into
+  // +004. Only stripped when digits follow, so a half-typed "0" is left alone.
+  return digits.replace(/^(?:011|00)(?=\d)/, "").slice(0, 3);
+}
+
+function formatCountryCode(value) {
+  const digits = getCountryCodeDigits(value);
+  return digits ? `+${digits}` : "";
+}
+
+function isUsCountryCode(countryCode) {
+  return getCountryCodeDigits(countryCode) === "1";
+}
+
+// The country code that applies to a phone input. An emptied country box reads
+// as +1 here so validation never runs against "no country"; the blur handler
+// puts the default back in the box so what we validate is what is on screen.
+function getPhoneCountryCode(input) {
+  const countryInput = input
+    ?.closest("[data-phone-field]")
+    ?.querySelector("[data-phone-country]");
+
+  return formatCountryCode(countryInput?.value) || DEFAULT_COUNTRY_CODE;
+}
+
 function getUsPhoneDigits(value) {
   const rawDigits = String(value || "").replace(/\D/g, "");
   const digits = rawDigits.length > 10 && rawDigits.startsWith("1")
@@ -317,6 +357,21 @@ function getUsPhoneDigits(value) {
     : rawDigits;
 
   return digits.slice(0, 10);
+}
+
+// The national part of a number, given its country code. US numbers keep the
+// 10-digit cap and the "typed the 1 themselves" fix. For everywhere else we do
+// not carry per-country numbering rules, so the only cap we can honestly apply
+// is whatever E.164 leaves after the country code.
+function getNationalPhoneDigits(value, countryCode) {
+  if (isUsCountryCode(countryCode)) return getUsPhoneDigits(value);
+
+  const limit = Math.max(0, MAX_PHONE_DIGITS - getCountryCodeDigits(countryCode).length);
+  return String(value || "").replace(/\D/g, "").slice(0, limit);
+}
+
+function getPhoneInputDigits(input) {
+  return getNationalPhoneDigits(input.value, getPhoneCountryCode(input));
 }
 
 function formatUsPhone(digits) {
@@ -327,11 +382,26 @@ function formatUsPhone(digits) {
   return `(${value.slice(0, 3)}) ${value.slice(3, 6)}-${value.slice(6)}`;
 }
 
-function getNormalizedPhoneDigitCountBeforeCursor(value, cursorPosition) {
+// US numbers get the familiar (555) 123-4567 grouping. Other countries group
+// digits differently enough that imposing the US shape would be wrong more
+// often than right, so those are normalized to bare digits.
+function formatPhoneValue(value, countryCode) {
+  return isUsCountryCode(countryCode)
+    ? formatUsPhone(value)
+    : getNationalPhoneDigits(value, countryCode);
+}
+
+function getNormalizedPhoneDigitCountBeforeCursor(value, cursorPosition, countryCode) {
   const allDigits = String(value || "").replace(/\D/g, "");
   const cursorDigits = String(value || "")
     .slice(0, cursorPosition)
     .replace(/\D/g, "");
+
+  if (!isUsCountryCode(countryCode)) {
+    const limit = Math.max(0, MAX_PHONE_DIGITS - getCountryCodeDigits(countryCode).length);
+    return Math.min(cursorDigits.length, limit);
+  }
+
   const countryPrefixWasTyped = allDigits.length > 10 && allDigits.startsWith("1");
   const digitCount = countryPrefixWasTyped && cursorDigits.length > 0
     ? cursorDigits.length - 1
@@ -355,11 +425,12 @@ function getCaretPositionForPhoneDigitCount(formattedValue, digitCount) {
 }
 
 function formatPhoneInput(input) {
+  const countryCode = getPhoneCountryCode(input);
   const cursorPosition = input.selectionStart;
   const digitCountBeforeCursor = typeof cursorPosition === "number"
-    ? getNormalizedPhoneDigitCountBeforeCursor(input.value, cursorPosition)
+    ? getNormalizedPhoneDigitCountBeforeCursor(input.value, cursorPosition, countryCode)
     : null;
-  const formattedValue = formatUsPhone(input.value);
+  const formattedValue = formatPhoneValue(input.value, countryCode);
 
   input.value = formattedValue;
 
@@ -376,12 +447,32 @@ function formatPhoneInput(input) {
   }
 }
 
+// Normalizes the country box to "+" plus digits as it is typed, so a pasted
+// "0044" or "(44)" still submits as +44.
+function formatCountryCodeInput(input) {
+  const formatted = formatCountryCode(input.value);
+  // Only write when it actually changed: re-assigning an identical value still
+  // drops the caret to the end of the box in some browsers.
+  if (input.value !== formatted) input.value = formatted;
+}
+
 function getWaitlistPhoneSubmissionValue(input) {
-  return `+1 ${formatUsPhone(input.value)}`;
+  const countryCode = getPhoneCountryCode(input);
+  return `${countryCode} ${formatPhoneValue(input.value, countryCode)}`;
 }
 
 function isValidWaitlistPhone(input) {
-  return getUsPhoneDigits(input.value).length === 10;
+  const countryCode = getPhoneCountryCode(input);
+  const nationalDigits = getNationalPhoneDigits(input.value, countryCode);
+  if (isUsCountryCode(countryCode)) return nationalDigits.length === 10;
+
+  // Outside the US we have no per-country length table, so we hold the number
+  // to the same 10–15 total digits the sheet endpoint enforces. Anything this
+  // accepts is therefore something the backend will also accept — a stricter
+  // guess here would reject real numbers, a looser one would hand the visitor
+  // a generic network-ish failure instead of a fixable field error.
+  const totalDigits = getCountryCodeDigits(countryCode).length + nationalDigits.length;
+  return totalDigits >= 10 && totalDigits <= MAX_PHONE_DIGITS;
 }
 
 function getValueLengthBucket(value) {
@@ -401,6 +492,10 @@ function getWaitlistFieldState(input, isEmail) {
     has_value: value.length > 0,
     looks_valid: isEmail ? value.length > 0 && input.checkValidity() : isValidWaitlistPhone(input),
     value_length_bucket: getValueLengthBucket(value),
+    // Whether anyone actually edits the country code is the open question
+    // behind making it editable at all; without this the only record of a
+    // non-US signup is the phone column in the sheet.
+    ...(isEmail ? {} : { country_code: getPhoneCountryCode(input) }),
   };
 }
 
@@ -608,10 +703,14 @@ if (waitlistForm) {
     .querySelectorAll(`[data-waitlist-field]:not([data-waitlist-field="${activeVariant}"])`)
     .forEach((field) => field.remove());
 
-  const input = waitlistForm.querySelector("input[type='tel'], input[type='email']");
+  // Scoped past the country box, which is also type=tel and sits first in the
+  // markup — an unqualified selector here would pick it up instead.
+  const input = waitlistForm.querySelector(`${PHONE_INPUT_SELECTOR}, input[type='email']`);
+  const countryInput = waitlistForm.querySelector("[data-phone-country]");
   const button = waitlistForm.querySelector("button[type='submit']");
   const isEmailVariant = input?.type === "email";
   let trackedFieldInputStart = false;
+  let trackedCountryCodeEdit = false;
 
   // The test's exposure event, and the funnel's denominator. Fired here rather
   // than in ab-test.js because grandTrackWebsiteEvent does not exist yet when
@@ -651,12 +750,31 @@ if (waitlistForm) {
       : isValidWaitlistPhone(input);
   }
 
+  // The (555) 123-4567 example is a promise about formatting that only holds
+  // for +1, so it is withdrawn as soon as the visitor picks another country.
+  function syncPhonePlaceholder() {
+    if (!input || !countryInput) return;
+
+    input.placeholder = isUsCountryCode(countryInput.value)
+      ? input.dataset.usPlaceholder || input.placeholder
+      : "Number without country code";
+  }
+
+  // Outside the US the only rule we enforce is a plausible total length, so the
+  // US copy ("10-digit") would be telling a UK visitor to do the wrong thing.
+  function getWaitlistErrorMessage() {
+    if (isEmailVariant) return "Enter a valid email address.";
+    return isUsCountryCode(getPhoneCountryCode(input))
+      ? "Enter a 10-digit US phone number."
+      : "Enter your full phone number, without the country code.";
+  }
+
   function syncWaitlistFieldState(options = {}) {
     if (!input || !button) return;
 
     const hasValue = isEmailVariant
       ? input.value.trim().length > 0
-      : getUsPhoneDigits(input.value).length > 0;
+      : getPhoneInputDigits(input).length > 0;
     const isValid = isValidWaitlistValue();
     const showError = Boolean(options.showError && hasValue && !isValid);
 
@@ -664,10 +782,7 @@ if (waitlistForm) {
     input.setAttribute("aria-invalid", showError ? "true" : "false");
 
     if (showError) {
-      setWaitlistStatus(
-        isEmailVariant ? "Enter a valid email address." : "Enter a 10-digit US phone number.",
-        "error",
-      );
+      setWaitlistStatus(getWaitlistErrorMessage(), "error");
     } else if (!options.preserveStatus) {
       setWaitlistStatus("", "neutral");
     }
@@ -710,6 +825,36 @@ if (waitlistForm) {
         section_id: "waitlist",
         ...getWaitlistFieldState(input, isEmailVariant),
       });
+    });
+  }
+
+  if (countryInput && input) {
+    syncPhonePlaceholder();
+
+    countryInput.addEventListener("input", () => {
+      formatCountryCodeInput(countryInput);
+      // Switching country changes both how the number is grouped and how long
+      // it is allowed to be, so the number already typed has to be re-run
+      // through the new rules rather than left in the old country's shape.
+      formatPhoneInput(input);
+      syncPhonePlaceholder();
+      syncWaitlistFieldState();
+
+      if (trackedCountryCodeEdit) return;
+      trackedCountryCodeEdit = true;
+      trackAnalyticsEvent("waitlist_country_code_edit", {
+        section_id: "waitlist",
+        country_code: getPhoneCountryCode(input),
+      });
+    });
+
+    countryInput.addEventListener("blur", () => {
+      // An empty box would silently validate as +1 (see getPhoneCountryCode);
+      // put the default back so the visitor can see what they are submitting.
+      countryInput.value = formatCountryCode(countryInput.value) || DEFAULT_COUNTRY_CODE;
+      formatPhoneInput(input);
+      syncPhonePlaceholder();
+      syncWaitlistFieldState({ showError: true });
     });
   }
 
@@ -861,13 +1006,13 @@ function buildProfilePayload(form) {
   } catch {}
 
   const data = new FormData(form);
-  const phoneInput = form.querySelector("input[type='tel']");
+  const phoneInput = form.querySelector(PHONE_INPUT_SELECTOR);
   // The optional second contact method, normalized the same way the homepage
   // does it so the two arms write identically formatted values. Sent only when
   // non-empty: the backend writes contact columns only for non-empty values, so
   // a blank field can never clear what the signup already captured.
   const submittedPhone =
-    phoneInput && getUsPhoneDigits(phoneInput.value).length > 0
+    phoneInput && getPhoneInputDigits(phoneInput).length > 0
       ? getWaitlistPhoneSubmissionValue(phoneInput)
       : "";
 
@@ -915,7 +1060,7 @@ if (profileForm) {
 
   // Same live formatting as the homepage phone field, so an optional phone
   // given here behaves and normalizes identically.
-  const profilePhoneInput = profileForm.querySelector("input[type='tel']");
+  const profilePhoneInput = profileForm.querySelector(PHONE_INPUT_SELECTOR);
   if (profilePhoneInput) {
     ["input", "blur"].forEach((eventName) => {
       profilePhoneInput.addEventListener(eventName, () => formatPhoneInput(profilePhoneInput));
@@ -976,7 +1121,7 @@ if (profileForm) {
       return;
     }
 
-    const phoneField = profileForm.querySelector("input[type='tel']");
+    const phoneField = profileForm.querySelector(PHONE_INPUT_SELECTOR);
     if (phoneField && phoneField.value.trim() && !isValidWaitlistPhone(phoneField)) {
       trackAnalyticsEvent("waitlist_profile_submit_error", {
         section_id: "welcome",

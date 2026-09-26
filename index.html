@@ -355,9 +355,15 @@
     <form class="card" id="tester-form" data-waitlist-form data-waitlist-endpoint="https://script.google.com/macros/s/AKfycbznF16TQs1AShix3v0rp6DCZVs7P844Cp0KCfeCoApbPh2FF2sCC6M97vKxu_s2YmuY/exec" novalidate>
       <div class="stack stack-18" data-waitlist-field="phone">
         <label for="phone">Phone number</label>
-        <div class="field">
-          <span class="prefix" aria-hidden="true">+1</span>
-          <input id="phone" name="phone" type="tel" autocomplete="tel-national" inputmode="tel" placeholder="(555) 123-4567" aria-describedby="waitlist-status" required>
+        <!-- The country code used to be a static "+1" label, which quietly made
+             the form US-only: a tester abroad had nowhere to put their country
+             code and no way to tell whether typing it into the number field
+             would work. It is now an editable field that still defaults to +1,
+             so nothing changes for the US visitors who are the overwhelming
+             majority. data-phone-field pairs the two inputs for script.js. -->
+        <div class="field" data-phone-field>
+          <input id="phone_country" name="phone_country" class="prefix" data-phone-country type="tel" autocomplete="tel-country-code" inputmode="tel" value="+1" maxlength="4" aria-label="Country code" aria-describedby="waitlist-status">
+          <input id="phone" name="phone" type="tel" autocomplete="tel-national" inputmode="tel" placeholder="(555) 123-4567" data-us-placeholder="(555) 123-4567" aria-describedby="waitlist-status" required>
         </div>
         <button type="submit" class="btn" disabled>Become a tester</button>
       </div>

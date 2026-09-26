@@ -103,6 +103,7 @@
 <link rel="stylesheet" href="homepage.css">
     <script src="analytics-context.js" defer></script>
     <script src="posthog.js" defer></script>
+    <script src="countries.js" defer></script>
     <script src="script.js" defer></script>
   </head>
 <body class="homepage">
@@ -364,12 +365,25 @@
         <label for="phone" id="phone-label">Phone number</label>
         <!-- The country code used to be a static "+1" label, which quietly made
              the form US-only: a tester abroad had nowhere to put their country
-             code and no way to tell whether typing it into the number field
-             would work. It is now an editable field that still defaults to +1,
-             so nothing changes for the US visitors who are the overwhelming
-             majority. data-phone-field pairs the two inputs for script.js. -->
+             code and nowhere to put it. It is a country picker now, defaulting
+             to the United States so nothing changes for the overwhelming
+             majority. data-phone-field pairs the two controls for script.js.
+
+             The <select> is the real control — it gets the native picker on
+             mobile, keyboard type-ahead on desktop, and the accessible name.
+             It is laid over the flag and dial code rather than showing its own
+             text because a native select can only display the full option
+             label ("United Kingdom +44"), which does not fit the prefix slot.
+             script.js fills in the options; the markup ships one so the field
+             is never empty if countries.js fails to load. -->
         <div class="field" data-phone-field role="group" aria-labelledby="phone-label">
-          <input id="phone_country" name="phone_country" class="prefix" data-phone-country type="tel" autocomplete="tel-country-code" inputmode="tel" value="+1" maxlength="6" aria-label="Country code" aria-describedby="waitlist-status">
+          <span class="prefix prefix-country">
+            <span class="prefix-flag" data-phone-country-flag aria-hidden="true">&#127482;&#127480;</span>
+            <span class="prefix-dial" data-phone-country-dial aria-hidden="true">+1</span>
+            <select id="phone_country" name="phone_country" data-phone-country autocomplete="tel-country-code" aria-label="Country" aria-describedby="waitlist-status">
+              <option value="+1" data-country="US" selected>United States +1</option>
+            </select>
+          </span>
           <input id="phone" name="phone" type="tel" autocomplete="tel-national" inputmode="tel" placeholder="(555) 123-4567" data-us-placeholder="(555) 123-4567" aria-describedby="waitlist-status" required>
         </div>
         <button type="submit" class="btn" disabled>Become a tester</button>

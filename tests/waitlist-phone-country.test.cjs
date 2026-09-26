@@ -19,7 +19,6 @@ assert.notEqual(end, -1, "the getUserAgentData boundary after getWaitlistFieldSt
 const helpers = source.slice(start, end);
 assert.ok(
   helpers.includes("function formatPhoneInput(") &&
-    helpers.includes("function formatCountryCodeInput(") &&
     helpers.includes("function getWaitlistFieldState("),
   "extracted slice does not look like the phone helpers — markers have drifted",
 );
@@ -29,7 +28,6 @@ vm.createContext(context);
 vm.runInContext(helpers, context);
 const {
   formatCountryCode,
-  formatCountryCodeInput,
   formatPhoneInput,
   formatPhoneValue,
   getCaretPositionForPhoneDigitCount,
@@ -177,50 +175,25 @@ test("formatPhoneInput survives a non-numeric selectionStart and a missing setSe
   assert.equal(noApi.value, "7700900123");
 });
 
-// --- the country box itself --------------------------------------------------
+// --- the country picker ------------------------------------------------------
 
-test("formatCountryCodeInput leaves an already-normalized value untouched", () => {
-  // Re-assigning an identical value drops the caret to the end of the box in
-  // some browsers, so the no-write path is the behavior, not an optimization.
-  let writes = 0;
-  const box = {
-    _value: "+1",
-    get value() {
-      return this._value;
-    },
-    set value(next) {
-      writes += 1;
-      this._value = next;
-    },
-  };
-  formatCountryCodeInput(box);
-  assert.equal(writes, 0);
-  assert.equal(box.value, "+1");
-});
-
-test("formatCountryCodeInput normalizes pasted shapes in place", () => {
-  const paren = { value: "(44)" };
-  formatCountryCodeInput(paren);
-  assert.equal(paren.value, "+44");
-
-  const dialled = { value: "0044" };
-  formatCountryCodeInput(dialled);
-  assert.equal(dialled.value, "+44");
-
-  const bare = { value: "44" };
-  formatCountryCodeInput(bare);
-  assert.equal(bare.value, "+44");
-});
-
-test("a country box holding only + empties, and validation falls back to +1", () => {
-  const box = { value: "+" };
-  formatCountryCodeInput(box);
-  assert.equal(box.value, "");
-
+test("a picker with no selection still resolves to the +1 default", () => {
+  // getPhoneCountryCode is what every other helper reads, so its fallback is
+  // the one that decides how an unselected or failed-to-load picker behaves.
   const input = phoneField("5551234567", "");
   assert.equal(getPhoneCountryCode(input), "+1");
   assert.equal(isValidWaitlistPhone(input), true);
   assert.equal(getWaitlistPhoneSubmissionValue(input), "+1 (555) 123-4567");
+});
+
+test("the picker's value is a bare dial code, which is all the helpers read", () => {
+  // The <option value> contract: swapping the free-text box for a select must
+  // not change what getPhoneCountryCode sees.
+  assert.equal(getPhoneCountryCode(phoneField("7700900123", "+44")), "+44");
+  assert.equal(
+    getWaitlistPhoneSubmissionValue(phoneField("7700900123", "+44")),
+    "+44 7700900123",
+  );
 });
 
 // --- switching country mid-entry ---------------------------------------------
@@ -257,48 +230,46 @@ test("the phone arm's field state carries the country code, the email arm does n
 
 // --- markup contracts the helpers depend on ----------------------------------
 
-test("index.html pairs the two inputs the way the helpers expect", () => {
+test("index.html pairs the picker and the number input as the helpers expect", () => {
   // Attribute presence, not the literal tag: getPhoneCountryCode only needs the
-  // wrapper to carry data-phone-field, so adding role/aria to it must not fail.
+  // wrapper to carry data-phone-field, so adding role/aria must not fail.
   assert.match(indexHtml, /<div class="field"[^>]*\sdata-phone-field(\s|>)/);
-  assert.match(indexHtml, /id="phone_country"[^>]*data-phone-country/);
-  // getPhoneCountryCode's :not() scoping only works if the country box is a tel
-  // input carrying the marker attribute and the number input is not.
-  assert.match(indexHtml, /id="phone_country"[^>]*type="tel"/);
+  assert.match(indexHtml, /<select[^>]*id="phone_country"[^>]*data-phone-country/);
   assert.ok(
     !/id="phone"\s[^>]*data-phone-country/.test(indexHtml),
     "the number input must not carry data-phone-country",
+  );
+  // PHONE_INPUT_SELECTOR scopes on type=tel, so the picker must not be one.
+  assert.ok(
+    !/<select[^>]*id="phone_country"[^>]*type="tel"/.test(indexHtml),
+    "the picker is a <select>; giving it type=tel would make it match PHONE_INPUT_SELECTOR",
   );
   // syncPhonePlaceholder restores this exact string when the code returns to +1.
   assert.match(indexHtml, /id="phone"[^>]*data-us-placeholder="\(555\) 123-4567"/);
   assert.match(indexHtml, /id="phone"[^>]*placeholder="\(555\) 123-4567"/);
   assert.ok(
     source.includes(`const PHONE_INPUT_SELECTOR = "input[type='tel']:not([data-phone-country])"`),
-    "the scoped phone selector changed — the country box may now be picked as the number field",
+    "the scoped phone selector changed — the picker may now be picked as the number field",
   );
 });
 
-// REGRESSION GUARD: welcome.html's optional phone must stay US-only. Adding a
-// country box there would silently change how that field validates and what it
-// writes to the sheet, and nothing else in the suite would notice.
-// welcome.html used to have no country box, which meant its phone field ran
-// through the country-aware helpers with getPhoneCountryCode falling back to
-// +1: an autofilled "+44 7700 900123" was rewritten to a plausible-looking US
-// number that belonged to nobody. It now carries the same pair as the homepage.
-test("welcome.html carries the same country box as the homepage", () => {
-  assert.match(welcomeHtml, /<div class="field"[^>]*\sdata-phone-field(\s|>)/);
-  assert.match(welcomeHtml, /id="phone_country"[\s\S]{0,300}data-phone-country/);
-  assert.match(welcomeHtml, /id="phone"[\s\S]{0,300}type="tel"/);
-  // The hint no longer promises US-only, because it is no longer true.
-  assert.ok(!welcomeHtml.includes("US numbers only"));
-});
-
-test("the two pages agree on the country box contract", () => {
+test("both pages ship the same picker contract", () => {
   for (const [name, html] of [["index.html", indexHtml], ["welcome.html", welcomeHtml]]) {
-    const maxlength = html.match(/id="phone_country"[\s\S]{0,300}maxlength="(\d+)"/);
-    assert.ok(maxlength, `${name} country box has no maxlength`);
-    assert.ok(Number(maxlength[1]) >= 6, `${name} truncates access prefixes`);
-    assert.match(html, /id="phone_country"[\s\S]{0,300}value="\+1"/, `${name} default is not +1`);
+    // A hard-coded United States option so the field is never empty if
+    // countries.js fails to load.
+    assert.match(
+      html,
+      /<option value="\+1" data-country="US" selected>/,
+      `${name} has no fallback option`,
+    );
+    // The display spans populateCountryPicker/syncCountryPickerDisplay write to.
+    assert.match(html, /data-phone-country-flag/, `${name} has no flag slot`);
+    assert.match(html, /data-phone-country-dial/, `${name} has no dial slot`);
+    // countries.js must parse before script.js reads window.grandCountries.
+    const countriesAt = html.indexOf("countries.js");
+    const scriptAt = html.indexOf("script.js\" defer");
+    assert.ok(countriesAt > -1, `${name} does not load countries.js`);
+    assert.ok(countriesAt < scriptAt, `${name} loads countries.js after script.js`);
   }
 });
 
@@ -309,19 +280,6 @@ test("the two pages agree on the country box contract", () => {
 // "+4" — a country code nobody dialled, which passed validation and would have
 // been written to the sheet. The cap now leaves room for "+" plus the longest
 // access prefix and code, so the README's documented paste actually works.
-test("the country box is wide enough for the access prefixes the helper handles", () => {
-  const maxlength = indexHtml.match(/id="phone_country"[^>]*maxlength="(\d+)"/);
-  assert.ok(maxlength, "the country box has no maxlength to check");
-  // "+" + "011" + a 3-digit code is the longest value formatCountryCode must
-  // see intact to resolve it correctly.
-  assert.ok(
-    Number(maxlength[1]) >= 6,
-    `maxlength=${maxlength[1]} truncates a pasted access prefix before JS sees it`,
-  );
-  assert.equal(formatCountryCode("01144"), "+44");
-  assert.equal(formatCountryCode("0044"), "+44");
-});
-
 // The US path strips a country code the visitor typed into the number box
 // (getUsPhoneDigits' leading-1 rule). There was no equivalent outside the US,
 // so pasting a full international number doubled it — "+44 447700900123" —

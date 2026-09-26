@@ -54,12 +54,13 @@ test("country code normalizes to + plus digits", () => {
   assert.equal(formatCountryCode("+3521"), "+352");
 });
 
-test("an international dialing prefix is stripped instead of eating the code", () => {
-  assert.equal(formatCountryCode("0044"), "+44");
-  assert.equal(formatCountryCode("01144"), "+44");
-  assert.equal(formatCountryCode("001"), "+1");
-  // Mid-typing, a lone "0" has nothing after it to disambiguate — leave it.
-  assert.equal(formatCountryCode("0"), "+0");
+test("the country code is read straight off the picker's option value", () => {
+  // The picker can only hold values we put in an <option>, so this no longer
+  // parses dialled shapes — getNationalPhoneDigits handles an access prefix
+  // typed into the number box, which is the only place one can still arrive.
+  assert.equal(formatCountryCode("+44"), "+44");
+  assert.equal(formatCountryCode("+1"), "+1");
+  assert.equal(formatCountryCode("+352"), "+352");
 });
 
 test("a field with no country box still behaves as US +1", () => {

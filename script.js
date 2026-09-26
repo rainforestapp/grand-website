@@ -322,12 +322,13 @@ const MAX_PHONE_DIGITS = 15;
 const PHONE_INPUT_SELECTOR = "input[type='tel']:not([data-phone-country])";
 
 function getCountryCodeDigits(value) {
-  const digits = String(value || "").replace(/\D/g, "");
-  // People paste the number the way they would dial it, which often carries an
-  // international access prefix ("00 44" from Europe, "011 44" from the US).
-  // Neither is part of the country code, and keeping it would turn +44 into
-  // +004. Only stripped when digits follow, so a half-typed "0" is left alone.
-  return digits.replace(/^(?:011|00)(?=\d)/, "").slice(0, 3);
+  // The country code always comes from the picker now, so this only ever sees
+  // a value we put in an <option> ("+44"). It stays defensive about the shape
+  // because welcome.html and the homepage both feed it and a missing picker
+  // falls back to the DEFAULT_COUNTRY_CODE string. Access-prefix handling
+  // lives in getNationalPhoneDigits, which is where a visitor can still type
+  // one.
+  return String(value || "").replace(/\D/g, "").slice(0, 3);
 }
 
 function formatCountryCode(value) {
@@ -489,13 +490,47 @@ function formatPhoneInput(input) {
   }
 }
 
-// Normalizes the country box to "+" plus digits as it is typed, so a pasted
-// "0044" or "(44)" still submits as +44.
-function formatCountryCodeInput(input) {
-  const formatted = formatCountryCode(input.value);
-  // Only write when it actually changed: re-assigning an identical value still
-  // drops the caret to the end of the box in some browsers.
-  if (input.value !== formatted) input.value = formatted;
+// Build the picker's options from countries.js. Returns false when the data
+// did not load, in which case the markup's single hard-coded United States
+// option stays and the field still works for the overwhelming majority.
+function populateCountryPicker(select) {
+  const countries = window.grandCountries;
+  if (!select || !Array.isArray(countries) || countries.length === 0) return false;
+
+  const selectedCountry = select.querySelector("option[selected]")?.dataset.country || "US";
+  const options = countries.map((country) => {
+    const option = document.createElement("option");
+    // The value is the dial code alone, so every phone helper keeps reading
+    // this control exactly as it read the old text box. The ISO code rides
+    // along in a data attribute for analytics, where "+1" cannot tell the
+    // United States apart from Canada or twenty Caribbean countries.
+    option.value = country.dial;
+    option.dataset.country = country.iso;
+    option.textContent = `${country.flag} ${country.name} ${country.dial}`;
+    option.selected = country.iso === selectedCountry;
+    return option;
+  });
+
+  select.replaceChildren(...options);
+  return true;
+}
+
+// The closed picker shows a flag and a dial code; the select's own label is
+// the full "United Kingdom +44", which does not fit the slot.
+function syncCountryPickerDisplay(select) {
+  const field = select?.closest("[data-phone-field]");
+  if (!field) return;
+
+  const iso = select.selectedOptions[0]?.dataset.country || "";
+  const flag = field.querySelector("[data-phone-country-flag]");
+  const dial = field.querySelector("[data-phone-country-dial]");
+
+  if (flag) flag.textContent = window.grandCountryFlag?.(iso) || "";
+  if (dial) dial.textContent = select.value || DEFAULT_COUNTRY_CODE;
+}
+
+function getSelectedCountryIso(select) {
+  return select?.selectedOptions?.[0]?.dataset.country || "";
 }
 
 function getWaitlistPhoneSubmissionValue(input) {
@@ -540,7 +575,14 @@ function getWaitlistFieldState(input, isEmail) {
     // Whether anyone actually edits the country code is the open question
     // behind making it editable at all; without this the only record of a
     // non-US signup is the phone column in the sheet.
-    ...(isEmail ? {} : { country_code: getPhoneCountryCode(input) }),
+    ...(isEmail
+      ? {}
+      : {
+          country_code: getPhoneCountryCode(input),
+          country: getSelectedCountryIso(
+            input.closest("[data-phone-field]")?.querySelector("[data-phone-country]"),
+          ),
+        }),
   };
 }
 
@@ -882,17 +924,18 @@ if (waitlistForm) {
   }
 
   if (countryInput && input) {
+    populateCountryPicker(countryInput);
+    syncCountryPickerDisplay(countryInput);
     syncPhonePlaceholder();
     lastCountryCode = getPhoneCountryCode(input);
-    countryInput.addEventListener("focus", () => {
-      trackWaitlistFieldFocus();
-      // The box already holds "+1". Without selecting it, someone who clicks in
-      // and types their own code appends to the default and gets "+144".
-      countryInput.select?.();
-    });
+    countryInput.addEventListener("focus", trackWaitlistFieldFocus);
 
-    countryInput.addEventListener("input", () => {
-      formatCountryCodeInput(countryInput);
+    // "change", not "input": a picker only ever reports real selections, so
+    // the guesswork the free-text box needed — normalizing as you type,
+    // restoring a default on blur, telling a stray keystroke apart from a
+    // deliberate edit — has nothing left to do.
+    countryInput.addEventListener("change", () => {
+      syncCountryPickerDisplay(countryInput);
       // Switching country changes both how the number is grouped and how long
       // it is allowed to be, so the number already typed has to be re-run
       // through the new rules rather than left in the old country's shape.
@@ -900,10 +943,6 @@ if (waitlistForm) {
       syncPhonePlaceholder();
       syncWaitlistFieldState();
 
-      // Fire on a real change of country, not on any keystroke. Characters the
-      // formatter strips, and a browser autofilling this field, both land here
-      // with the code unchanged; counting those would fill the metric with
-      // "+1 edits" that nobody made.
       const countryCode = getPhoneCountryCode(input);
       if (countryCode === lastCountryCode) return;
       lastCountryCode = countryCode;
@@ -913,17 +952,8 @@ if (waitlistForm) {
       trackAnalyticsEvent("waitlist_country_code_edit", {
         section_id: "waitlist",
         country_code: countryCode,
+        country: getSelectedCountryIso(countryInput),
       });
-    });
-
-    countryInput.addEventListener("blur", () => {
-      // An empty box would silently validate as +1 (see getPhoneCountryCode);
-      // put the default back so the visitor can see what they are submitting.
-      countryInput.value = formatCountryCode(countryInput.value) || DEFAULT_COUNTRY_CODE;
-      lastCountryCode = getPhoneCountryCode(input);
-      formatPhoneInput(input);
-      syncPhonePlaceholder();
-      syncWaitlistFieldState({ showError: true });
     });
   }
 
@@ -1137,18 +1167,13 @@ if (profileForm) {
     });
   }
 
-  // The country box here behaves exactly as it does on the homepage: normalize
-  // as it is typed, re-run the number through the new country's rules, and put
-  // the default back rather than leaving an empty box that silently reads +1.
+  // Same picker as the homepage, so a number given here is normalized the same
+  // way and lands in the sheet in the same shape.
   if (profileCountryInput && profilePhoneInput) {
-    profileCountryInput.addEventListener("focus", () => profileCountryInput.select?.());
-    profileCountryInput.addEventListener("input", () => {
-      formatCountryCodeInput(profileCountryInput);
-      formatPhoneInput(profilePhoneInput);
-    });
-    profileCountryInput.addEventListener("blur", () => {
-      profileCountryInput.value =
-        formatCountryCode(profileCountryInput.value) || DEFAULT_COUNTRY_CODE;
+    populateCountryPicker(profileCountryInput);
+    syncCountryPickerDisplay(profileCountryInput);
+    profileCountryInput.addEventListener("change", () => {
+      syncCountryPickerDisplay(profileCountryInput);
       formatPhoneInput(profilePhoneInput);
     });
   }

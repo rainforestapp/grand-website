@@ -17,11 +17,12 @@ html[data-profile-ask="email"] [data-profile-field="phone"],html[data-profile-as
 .profile-field input:not([type="radio"]),.profile-field textarea{width:100%;min-width:0;border:1px solid var(--field);border-radius:6px;background:#fff;color:var(--ink);font:inherit;font-size:16px;padding:14px 16px}
 .profile-field textarea{resize:vertical;min-height:124px}
 .profile-field input:focus,.profile-field textarea:focus{border-color:var(--green)}
-/* The phone row reuses the homepage's country-code + number pair. The rule
-   above sets every profile input to width:100%, which would stack them, so the
-   country box is re-pinned to the same size it has on the homepage. */
+/* The phone row reuses the homepage's country picker + number pair. The rule
+   above sets every profile input to width:100%, which would stretch the
+   picker's hidden <select> out of its shell, so both are re-pinned here. */
 .profile-field .field{display:flex;gap:10px}
-.profile-field .field input.prefix{flex:0 0 72px;width:72px;padding:14px 8px;text-align:center}
+.profile-field .field .prefix-country{flex:0 0 104px}
+.profile-field .field .prefix-country select{width:100%;padding:0;border:0}
 .profile-field textarea:focus-visible{outline:3px solid #b68b35;outline-offset:4px}
 .profile-choices{display:flex;flex-wrap:wrap;gap:8px 24px}
 .profile-choices legend{width:100%}

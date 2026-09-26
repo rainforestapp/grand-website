@@ -363,11 +363,38 @@ function getUsPhoneDigits(value) {
 // 10-digit cap and the "typed the 1 themselves" fix. For everywhere else we do
 // not carry per-country numbering rules, so the only cap we can honestly apply
 // is whatever E.164 leaves after the country code.
+function getNationalDigitLimit(countryCode) {
+  return Math.max(0, MAX_PHONE_DIGITS - getCountryCodeDigits(countryCode).length);
+}
+
 function getNationalPhoneDigits(value, countryCode) {
   if (isUsCountryCode(countryCode)) return getUsPhoneDigits(value);
 
-  const limit = Math.max(0, MAX_PHONE_DIGITS - getCountryCodeDigits(countryCode).length);
-  return String(value || "").replace(/\D/g, "").slice(0, limit);
+  const codeDigits = getCountryCodeDigits(countryCode);
+  const text = String(value || "").trim();
+  let digits = text.replace(/\D/g, "");
+
+  // Outside the US we do not guess. A national number can legitimately begin
+  // with its own country code, and a leading zero is significant in Italy and
+  // elsewhere, so whatever is typed literally is kept literally. The only two
+  // shapes acted on are ones the visitor marked unambiguously as the full
+  // international number:
+  //
+  //   "+44 7700 900123"   an explicit "+" in front of the country code
+  //   "0044 7700 900123"  an access prefix immediately followed by it
+  //
+  // Both would otherwise submit the country code twice, as
+  // "+44 447700900123", and that lead is unreachable.
+  if (codeDigits) {
+    const accessPrefixed = new RegExp(`^(?:011|00)${codeDigits}`);
+    if (text.startsWith("+") && digits.startsWith(codeDigits)) {
+      digits = digits.slice(codeDigits.length);
+    } else if (accessPrefixed.test(digits)) {
+      digits = digits.replace(accessPrefixed, "");
+    }
+  }
+
+  return digits.slice(0, getNationalDigitLimit(countryCode));
 }
 
 function getPhoneInputDigits(input) {
@@ -386,9 +413,21 @@ function formatUsPhone(digits) {
 // digits differently enough that imposing the US shape would be wrong more
 // often than right, so those are normalized to bare digits.
 function formatPhoneValue(value, countryCode) {
-  return isUsCountryCode(countryCode)
-    ? formatUsPhone(value)
-    : getNationalPhoneDigits(value, countryCode);
+  if (isUsCountryCode(countryCode)) return formatUsPhone(value);
+
+  const codeDigits = getCountryCodeDigits(countryCode);
+  const text = String(value || "").trim();
+  const digits = text.replace(/\D/g, "");
+
+  // Keep a "+" the visitor is still typing behind. Dropping it as soon as it
+  // appears would erase the one unambiguous signal that a full international
+  // number is coming, leaving getNationalPhoneDigits nothing to act on by the
+  // time the country code lands.
+  if (text.startsWith("+") && codeDigits && !digits.startsWith(codeDigits)) {
+    return `+${digits.slice(0, getNationalDigitLimit(countryCode))}`;
+  }
+
+  return getNationalPhoneDigits(value, countryCode);
 }
 
 function getNormalizedPhoneDigitCountBeforeCursor(value, cursorPosition, countryCode) {
@@ -398,8 +437,7 @@ function getNormalizedPhoneDigitCountBeforeCursor(value, cursorPosition, country
     .replace(/\D/g, "");
 
   if (!isUsCountryCode(countryCode)) {
-    const limit = Math.max(0, MAX_PHONE_DIGITS - getCountryCodeDigits(countryCode).length);
-    return Math.min(cursorDigits.length, limit);
+    return Math.min(cursorDigits.length, getNationalDigitLimit(countryCode));
   }
 
   const countryPrefixWasTyped = allDigits.length > 10 && allDigits.startsWith("1");
@@ -426,17 +464,21 @@ function getCaretPositionForPhoneDigitCount(formattedValue, digitCount) {
 
 function formatPhoneInput(input) {
   const countryCode = getPhoneCountryCode(input);
-  const cursorPosition = input.selectionStart;
+  // Reading selectionStart forces a layout, and the caret only matters while
+  // this input has focus. The country box calls this on its own keystrokes,
+  // when focus is elsewhere, so the guard has to come first.
+  const isFocused = document.activeElement === input;
+  const cursorPosition = isFocused ? input.selectionStart : null;
   const digitCountBeforeCursor = typeof cursorPosition === "number"
     ? getNormalizedPhoneDigitCountBeforeCursor(input.value, cursorPosition, countryCode)
     : null;
   const formattedValue = formatPhoneValue(input.value, countryCode);
 
-  input.value = formattedValue;
+  if (input.value !== formattedValue) input.value = formattedValue;
 
   if (
     digitCountBeforeCursor !== null &&
-    document.activeElement === input &&
+    isFocused &&
     typeof input.setSelectionRange === "function"
   ) {
     const nextCursorPosition = getCaretPositionForPhoneDigitCount(
@@ -465,6 +507,9 @@ function isValidWaitlistPhone(input) {
   const countryCode = getPhoneCountryCode(input);
   const nationalDigits = getNationalPhoneDigits(input.value, countryCode);
   if (isUsCountryCode(countryCode)) return nationalDigits.length === 10;
+  // No country code starts with a zero, so "+0" is not one no matter how many
+  // digits follow it into the number box.
+  if (!/^[1-9]/.test(getCountryCodeDigits(countryCode))) return false;
 
   // Outside the US we have no per-country length table, so we hold the number
   // to the same 10–15 total digits the sheet endpoint enforces. Anything this
@@ -711,6 +756,11 @@ if (waitlistForm) {
   const isEmailVariant = input?.type === "email";
   let trackedFieldInputStart = false;
   let trackedCountryCodeEdit = false;
+  let trackedFieldFocus = false;
+  // The country code is the first thing a non-US visitor touches, and it is a
+  // sibling input rather than the one the funnel used to watch. Shared between
+  // both boxes so the pair reports one start, whichever they reach first.
+  let lastCountryCode = DEFAULT_COUNTRY_CODE;
 
   // The test's exposure event, and the funnel's denominator. Fired here rather
   // than in ab-test.js because grandTrackWebsiteEvent does not exist yet when
@@ -752,12 +802,14 @@ if (waitlistForm) {
 
   // The (555) 123-4567 example is a promise about formatting that only holds
   // for +1, so it is withdrawn as soon as the visitor picks another country.
+  // The replacement has to survive a 375px phone, where the number input is
+  // only ~171px wide: anything longer renders clipped mid-word.
   function syncPhonePlaceholder() {
     if (!input || !countryInput) return;
 
-    input.placeholder = isUsCountryCode(countryInput.value)
+    input.placeholder = isUsCountryCode(getPhoneCountryCode(input))
       ? input.dataset.usPlaceholder || input.placeholder
-      : "Number without country code";
+      : "No country code";
   }
 
   // Outside the US the only rule we enforce is a plausible total length, so the
@@ -767,6 +819,18 @@ if (waitlistForm) {
     return isUsCountryCode(getPhoneCountryCode(input))
       ? "Enter a 10-digit US phone number."
       : "Enter your full phone number, without the country code.";
+  }
+
+  function trackWaitlistFieldFocus() {
+    if (trackedFieldFocus) return;
+    trackedFieldFocus = true;
+
+    trackAnalyticsEvent(`waitlist_${activeVariant}_focus`, {
+      section_id: "waitlist",
+    });
+    window.grandTrackWebsiteEvent?.("waitlist_started", {
+      form_type: activeVariant,
+    });
   }
 
   function syncWaitlistFieldState(options = {}) {
@@ -791,18 +855,7 @@ if (waitlistForm) {
   if (input && button) {
     syncWaitlistFieldState();
 
-    input.addEventListener(
-      "focus",
-      () => {
-        trackAnalyticsEvent(`waitlist_${activeVariant}_focus`, {
-          section_id: "waitlist",
-        });
-        window.grandTrackWebsiteEvent?.("waitlist_started", {
-          form_type: activeVariant,
-        });
-      },
-      { once: true },
-    );
+    input.addEventListener("focus", trackWaitlistFieldFocus);
 
     input.addEventListener("input", () => {
       if (!isEmailVariant) formatPhoneInput(input);
@@ -830,6 +883,13 @@ if (waitlistForm) {
 
   if (countryInput && input) {
     syncPhonePlaceholder();
+    lastCountryCode = getPhoneCountryCode(input);
+    countryInput.addEventListener("focus", () => {
+      trackWaitlistFieldFocus();
+      // The box already holds "+1". Without selecting it, someone who clicks in
+      // and types their own code appends to the default and gets "+144".
+      countryInput.select?.();
+    });
 
     countryInput.addEventListener("input", () => {
       formatCountryCodeInput(countryInput);
@@ -840,11 +900,19 @@ if (waitlistForm) {
       syncPhonePlaceholder();
       syncWaitlistFieldState();
 
+      // Fire on a real change of country, not on any keystroke. Characters the
+      // formatter strips, and a browser autofilling this field, both land here
+      // with the code unchanged; counting those would fill the metric with
+      // "+1 edits" that nobody made.
+      const countryCode = getPhoneCountryCode(input);
+      if (countryCode === lastCountryCode) return;
+      lastCountryCode = countryCode;
+
       if (trackedCountryCodeEdit) return;
       trackedCountryCodeEdit = true;
       trackAnalyticsEvent("waitlist_country_code_edit", {
         section_id: "waitlist",
-        country_code: getPhoneCountryCode(input),
+        country_code: countryCode,
       });
     });
 
@@ -852,6 +920,7 @@ if (waitlistForm) {
       // An empty box would silently validate as +1 (see getPhoneCountryCode);
       // put the default back so the visitor can see what they are submitting.
       countryInput.value = formatCountryCode(countryInput.value) || DEFAULT_COUNTRY_CODE;
+      lastCountryCode = getPhoneCountryCode(input);
       formatPhoneInput(input);
       syncPhonePlaceholder();
       syncWaitlistFieldState({ showError: true });
@@ -1061,9 +1130,26 @@ if (profileForm) {
   // Same live formatting as the homepage phone field, so an optional phone
   // given here behaves and normalizes identically.
   const profilePhoneInput = profileForm.querySelector(PHONE_INPUT_SELECTOR);
+  const profileCountryInput = profileForm.querySelector("[data-phone-country]");
   if (profilePhoneInput) {
     ["input", "blur"].forEach((eventName) => {
       profilePhoneInput.addEventListener(eventName, () => formatPhoneInput(profilePhoneInput));
+    });
+  }
+
+  // The country box here behaves exactly as it does on the homepage: normalize
+  // as it is typed, re-run the number through the new country's rules, and put
+  // the default back rather than leaving an empty box that silently reads +1.
+  if (profileCountryInput && profilePhoneInput) {
+    profileCountryInput.addEventListener("focus", () => profileCountryInput.select?.());
+    profileCountryInput.addEventListener("input", () => {
+      formatCountryCodeInput(profileCountryInput);
+      formatPhoneInput(profilePhoneInput);
+    });
+    profileCountryInput.addEventListener("blur", () => {
+      profileCountryInput.value =
+        formatCountryCode(profileCountryInput.value) || DEFAULT_COUNTRY_CODE;
+      formatPhoneInput(profilePhoneInput);
     });
   }
 
@@ -1127,7 +1213,12 @@ if (profileForm) {
         section_id: "welcome",
         error: "invalid_phone",
       });
-      setProfileStatus("Please enter a 10-digit US phone number, or leave it blank.", "error");
+      setProfileStatus(
+        isUsCountryCode(getPhoneCountryCode(phoneField))
+          ? "Please enter a 10-digit US phone number, or leave it blank."
+          : "Please enter your full phone number without the country code, or leave it blank.",
+        "error",
+      );
       phoneField.focus();
       return;
     }

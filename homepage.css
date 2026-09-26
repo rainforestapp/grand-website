@@ -329,9 +329,10 @@ input::placeholder{color:var(--muted-2)}
 .field{display:flex;gap:10px}
 .card input{flex:1;min-width:0;padding:14px 16px;border:1px solid var(--field);border-radius:6px;font-size:16px;font-family:inherit;background:#fff;color:var(--ink);outline:none}
 .card input:focus{border-color:var(--green)}
-/* The country code is an input now, not a label. It keeps the old prefix's
-   size and quiet weight so the row still reads as one field, but it must not
-   take the even share of the row that `.card input`'s flex:1 would give it. */
+/* The country code is an input now, not a label. It deliberately keeps the
+   full ink color of `.card input` rather than the old label's muted grey, so it
+   reads as a value you can edit. Width is pinned because `.card input`'s flex:1
+   would otherwise hand it an even half of the row. */
 .card input.prefix{flex:0 0 72px;width:72px;padding:14px 8px;text-align:center}
 .card .btn{border-radius:6px;padding:16px;background:var(--band)}
 .card .btn:hover{background:var(--green-dark)}
@@ -438,6 +439,7 @@ a:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid #b68b
  /* waitlist + footer */
  .waitlist .h3{font-size:38px}
  .card{padding:24px;gap:16px}
+ .card input.prefix{flex:0 0 60px;width:60px}
  .site-footer .wrap{gap:32px;padding:40px var(--gutter) 32px}
  .footer-top{flex-direction:column;gap:28px}
  .footer-links{display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;text-align:left}

@@ -153,17 +153,42 @@
               >
             </div>
 
+            <!--
+              Same editable country code as the homepage phone arm. Without it
+              this field ran through the country-aware helpers with no country
+              box, which defaults to +1 — so a pasted or autofilled
+              "+44 7700 900123" was silently rewritten to "+1 (447) 700-9001",
+              a plausible-looking US number that is not anyone's. It also kept
+              the two A/B arms asymmetric: the phone arm could take an
+              international number and the email arm's only phone-capture
+              surface could not.
+            -->
             <div class="profile-field" data-profile-field="phone">
-              <label for="phone">Phone number</label>
-              <p class="profile-hint">Optional &mdash; the quickest way to get you set up. US numbers only.</p>
-              <input
-                id="phone"
-                name="phone"
-                type="tel"
-                autocomplete="tel"
-                inputmode="tel"
-                placeholder="(555) 123-4567"
-              >
+              <label for="phone" id="profile-phone-label">Phone number</label>
+              <p class="profile-hint">Optional &mdash; the quickest way to get you set up.</p>
+              <div class="field" data-phone-field role="group" aria-labelledby="profile-phone-label">
+                <input
+                  id="phone_country"
+                  name="phone_country"
+                  class="prefix"
+                  data-phone-country
+                  type="tel"
+                  autocomplete="tel-country-code"
+                  inputmode="tel"
+                  value="+1"
+                  maxlength="6"
+                  aria-label="Country code"
+                >
+                <input
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  autocomplete="tel-national"
+                  inputmode="tel"
+                  placeholder="(555) 123-4567"
+                  data-us-placeholder="(555) 123-4567"
+                >
+              </div>
             </div>
 
             <div class="profile-field">

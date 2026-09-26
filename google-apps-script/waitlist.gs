@@ -132,6 +132,15 @@ const EVENT_HEADERS = [
   "has_fbclid",
   "has_rdt_cid",
   "qa_mode",
+  // Which country the phone arm was submitted under. Appended last on purpose:
+  // ensureHeaders_ can only migrate a live sheet when new columns go on the
+  // end, and inserting mid-list would relabel every historical row's
+  // attribution columns without moving the data under them.
+  //
+  // Both, not just the dial code: "+1" cannot tell the United States apart
+  // from Canada or the twenty-odd Caribbean countries that share it.
+  "country_code",
+  "country",
 ];
 
 function doGet() {
@@ -653,6 +662,8 @@ function rowForEventPayload_(payload) {
     valueOrBlank_(payload.has_fbclid),
     valueOrBlank_(payload.has_rdt_cid),
     valueOrBlank_(payload.qa_mode),
+    plainTextPhone_(payload.country_code),
+    String(payload.country || "").trim().slice(0, 2),
   ];
 }
 

@@ -67,6 +67,7 @@
     <link rel="stylesheet" href="welcome.css">
     <script src="analytics-context.js" defer></script>
     <script src="posthog.js" defer></script>
+    <script src="countries.js" defer></script>
     <script src="script.js" defer></script>
   </head>
   <body>
@@ -153,17 +154,37 @@
               >
             </div>
 
+            <!--
+              Same country picker as the homepage phone arm. Without one this
+              field ran through the country-aware helpers with no country box,
+              which defaults to +1 — so a pasted or autofilled
+              "+44 7700 900123" was silently rewritten to "+1 (447) 700-9001",
+              a plausible-looking US number that is not anyone's. It also kept
+              the two A/B arms asymmetric: the phone arm could take an
+              international number and the email arm's only phone-capture
+              surface could not.
+            -->
             <div class="profile-field" data-profile-field="phone">
-              <label for="phone">Phone number</label>
-              <p class="profile-hint">Optional &mdash; the quickest way to get you set up. US numbers only.</p>
-              <input
-                id="phone"
-                name="phone"
-                type="tel"
-                autocomplete="tel"
-                inputmode="tel"
-                placeholder="(555) 123-4567"
-              >
+              <label for="phone" id="profile-phone-label">Phone number</label>
+              <p class="profile-hint">Optional &mdash; the quickest way to get you set up.</p>
+              <div class="field" data-phone-field role="group" aria-labelledby="profile-phone-label">
+                <span class="prefix prefix-country">
+                  <span class="prefix-flag" data-phone-country-flag aria-hidden="true">&#127482;&#127480;</span>
+                  <span class="prefix-dial" data-phone-country-dial aria-hidden="true">+1</span>
+                  <select id="phone_country" name="phone_country" data-phone-country autocomplete="tel-country-code" aria-label="Country">
+                    <option value="+1" data-country="US" selected>United States +1</option>
+                  </select>
+                </span>
+                <input
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  autocomplete="tel-national"
+                  inputmode="tel"
+                  placeholder="(555) 123-4567"
+                  data-us-placeholder="(555) 123-4567"
+                >
+              </div>
             </div>
 
             <div class="profile-field">

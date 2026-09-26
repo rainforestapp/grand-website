@@ -327,9 +327,28 @@ input::placeholder{color:var(--muted-2)}
 .card{background:#fff;color:var(--ink);border-radius:8px;padding:36px;display:flex;flex-direction:column;gap:18px}
 .card label{font-size:14px;font-weight:600;color:var(--ink-2)}
 .field{display:flex;gap:10px}
-.prefix{display:flex;align-items:center;padding:0 14px;border:1px solid var(--field);border-radius:6px;font-size:16px;color:var(--muted);background:#fff}
 .card input{flex:1;min-width:0;padding:14px 16px;border:1px solid var(--field);border-radius:6px;font-size:16px;font-family:inherit;background:#fff;color:var(--ink);outline:none}
 .card input:focus{border-color:var(--green)}
+/* Country picker. The shell carries the border and the focus ring; the real
+   <select> sits transparently on top of it at full size, so the visitor gets
+   the native picker (and its mobile wheel) while the closed state shows a flag
+   and dial code instead of the select's own full option label. Width is pinned
+   because `.field` is a flex row and the number input should take the rest. */
+.prefix-country{position:relative;flex:0 0 104px;display:flex;align-items:center;justify-content:center;gap:6px;padding:14px 8px;border:1px solid var(--field);border-radius:6px;background:#fff;font-size:16px;color:var(--ink);cursor:pointer}
+/* The caret is the only thing telling you this opens — the <select> that would
+   normally draw one is transparent. Borders rather than a glyph so it inherits
+   nothing from the emoji font next to it. */
+.prefix-country::after{content:"";flex:none;width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-top:5px solid var(--muted)}
+.prefix-country:focus-within{border-color:var(--green)}
+.prefix-flag{font-size:18px;line-height:1}
+.prefix-dial{font-variant-numeric:tabular-nums}
+/* Full-bleed and invisible: the shell above is what you see, this is what you
+   click and what a screen reader reads. `opacity:0` rather than a visibility
+   or clip trick so the native dropdown still anchors to the right spot. */
+.prefix-country select{position:absolute;inset:0;width:100%;height:100%;margin:0;padding:0;border:0;opacity:0;cursor:pointer;-webkit-appearance:none;appearance:none;font:inherit}
+/* The open dropdown list inherits the page font but is drawn by the OS, so it
+   needs a readable colour of its own on the dark-on-white card. */
+.prefix-country option{color:var(--ink);background:#fff}
 .card .btn{border-radius:6px;padding:16px;background:var(--band)}
 .card .btn:hover{background:var(--green-dark)}
 .fine{font-size:13px;color:var(--muted);line-height:1.5}
@@ -435,6 +454,7 @@ a:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid #b68b
  /* waitlist + footer */
  .waitlist .h3{font-size:38px}
  .card{padding:24px;gap:16px}
+ .prefix-country{flex:0 0 96px;gap:5px;padding:14px 6px}
  .site-footer .wrap{gap:32px;padding:40px var(--gutter) 32px}
  .footer-top{flex-direction:column;gap:28px}
  .footer-links{display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;text-align:left}

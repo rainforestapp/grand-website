@@ -4,6 +4,8 @@ Static landing-page wireframe for Grand.
 
 ## Status
 
+- Refreshed the homepage app screenshots with the September 30 iOS design: the sage normal-day overview, honey “A slower day” deviation page for “Important changes”, and clay in-app alert with “Call Mom”. Captured real SwiftUI screens from `grand-ios` revision `105d133f` in an isolated iPhone 17 Pro preview build using the app’s synthetic `previewSage`/`previewHoney` and alert fixtures, with the nickname Mom. The app repository is unchanged. Date-versioned WebP assets include 260px, 560px, and 1206px variants with matching `srcset` descriptors and intrinsic dimensions. Homepage captions remain unchanged. All 56 tests pass on current main. Verified image loading and layout at 1440px, 768px, and 390px; review captures are in `docs/screenshots/homepage/app-refresh-20260930/`.
+
 - Replaced the waitlist phone field's fixed `+1` label with a country picker. **Why:** the label was not editable, so anyone outside the US had nowhere to put their country code &mdash; a silent dead end in the arm that collects phone numbers, on a site whose traffic is paid ads pointing at the bare homepage.
 
   It is a native `<select>` of 236 countries (`countries.js`), defaulting to the United States, so nothing changes for the overwhelming majority. The select is laid transparently over a flag and dial code rather than showing its own text, because a native select can only display the full option label (&ldquo;United Kingdom +44&rdquo;), which does not fit the prefix slot. **Why a native select:** it gets the platform picker on mobile and keyboard type-ahead on desktop for free, on a site with no framework or bundler to build a custom combobox with.

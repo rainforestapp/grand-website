@@ -1142,6 +1142,17 @@ function buildProfilePayload(form) {
   };
 }
 
+// Kill switch for the direct booking panel. Flip to `true` to resume sending
+// qualified candidates straight to Calendly.
+//
+// Why it is off: call volume outran the time we have to run onboarding calls.
+// This is a capacity limit, not a fit one — the three-part qualifier still
+// describes who we want, so we keep scoring it and keep the panel markup in
+// `welcome.html` rather than deleting either. While this is `false` every
+// profile submitter lands on the "You're on the list." panel, and the analytics
+// events still carry `qualified` so we can see who we would have booked.
+const DIRECT_BOOKING_OPEN = false;
+
 if (profileForm) {
   const doneMessage = document.querySelector("[data-profile-done]");
   const waitlistedMessage = document.querySelector("[data-profile-waitlisted]");
@@ -1275,27 +1286,32 @@ if (profileForm) {
       submitted = true;
       firePixelConversion("CompleteRegistration", "Lead");
 
-      // Only good-fit alpha candidates see the scheduling link: an iPhone-using
-      // caregiver whose loved one lives alone and has no pets. Everyone else still
-      // has their answers saved but lands on the "you're on the list" panel.
+      // Good-fit alpha candidates are an iPhone-using caregiver whose loved one
+      // lives alone and has no pets. We still score every submission, but while
+      // `DIRECT_BOOKING_OPEN` is false nobody is routed to the scheduling link —
+      // qualifiers and everyone else alike land on the "you're on the list" panel
+      // with their answers saved.
       const qualifies =
         payload.phone_type === "iphone" &&
         payload.lives_alone === "yes" &&
         payload.has_pets === "no";
+      const routedToBooking = qualifies && DIRECT_BOOKING_OPEN;
 
       trackAnalyticsEvent("waitlist_profile_submit_success", {
         section_id: "welcome",
         submission_id: payload.submission_id,
         delivery_confirmed: true,
         qualified: qualifies,
+        routed_to_booking: routedToBooking,
       });
       window.grandTrackWebsiteEvent?.("profile_completed", {
         submission_id: payload.submission_id,
         delivery_confirmed: true,
         qualified: qualifies,
+        routed_to_booking: routedToBooking,
       });
 
-      const panel = qualifies ? doneMessage : waitlistedMessage;
+      const panel = routedToBooking ? doneMessage : waitlistedMessage;
       if (panel) {
         (profileForm.closest("[data-profile-layout]") || profileForm).hidden = true;
         panel.hidden = false;

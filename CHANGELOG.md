@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.0.2.1 — 2026-10-05
+
+- Pause direct booking: nobody is routed to the Calendly scheduling page, including people who clear every qualifier. Onboarding-call volume outran the time we have to run the calls, so this is a capacity limit rather than a fit one.
+- Add `DIRECT_BOOKING_OPEN` to `script.js` as the single switch, defaulting to `false`. The post-profile panel choice reads `routedToBooking` (`qualifies && DIRECT_BOOKING_OPEN`), so every profile submitter sees the "You're on the list." panel.
+- Keep scoring fit on every submission. `waitlist_profile_submit_success` and `profile_completed` still carry `qualified`, now alongside `routed_to_booking`, so the people we would have booked stay visible in analytics. Both are first-class properties in PostHog; sheet-side they ride inside `raw_payload`, so no new column and no Apps Script redeploy. (Those are the call-site names: `profile_completed` reaches PostHog as `website_profile_completed`, and `waitlist_profile_submit_success` is sheet-side only.)
+- Keep the booking panel and its Calendly link in `welcome.html`, commented as intentionally unreachable. Reopening is flipping the flag plus updating the guard test that pins it, so the pause cannot lift by accident.
+- Stop publishing `tests/` to the live site. The suite was being rsynced to GitHub Pages and served at `/tests/` with `robots.txt` set to `Allow: /`, so a test asserting on the booking URL would have put that link on a crawlable path and defeated the `noindex` on `welcome.html`.
+- Run the test suite in CI. Until now the only workflow was the Pages deploy, so a change that broke a guard test reached production unchallenged.
+- Reword the profile intro: it promised to "match you with the right next step" when every submitter now lands on the same panel.
+- Tests: 56 → 71. The new `tests/direct-booking-pause.test.cjs` runs the post-submit block with the flag injected, so it covers both the paused routing and the one-flag-flip rollback, and pins the booking panel as present-but-hidden.
+
 ## 0.0.2.0 — 2026-09-26
 
 - Replace the waitlist phone field's fixed `+1` label with a country picker: a native `<select>` of 236 countries defaulting to the United States, shown closed as a flag and dial code. Anyone outside the US previously had nowhere to put their country code.

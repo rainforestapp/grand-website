@@ -319,8 +319,10 @@ input::placeholder{color:var(--muted-2)}
 
 /* waitlist + footer */
 .waitlist{background:var(--band);color:#fff}
+.waitlist .grid-2{align-items:start}
 .waitlist .h3{font-size:clamp(40px,4.5vw,64px);line-height:1.02}
 .waitlist .body-lg{color:var(--band-soft)}
+.waitlist-signup{display:grid;gap:32px;min-width:0}
 /* The default green eyebrow sits at roughly 1.5:1 on the dark band — illegible
    and a WCAG failure. Lift it onto the band's light token. */
 .waitlist .eyebrow{color:var(--band-soft)}
@@ -460,3 +462,15 @@ a:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid #b68b
  .footer-links{display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;text-align:left}
 }
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.btn,.scroll-hint{transition:none}}
+
+/* Family testimonial continues the waitlist's dark band. */
+#testimonial{background:var(--band);color:#fff}
+#testimonial .wrap{padding-top:0}
+.testimonial{margin:0;padding-top:calc(var(--section-pad) / 2);border-top:1px solid rgba(255,255,255,.14);align-items:center}
+.testimonial-photo{object-position:50% 30%;height:auto}
+.testimonial-quote{margin:0;text-indent:-.4em;color:#fff}
+#testimonial .eyebrow{color:var(--band-soft)}
+#testimonial .testimonial-name{font-weight:600;color:#fff}
+@media(min-width:801px){.testimonial{grid-template-columns:minmax(0,5fr) minmax(0,7fr)}.testimonial-photo{max-width:400px}}
+@media(min-width:701px) and (max-width:1100px){.testimonial{grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:32px;align-items:start}}
+@media(max-width:700px){.testimonial-photo{width:200px;max-width:100%;aspect-ratio:4/3}}

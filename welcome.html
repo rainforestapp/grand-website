@@ -239,6 +239,14 @@
           </div>
         </div>
 
+        <!--
+          Direct booking is paused: onboarding-call volume outran the time we
+          have to run the calls. `DIRECT_BOOKING_OPEN` in script.js is `false`,
+          so nothing routes to this panel right now and every profile submitter
+          sees the "You're on the list." panel below. The markup and the
+          Calendly link are kept intact so flipping that flag back to `true`
+          restores the fast-track flow with no further changes.
+        -->
         <div class="profile-done" data-profile-done hidden>
           <h2>Fast track getting set up as a test user of Grand</h2>
           <p>

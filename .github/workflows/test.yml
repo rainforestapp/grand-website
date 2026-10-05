@@ -1,0 +1,30 @@
+# Nothing ran the test suite before this: the only workflow was the gh-pages
+# deploy, so a change that broke a guard test reached production unchallenged.
+# That matters now that tests/direct-booking-pause.test.cjs is the thing standing
+# between an accidental edit and reopening direct booking.
+name: Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      # Glob the files rather than passing the directory: `node --test tests/`
+      # resolves the directory as a module entry point and fails on Node 22.
+      - name: Run tests
+        run: node --test tests/*.test.cjs

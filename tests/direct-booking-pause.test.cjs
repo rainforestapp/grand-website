@@ -6,6 +6,9 @@ const { test } = require("node:test");
 const source = fs.readFileSync("script.js", "utf8");
 const welcome = fs.readFileSync("welcome.html", "utf8");
 
+// Host only, never the bookable event path — see the note on the panel test.
+const BOOKING_HOST = "https://calendly.com";
+
 // Same source-slicing seam the other script.js tests use: the routing lives
 // inside a submit handler with no module boundary, so lift the flag and the
 // two expressions that consume it out by markers and run them standalone.
@@ -63,11 +66,17 @@ test("the panel choice stays gated on the flag", () => {
   );
 });
 
-// Paused, not deleted: the panel and its Calendly link stay in the page so
-// re-enabling is a one-line flag flip.
+// Paused, not deleted: the panel and its booking link stay in the page so
+// re-enabling is a flag flip rather than a rewrite.
+//
+// Note this file never spells out the bookable event URL. `tests/` was rsynced
+// to gh-pages until this change excluded it, so a literal booking link here was
+// a publicly fetchable copy of the exact link the pause exists to stop handing
+// out. Asserting on the host keeps the file harmless even if that deploy
+// exclusion is ever reverted.
 test("the booking panel is kept in welcome.html", () => {
   assert.match(welcome, /data-profile-done/);
-  assert.match(welcome, /calendly\.com\/d\/dz47-vkm-rb2\/grand-early-tester-program/);
+  assert.ok(welcome.includes(`${BOOKING_HOST}/`), "the booking link was removed rather than kept");
   assert.match(welcome, /data-profile-waitlisted/);
 });
 
@@ -214,7 +223,7 @@ test("the unreachable booking panel stays hidden in the markup", () => {
 // The kept Calendly link has to stay inside the hidden panel. Hoisting it out —
 // into the form, or the footer — would reopen booking without touching the flag.
 test("the Calendly link is only reachable from inside the hidden booking panel", () => {
-  const calendly = welcome.indexOf("https://calendly.com/d/dz47-vkm-rb2");
+  const calendly = welcome.indexOf(BOOKING_HOST);
   const panelStart = welcome.indexOf("data-profile-done");
   const panelEnd = welcome.indexOf("data-profile-waitlisted");
   assert.notEqual(calendly, -1, "the Calendly link was removed rather than kept");
@@ -223,7 +232,7 @@ test("the Calendly link is only reachable from inside the hidden booking panel",
     "the Calendly link escaped the hidden booking panel",
   );
   assert.equal(
-    welcome.split("https://calendly.com/d/dz47-vkm-rb2").length - 1,
+    welcome.split(BOOKING_HOST).length - 1,
     1,
     "a second Calendly link appeared in welcome.html",
   );

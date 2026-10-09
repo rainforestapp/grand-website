@@ -9,11 +9,19 @@
       content="The team building Grand."
     >
     <!--
-      Deliberately unlisted. The story on this page has not been approved yet,
-      so the page is reachable only by typing the URL: it is linked from no
-      nav or footer, kept out of sitemap.xml, and noindexed here. Remove this
-      robots tag, add the page to sitemap.xml, and add the nav/footer links
-      together, in the same change that lands the approved story.
+      Deliberately unlisted on the website: linked from no nav or footer, kept
+      out of sitemap.xml, and noindexed here. The story has not been approved,
+      so nothing should point at this page yet.
+
+      Note what that does NOT mean. The repo is public and the site deploys
+      from it, so this page and its portraits are world-readable at
+      /about.html the moment this lands. noindex keeps it out of search
+      results; it is not an access control.
+
+      To publish, in the same change that lands the approved story: remove this
+      robots tag, add a rel=canonical (every other page has one), add the page
+      to sitemap.xml, add the nav/footer links, and delete
+      tests/about-unlisted.test.cjs, which pins all of the above.
     -->
     <meta name="robots" content="noindex, nofollow">
     <meta name="theme-color" content="#ffffff">
@@ -59,36 +67,36 @@
         </header>
 
         <section class="about-team" aria-labelledby="our-team">
-          <h2 id="our-team">Our team</h2>
-          <!-- Si, James, AJ and Billy are cropped from supplied photographs.
-               Fred and Keith are still cropped out of the pre-seed deck's team
-               slide, which is flattened, so theirs cap at 288px and are a touch
-               softer than the rest; replace them when real files turn up.
-               Achille is on that slide too, but under "Advisor" rather than the
-               team block, so he is not here. -->
+          <h2 id="our-team" class="h2-sm">Our team</h2>
+          <!-- Si, James, AJ and Billy are cropped from photographs they
+               supplied. Fred and Keith are cropped out of an internal slide
+               because no separate files exist for them, so theirs cap at 288px
+               and are a touch softer; replace them when real files turn up.
+               Achille is an advisor, not a member of the team, so he is not
+               here. -->
           <ul class="team-grid">
             <li class="team-member">
-              <img class="team-photo" src="assets/team/fred.webp" width="288" height="288" loading="lazy" decoding="async" alt="">
+              <img class="team-photo" src="assets/team/fred.webp" width="288" height="288" decoding="async" alt="">
               <p class="team-name">Fred Stevens&#8209;Smith</p>
             </li>
             <li class="team-member">
-              <img class="team-photo" src="assets/team/si.webp" width="360" height="360" loading="lazy" decoding="async" alt="">
+              <img class="team-photo" src="assets/team/si.webp" width="360" height="360" decoding="async" alt="">
               <p class="team-name">Si Stephens&#8209;Manassiev</p>
             </li>
             <li class="team-member">
-              <img class="team-photo" src="assets/team/james.webp" width="360" height="360" loading="lazy" decoding="async" alt="">
+              <img class="team-photo" src="assets/team/james.webp" width="360" height="360" decoding="async" alt="">
               <p class="team-name">James Palmer</p>
             </li>
             <li class="team-member">
-              <img class="team-photo" src="assets/team/keith.webp" width="288" height="288" loading="lazy" decoding="async" alt="">
+              <img class="team-photo" src="assets/team/keith.webp" width="288" height="288" decoding="async" alt="">
               <p class="team-name">Keith Johnson</p>
             </li>
             <li class="team-member">
-              <img class="team-photo" src="assets/team/aj.webp" width="360" height="360" loading="lazy" decoding="async" alt="">
+              <img class="team-photo" src="assets/team/aj.webp" width="360" height="360" decoding="async" alt="">
               <p class="team-name">AJ Funk</p>
             </li>
             <li class="team-member">
-              <img class="team-photo" src="assets/team/billy.webp" width="300" height="300" loading="lazy" decoding="async" alt="">
+              <img class="team-photo" src="assets/team/billy.webp" width="300" height="300" decoding="async" alt="">
               <p class="team-name">Billy Goudy</p>
             </li>
           </ul>

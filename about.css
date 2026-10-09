@@ -21,7 +21,9 @@
 
 /* Our team */
 .about-team{margin-top:112px;padding-top:56px;border-top:1px solid var(--rule)}
-.about-team h2{font-family:var(--serif);font-weight:400;font-size:clamp(34px,3.6vw,48px);line-height:1.08;letter-spacing:-.02em}
+/* The heading uses homepage.css's .h2-sm. A local copy of that rule drifted
+   once already: homepage.css drops .h2-sm to 30px at <=700px and the copy did
+   not, so this heading alone stayed 34px on a phone. */
 /* Fixed column counts rather than auto-fit: the roster is six, and auto-fit
    lands on four at tablet width, which leaves a two-card orphan row. 6 / 3 / 2
    all divide evenly. */

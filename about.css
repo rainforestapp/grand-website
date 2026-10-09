@@ -2,8 +2,10 @@
    adds the two things the homepage has no pattern for: the story placeholder
    panel and the team portrait grid. */
 
-.about-page{padding:72px var(--gutter) 112px}
-.about-container{max-width:var(--max);margin:0 auto}
+/* The content column is homepage.css's .wrap, not a local copy of it. A copy
+   here put the gutter outside the max-width box instead of inside, so every
+   line on the page sat one gutter (28px) left of the logo and the footer. */
+.about-page{padding:72px 0 112px}
 
 .about-header{max-width:760px}
 .about-header .eyebrow{margin-bottom:20px}

@@ -3,33 +3,29 @@ const fs = require("node:fs");
 const path = require("node:path");
 const { test } = require("node:test");
 
-// The About page carries an unapproved story, so it ships deliberately
-// unreachable: no link from any other page, out of the sitemap, and noindexed.
-// Each of those is one careless edit away from publishing the story early, so
-// each gets its own assertion. Lifting the page is then an explicit decision —
-// you have to come here and delete these tests on purpose.
+// The About page ships deliberately unreachable from the website: no link from
+// any other page, out of the sitemap, noindexed. Each of those is one careless
+// edit away from pointing visitors at an unapproved story, so each gets its own
+// assertion. DELETE THIS WHOLE FILE in the change that publishes the page --
+// the durable content checks live in about-team.test.cjs and stay.
+//
+// What this does NOT guard: the repo is public and the site deploys from it, so
+// the page is world-readable at /about.html regardless. These tests keep it
+// unadvertised, not private.
 
 const about = fs.readFileSync("about.html", "utf8");
 
-function teamGrid() {
-  const m = about.match(/<ul class="team-grid">[\s\S]*?<\/ul>/);
-  assert.ok(m, "about.html no longer has a .team-grid");
-  return m[0];
-}
-
-function siteHtmlFiles() {
-  const roots = [".", "grace"];
-  const files = [];
-  for (const dir of roots) {
-    for (const name of fs.readdirSync(dir)) {
-      if (!name.endsWith(".html")) continue;
-      const rel = path.join(dir, name);
-      if (rel === "about.html") continue;
-      files.push(rel);
-    }
+// Walk the whole tree rather than a fixed list of directories: a link added
+// from a page in a new subdirectory would otherwise slip past the guard.
+function textFilesToScan(dir = ".", out = []) {
+  const skip = new Set([".git", "node_modules", "docs", "tests", ".github", ".context", ".gstack"]);
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    if (skip.has(entry.name)) continue;
+    const rel = path.join(dir, entry.name).replace(/^\.\//, "");
+    if (entry.isDirectory()) textFilesToScan(rel, out);
+    else if (/\.(html|js|xml|css)$/.test(entry.name) && rel !== "about.html") out.push(rel);
   }
-  assert.ok(files.length >= 4, "expected to find the other site pages");
-  return files;
+  return out;
 }
 
 test("about.html is noindexed", () => {
@@ -38,61 +34,21 @@ test("about.html is noindexed", () => {
 
 test("about.html is absent from the sitemap", () => {
   const sitemap = fs.readFileSync("sitemap.xml", "utf8");
-  assert.equal(sitemap.includes("about"), false);
+  assert.equal(/about/i.test(sitemap), false);
 });
 
-test("no other page links to about.html", () => {
-  const linking = siteHtmlFiles().filter((rel) =>
-    fs.readFileSync(rel, "utf8").includes("about.html"),
+test("nothing anywhere in the site links to the About page", () => {
+  // Match the stem, not the filename: Pages also serves the page at the
+  // extensionless /about, so href="/about" would publish it just as well.
+  const linking = textFilesToScan().filter((rel) =>
+    /href\s*=\s*["'][^"']*\babout\b/i.test(fs.readFileSync(rel, "utf8")),
   );
   assert.deepEqual(linking, []);
 });
 
 test("the story is still holding copy, not the real story", () => {
-  // If this fails, the approved story has landed — which is the moment to
-  // delete this whole file and link the page up.
+  // If this fails, the approved story has landed -- which is the moment to
+  // delete this file and link the page up.
   assert.match(about, /<div class="about-story">/);
   assert.match(about, /class="kicker">Placeholder</);
-});
-
-test("the team is the six from the deck, in deck order", () => {
-  // The double-barrelled surnames are written with a non-breaking hyphen
-  // entity so they cannot split mid-surname, so compare on what a reader sees,
-  // not on the raw markup.
-  const names = [...about.matchAll(/<p class="team-name">([^<]+)<\/p>/g)].map((m) =>
-    m[1].replace(/&#8209;/g, "-"),
-  );
-  assert.deepEqual(names, [
-    "Fred Stevens-Smith",
-    "Si Stephens-Manassiev",
-    "James Palmer",
-    "Keith Johnson",
-    "AJ Funk",
-    "Billy Goudy",
-  ]);
-});
-
-test("Achille is not in the team", () => {
-  // He is on the same deck slide, but under "Advisor" rather than the team
-  // block. Excluding him was explicit, so it gets an explicit test. Scoped to
-  // the grid, not the whole file, because the markup comment above the grid
-  // names him to explain the omission.
-  assert.equal(/achille/i.test(teamGrid()), false);
-});
-
-test("every portrait file the page asks for exists", () => {
-  const srcs = [...about.matchAll(/<img [^>]*src="(assets\/team\/[^"]+)"/g)].map((m) => m[1]);
-  assert.equal(srcs.length, 6);
-  for (const src of srcs) {
-    assert.ok(fs.existsSync(src), `${src} is referenced but missing`);
-  }
-});
-
-test("every team card has a name and a portrait", () => {
-  const cards = about.match(/<li class="team-member">[\s\S]*?<\/li>/g) || [];
-  assert.ok(cards.length > 0, "team grid is empty");
-  for (const card of cards) {
-    assert.match(card, /<img [^>]*class="[^"]*team-photo[^"]*"[^>]*>/, "card is missing its photo");
-    assert.match(card, /<p class="team-name">[^<]+<\/p>/, "card is missing its name");
-  }
 });

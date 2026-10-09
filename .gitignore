@@ -1,2 +1,7 @@
 # gstack local artifacts (test plans, wip context) — not part of the site
 .gstack/
+
+# Conductor workspace scratch (attachments, screenshots, notes) — never part
+# of the site. Was excluded only by .git/info/exclude, which is local to one
+# clone; this repo is public, so the rule belongs in tree.
+.context/

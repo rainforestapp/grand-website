@@ -1,0 +1,41 @@
+/* About page. Shares the homepage shell, tokens, and type scale; this file only
+   adds the two things the homepage has no pattern for: the story placeholder
+   panel and the founding-team portrait grid. */
+
+.about-page{padding:72px var(--gutter) 112px}
+.about-container{max-width:var(--max);margin:0 auto}
+
+.about-header{max-width:760px}
+.about-header .eyebrow{margin-bottom:20px}
+.about-header h1{font-family:var(--serif);font-weight:400;font-size:clamp(42px,6vw,72px);line-height:1.05;letter-spacing:-.025em;text-wrap:balance}
+
+/* Story placeholder. Deliberately reads as unfinished — a dashed rule and muted
+   italic serif — so a reviewer cannot mistake the holding copy for the real
+   story, which is still going through approval. Delete this block (and its
+   markup) when the approved story lands. */
+.about-story{margin-top:40px;padding:48px;border:1px dashed var(--field);border-radius:6px;background:#fbfbfa;max-width:760px}
+.about-story .kicker{margin-bottom:14px}
+/* :not(.kicker) so the panel's serif-italic holding voice does not swallow the
+   uppercase sans kicker that labels it as a placeholder. */
+.about-story p:not(.kicker){font-family:var(--serif);font-style:italic;font-size:20px;line-height:1.6;color:var(--muted)}
+
+/* Founding team */
+.about-team{margin-top:112px;padding-top:56px;border-top:1px solid var(--rule)}
+.about-team h2{font-family:var(--serif);font-weight:400;font-size:clamp(34px,3.6vw,48px);line-height:1.08;letter-spacing:-.02em}
+.team-grid{list-style:none;margin:40px 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr));gap:44px 28px}
+.team-member{display:flex;flex-direction:column;gap:18px}
+/* height:auto or the intrinsic `height` attribute wins over .photo-4x5's
+   aspect-ratio and the card renders 500px tall. Same fix as .testimonial-photo. */
+.team-photo{height:auto;background:#eceee9}
+.team-name{font-size:18px;font-weight:600;color:var(--ink)}
+
+@media(max-width:700px){
+ .about-page{padding-top:40px;padding-bottom:72px}
+ .about-story{margin-top:28px;padding:28px}
+ .about-story p:not(.kicker){font-size:18px}
+ .about-team{margin-top:72px;padding-top:40px}
+ /* Two across on a phone rather than one: the cards carry a name and nothing
+    else, so a single column would leave the section needlessly long to scroll. */
+ .team-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:32px 20px}
+ .team-name{font-size:16px}
+}

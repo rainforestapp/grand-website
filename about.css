@@ -1,0 +1,51 @@
+/* About page. Shares the homepage shell, tokens, and type scale; this file only
+   adds the two things the homepage has no pattern for: the story placeholder
+   panel and the team portrait grid. */
+
+.about-page{padding:72px var(--gutter) 112px}
+.about-container{max-width:var(--max);margin:0 auto}
+
+.about-header{max-width:760px}
+.about-header .eyebrow{margin-bottom:20px}
+.about-header h1{font-family:var(--serif);font-weight:400;font-size:clamp(42px,6vw,72px);line-height:1.05;letter-spacing:-.025em;text-wrap:balance}
+
+/* The story. 680px rather than the header's 760px: at 20px that lands near 70
+   characters a line, which is where long-form prose stays readable. */
+.about-story{margin-top:40px;max-width:680px;display:flex;flex-direction:column;gap:24px}
+.about-story p{font-size:20px;line-height:1.65;color:var(--ink-3);text-wrap:pretty}
+
+/* Our team */
+.about-team{margin-top:112px;padding-top:56px;border-top:1px solid var(--rule)}
+/* The heading uses homepage.css's .h2-sm. A local copy of that rule drifted
+   once already: homepage.css drops .h2-sm to 30px at <=700px and the copy did
+   not, so this heading alone stayed 34px on a phone. */
+/* Fixed column counts rather than auto-fit: the roster is six, and auto-fit
+   lands on four at tablet width, which leaves a two-card orphan row. 6 / 3 / 2
+   all divide evenly. */
+.team-grid{list-style:none;margin:48px 0 0;padding:0;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:40px 24px}
+.team-member{display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center}
+/* Circular because the source photos are circular: the deck slide they came
+   from is flattened, so everything outside each circle is slide background,
+   not photograph. max-width caps them at tablet/mobile, where the column is
+   wider than the 288px the source actually has. */
+.team-photo{width:100%;max-width:180px;height:auto;aspect-ratio:1;border-radius:50%;background:#eceee9}
+/* 16px, not the 18px a standalone label would take: at six across the column
+   is ~170px, and the longest surname here needs every pixel of that to stay on
+   one line. balance splits the ones that still wrap evenly instead of leaving a
+   single trailing word. */
+.team-name{font-size:16px;font-weight:600;color:var(--ink);text-wrap:balance}
+
+@media(max-width:1100px){
+ .team-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:48px 32px}
+}
+
+@media(max-width:700px){
+ .about-page{padding-top:40px;padding-bottom:72px}
+ .about-story{margin-top:28px;gap:20px}
+ .about-story p{font-size:18px}
+ .about-team{margin-top:72px;padding-top:40px}
+ /* Two across on a phone rather than one: the cards carry a name and nothing
+    else, so a single column would leave the section needlessly long to scroll. */
+ .team-grid{margin-top:36px;grid-template-columns:repeat(2,minmax(0,1fr));gap:32px 20px}
+ .team-photo{max-width:150px}
+}

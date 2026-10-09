@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>About &middot; Grand</title>
+    <meta
+      name="description"
+      content="The team building Grand."
+    >
+    <!--
+      Deliberately unlisted on the website: linked from no nav or footer, kept
+      out of sitemap.xml, and noindexed here. The story below is written but not
+      yet approved, so nothing should point at this page yet.
+
+      Note what that does NOT mean. The repo is public and the site deploys
+      from it, so this page and its portraits are world-readable at
+      /about.html the moment this lands. noindex keeps it out of search
+      results; it is not an access control.
+
+      To publish, in the same change that lands the approved story: remove this
+      robots tag, add a rel=canonical (every other page has one), add the page
+      to sitemap.xml, add the nav/footer links, and delete
+      tests/about-unlisted.test.cjs, which pins all of the above.
+    -->
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#ffffff">
+
+    <link rel="icon" href="favicon.ico" sizes="32x32">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..700;1,6..72,300..700&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="homepage.css">
+    <link rel="stylesheet" href="about.css">
+    <script src="analytics-context.js" defer></script>
+    <script src="posthog.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#top">Skip to content</a>
+    <header class="site-header">
+  <nav class="wrap" aria-label="Primary navigation">
+    <a href="index.html" class="brand" aria-label="Grand home">grand</a>
+    <div class="nav-links">
+      <a href="index.html#system">How it works</a>
+      <a href="index.html#tracking">Caregiver experience</a>
+      <a href="index.html#response">Emergency response</a>
+      <a href="index.html#waitlist" class="btn btn-sm">Become a tester</a>
+    </div>
+  </nav>
+</header>
+
+    <main id="top" class="about-page">
+      <div class="about-container">
+        <header class="about-header">
+          <p class="eyebrow">About Grand</p>
+          <h1>Our story</h1>
+
+          <div class="about-story">
+            <p>We all have parents and loved ones who are getting older, and we
+              worry about them more than we usually say. For James, one of our
+              founders, it&rsquo;s his aunt. She had a bad fall at home and
+              couldn&rsquo;t get up, and she stayed on the floor until her
+              building&rsquo;s super happened to stop by and find her. No alarm
+              went off and nobody got an alert. She was found by luck.</p>
+            <p>Many of the people we love live alone, some of them far away, and
+              we couldn&rsquo;t honestly say we&rsquo;d know if something went
+              wrong. The options we found didn&rsquo;t fit them. Pendants get
+              left on the nightstand. Cameras feel like an invasion. And moving
+              out of a home they&rsquo;ve lived in for decades isn&rsquo;t what
+              anyone wants.</p>
+            <p>So we built Grand. There are no cameras and nothing to wear or
+              charge. Grand learns her normal day and lets you know when
+              something changes, so a fall or a hard week doesn&rsquo;t go
+              unnoticed. We&rsquo;re building it so parents can keep living in
+              the homes they love, and so the people who love them never have to
+              count on luck.</p>
+          </div>
+        </header>
+
+        <section class="about-team" aria-labelledby="our-team">
+          <h2 id="our-team" class="h2-sm">Our team</h2>
+          <!-- Si, James, AJ and Billy are cropped from photographs they
+               supplied. Fred and Keith are cropped out of an internal slide
+               because no separate files exist for them, so theirs cap at 288px
+               and are a touch softer; replace them when real files turn up.
+               Achille is an advisor, not a member of the team, so he is not
+               here. -->
+          <ul class="team-grid">
+            <li class="team-member">
+              <img class="team-photo" src="assets/team/fred.webp" width="288" height="288" decoding="async" alt="">
+              <p class="team-name">Fred Stevens&#8209;Smith</p>
+            </li>
+            <li class="team-member">
+              <img class="team-photo" src="assets/team/si.webp" width="360" height="360" decoding="async" alt="">
+              <p class="team-name">Si Stephens&#8209;Manassiev</p>
+            </li>
+            <li class="team-member">
+              <img class="team-photo" src="assets/team/james.webp" width="360" height="360" decoding="async" alt="">
+              <p class="team-name">James Palmer</p>
+            </li>
+            <li class="team-member">
+              <img class="team-photo" src="assets/team/keith.webp" width="288" height="288" decoding="async" alt="">
+              <p class="team-name">Keith Johnson</p>
+            </li>
+            <li class="team-member">
+              <img class="team-photo" src="assets/team/aj.webp" width="360" height="360" decoding="async" alt="">
+              <p class="team-name">AJ Funk</p>
+            </li>
+            <li class="team-member">
+              <img class="team-photo" src="assets/team/billy.webp" width="300" height="300" decoding="async" alt="">
+              <p class="team-name">Billy Goudy</p>
+            </li>
+          </ul>
+        </section>
+      </div>
+    </main>
+
+    <footer class="site-footer" aria-label="Site footer">
+  <div class="wrap">
+    <div class="footer-top">
+      <div class="footer-intro">
+        <p class="footer-contact-label">Contact us</p>
+        <a href="mailto:hello@grandeldercare.com">hello@grandeldercare.com</a>
+      </div>
+      <nav class="footer-links" aria-label="Footer navigation">
+        <a href="index.html#system">How it works</a>
+        <a href="index.html#tracking">Caregiver experience</a>
+        <a href="index.html#response">Emergency response</a>
+        <a href="index.html#waitlist">Become a tester</a>
+        <a href="privacy.html">Privacy Policy</a>
+        <a href="terms.html">Terms of Service</a>
+      </nav>
+    </div>
+    <div class="footer-bottom">
+      <a href="index.html" class="logo" aria-label="Grand home">grand</a>
+      <p class="footer-copyright">&copy; 2026 Grand. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+  </body>
+</html>

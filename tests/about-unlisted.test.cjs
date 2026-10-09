@@ -11,6 +11,12 @@ const { test } = require("node:test");
 
 const about = fs.readFileSync("about.html", "utf8");
 
+function teamGrid() {
+  const m = about.match(/<ul class="team-grid">[\s\S]*?<\/ul>/);
+  assert.ok(m, "about.html no longer has a .team-grid");
+  return m[0];
+}
+
 function siteHtmlFiles() {
   const roots = [".", "grace"];
   const files = [];
@@ -47,6 +53,27 @@ test("the story is still holding copy, not the real story", () => {
   // delete this whole file and link the page up.
   assert.match(about, /<div class="about-story">/);
   assert.match(about, /class="kicker">Placeholder</);
+});
+
+test("the founding team is the six from the deck, in deck order", () => {
+  const names = [...about.matchAll(/<p class="team-name">([^<]+)<\/p>/g)].map((m) => m[1]);
+  assert.deepEqual(names, ["Fred", "Si", "James", "Keith", "AJ", "Billy"]);
+});
+
+test("Achille is not in the founding team", () => {
+  // He is on the same deck slide, but under "Advisor" rather than the team
+  // block. Excluding him was explicit, so it gets an explicit test. Scoped to
+  // the grid, not the whole file, because the markup comment above the grid
+  // names him to explain the omission.
+  assert.equal(/achille/i.test(teamGrid()), false);
+});
+
+test("every portrait file the page asks for exists", () => {
+  const srcs = [...about.matchAll(/<img [^>]*src="(assets\/team\/[^"]+)"/g)].map((m) => m[1]);
+  assert.equal(srcs.length, 6);
+  for (const src of srcs) {
+    assert.ok(fs.existsSync(src), `${src} is referenced but missing`);
+  }
 });
 
 test("every founding-team card has a name and a portrait", () => {

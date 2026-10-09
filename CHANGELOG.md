@@ -2,9 +2,10 @@
 
 ## 0.0.3.0 — 2026-10-09
 
-- Add an About page at `/about.html` with a placeholder for the story and a team section: Fred Stevens-Smith, Si Stephens-Manassiev, James Palmer, Keith Johnson, AJ Funk, and Billy Goudy, name and photo only. Achille is an advisor rather than a member of the team, so he is not on it.
+- Add an About page at `/about.html` with the story and a team section: Fred Stevens-Smith, Si Stephens-Manassiev, James Palmer, Keith Johnson, AJ Funk, and Billy Goudy, name and photo only. Achille is an advisor rather than a member of the team, so he is not on it.
 - Keep the page unlisted while the story goes through approval: no link from any nav or footer, absent from `sitemap.xml`, `noindex, nofollow`. Publishing is a five-part change (robots tag, `rel=canonical`, sitemap entry, nav and footer links, delete the guard test), spelled out in both the page and the README.
-- Be clear that unlisted is not private. The repo is public and the site deploys from it, so the page is world-readable at its URL the moment it lands; `noindex` keeps it out of search results and nothing more. The story on it is a placeholder, so there is nothing confidential on the page.
+- Tell the story through James's aunt: a bad fall at home, hours on the floor, found by luck. Then why pendants, cameras and moving out did not fit, then what Grand does instead. Written but not yet signed off, which is why the page stays unlisted.
+- Be clear that unlisted is not private. The repo is public and the site deploys from it, so the page is world-readable at its URL the moment it lands; `noindex` keeps it out of search results and nothing more.
 - Show the portraits as circles, masked to transparent corners at export. Four come from photographs the subjects supplied and export at 2x their display size; two are cropped from an internal slide, cap at 288px, and want replacing when real files turn up.
 - Report `/about.html` to PostHog as `website_page_type: "about"`. It previously fell through to `"landing"`, which would have mixed its pageviews into the homepage funnel that paid-ad spend is read against.
 - Ignore `.context/` in the repo rather than only in `.git/info/exclude`. That exclude file is local to a single clone, so on a public repo the scratch directory was one `git add -A` from being published.

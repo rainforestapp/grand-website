@@ -5,9 +5,10 @@ const { test } = require("node:test");
 
 // The About page ships deliberately unreachable from the website: no link from
 // any other page, out of the sitemap, noindexed. Each of those is one careless
-// edit away from pointing visitors at an unapproved story, so each gets its own
-// assertion. DELETE THIS WHOLE FILE in the change that publishes the page --
-// the durable content checks live in about-team.test.cjs and stay.
+// edit away from pointing visitors at a story that has not been signed off, so
+// each gets its own assertion. DELETE THIS WHOLE FILE in the change that
+// publishes the page -- the durable content checks live in
+// about-team.test.cjs and stay.
 //
 // What this does NOT guard: the repo is public and the site deploys from it, so
 // the page is world-readable at /about.html regardless. These tests keep it
@@ -46,9 +47,13 @@ test("nothing anywhere in the site links to the About page", () => {
   assert.deepEqual(linking, []);
 });
 
-test("the story is still holding copy, not the real story", () => {
-  // If this fails, the approved story has landed -- which is the moment to
-  // delete this file and link the page up.
-  assert.match(about, /<div class="about-story">/);
-  assert.match(about, /class="kicker">Placeholder</);
+test("the story section is present and is real prose", () => {
+  // The story is written but not signed off. This no longer pins holding copy
+  // (there is none); it pins that the section exists and still has substance,
+  // so a half-revert cannot leave an empty page quietly passing as "unlisted".
+  const story = about.match(/<div class="about-story">[\s\S]*?<\/div>/);
+  assert.ok(story, "about.html no longer has a .about-story section");
+  const paragraphs = story[0].match(/<p>/g) || [];
+  assert.ok(paragraphs.length >= 3, `story has ${paragraphs.length} paragraphs, expected 3+`);
+  assert.equal(/placeholder/i.test(story[0]), false, "holding copy is back in the story");
 });

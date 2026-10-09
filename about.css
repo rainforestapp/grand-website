@@ -9,15 +9,10 @@
 .about-header .eyebrow{margin-bottom:20px}
 .about-header h1{font-family:var(--serif);font-weight:400;font-size:clamp(42px,6vw,72px);line-height:1.05;letter-spacing:-.025em;text-wrap:balance}
 
-/* Story placeholder. Deliberately reads as unfinished — a dashed rule and muted
-   italic serif — so a reviewer cannot mistake the holding copy for the real
-   story, which is still going through approval. Delete this block (and its
-   markup) when the approved story lands. */
-.about-story{margin-top:40px;padding:48px;border:1px dashed var(--field);border-radius:6px;background:#fbfbfa;max-width:760px}
-.about-story .kicker{margin-bottom:14px}
-/* :not(.kicker) so the panel's serif-italic holding voice does not swallow the
-   uppercase sans kicker that labels it as a placeholder. */
-.about-story p:not(.kicker){font-family:var(--serif);font-style:italic;font-size:20px;line-height:1.6;color:var(--muted)}
+/* The story. 680px rather than the header's 760px: at 20px that lands near 70
+   characters a line, which is where long-form prose stays readable. */
+.about-story{margin-top:40px;max-width:680px;display:flex;flex-direction:column;gap:24px}
+.about-story p{font-size:20px;line-height:1.65;color:var(--ink-3);text-wrap:pretty}
 
 /* Our team */
 .about-team{margin-top:112px;padding-top:56px;border-top:1px solid var(--rule)}
@@ -46,8 +41,8 @@
 
 @media(max-width:700px){
  .about-page{padding-top:40px;padding-bottom:72px}
- .about-story{margin-top:28px;padding:28px}
- .about-story p:not(.kicker){font-size:18px}
+ .about-story{margin-top:28px;gap:20px}
+ .about-story p{font-size:18px}
  .about-team{margin-top:72px;padding-top:40px}
  /* Two across on a phone rather than one: the cards carry a name and nothing
     else, so a single column would leave the section needlessly long to scroll. */

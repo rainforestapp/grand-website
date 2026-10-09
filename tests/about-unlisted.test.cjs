@@ -56,7 +56,12 @@ test("the story is still holding copy, not the real story", () => {
 });
 
 test("the team is the six from the deck, in deck order", () => {
-  const names = [...about.matchAll(/<p class="team-name">([^<]+)<\/p>/g)].map((m) => m[1]);
+  // The double-barrelled surnames are written with a non-breaking hyphen
+  // entity so they cannot split mid-surname, so compare on what a reader sees,
+  // not on the raw markup.
+  const names = [...about.matchAll(/<p class="team-name">([^<]+)<\/p>/g)].map((m) =>
+    m[1].replace(/&#8209;/g, "-"),
+  );
   assert.deepEqual(names, [
     "Fred Stevens-Smith",
     "Si Stephens-Manassiev",

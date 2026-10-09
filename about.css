@@ -1,6 +1,6 @@
 /* About page. Shares the homepage shell, tokens, and type scale; this file only
    adds the two things the homepage has no pattern for: the story placeholder
-   panel and the founding-team portrait grid. */
+   panel and the team portrait grid. */
 
 .about-page{padding:72px var(--gutter) 112px}
 .about-container{max-width:var(--max);margin:0 auto}
@@ -19,7 +19,7 @@
    uppercase sans kicker that labels it as a placeholder. */
 .about-story p:not(.kicker){font-family:var(--serif);font-style:italic;font-size:20px;line-height:1.6;color:var(--muted)}
 
-/* Founding team */
+/* Our team */
 .about-team{margin-top:112px;padding-top:56px;border-top:1px solid var(--rule)}
 .about-team h2{font-family:var(--serif);font-weight:400;font-size:clamp(34px,3.6vw,48px);line-height:1.08;letter-spacing:-.02em}
 /* Fixed column counts rather than auto-fit: the roster is six, and auto-fit

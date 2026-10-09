@@ -55,12 +55,12 @@ test("the story is still holding copy, not the real story", () => {
   assert.match(about, /class="kicker">Placeholder</);
 });
 
-test("the founding team is the six from the deck, in deck order", () => {
+test("the team is the six from the deck, in deck order", () => {
   const names = [...about.matchAll(/<p class="team-name">([^<]+)<\/p>/g)].map((m) => m[1]);
   assert.deepEqual(names, ["Fred", "Si", "James", "Keith", "AJ", "Billy"]);
 });
 
-test("Achille is not in the founding team", () => {
+test("Achille is not in the team", () => {
   // He is on the same deck slide, but under "Advisor" rather than the team
   // block. Excluding him was explicit, so it gets an explicit test. Scoped to
   // the grid, not the whole file, because the markup comment above the grid
@@ -76,9 +76,9 @@ test("every portrait file the page asks for exists", () => {
   }
 });
 
-test("every founding-team card has a name and a portrait", () => {
+test("every team card has a name and a portrait", () => {
   const cards = about.match(/<li class="team-member">[\s\S]*?<\/li>/g) || [];
-  assert.ok(cards.length > 0, "founding team grid is empty");
+  assert.ok(cards.length > 0, "team grid is empty");
   for (const card of cards) {
     assert.match(card, /<img [^>]*class="[^"]*team-photo[^"]*"[^>]*>/, "card is missing its photo");
     assert.match(card, /<p class="team-name">[^<]+<\/p>/, "card is missing its name");

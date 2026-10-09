@@ -57,7 +57,14 @@ test("the story is still holding copy, not the real story", () => {
 
 test("the team is the six from the deck, in deck order", () => {
   const names = [...about.matchAll(/<p class="team-name">([^<]+)<\/p>/g)].map((m) => m[1]);
-  assert.deepEqual(names, ["Fred", "Si", "James", "Keith", "AJ", "Billy"]);
+  assert.deepEqual(names, [
+    "Fred Stevens-Smith",
+    "Si Stephens-Manassiev",
+    "James Palmer",
+    "Keith Johnson",
+    "AJ Funk",
+    "Billy Goudy",
+  ]);
 });
 
 test("Achille is not in the team", () => {

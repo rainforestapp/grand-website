@@ -24,6 +24,11 @@
       pageType = "onboarding";
     } else if (path.endsWith("/privacy.html") || path.endsWith("/terms.html")) {
       pageType = "legal";
+    } else if (path.endsWith("/about.html") || path === "/about") {
+      // Without this branch /about.html falls through to "landing" and its
+      // pageviews mix into the homepage funnel that paid-ad spend is read
+      // against. Both forms, because Pages serves the page extensionless too.
+      pageType = "about";
     }
 
     const context = {

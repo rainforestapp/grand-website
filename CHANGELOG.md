@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.3.1 — 2026-10-09
+
+- Align the About page's content with the logo. The page used a local near-copy of the site's `.wrap` container that applied the gutter outside the max-width box instead of inside, so every line on it — eyebrow, headline, story, team heading, first portrait — sat 28px left of the wordmark above it and the footer logo below it. Only visible above about 1256px: below that the layout has no slack, so the misplaced padding lands where the correct padding would have.
+
 ## 0.0.3.0 — 2026-10-09
 
 - Add an About page at `/about.html` with the story and a team section: Fred Stevens-Smith, Si Stephens-Manassiev, James Palmer, Keith Johnson, AJ Funk, and Billy Goudy, name and photo only. Achille is an advisor rather than a member of the team, so he is not on it.

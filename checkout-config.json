@@ -1,0 +1,6 @@
+{
+  "_comment": "Hand-operated kill switch and the Stripe payment link. Nothing automated writes this file. Live seat counts come from the Apps Script endpoint; this is the fallback and the manual override. Set open to false to close the sale immediately without waiting for the seat poller.",
+  "_todo": "paymentLink is a placeholder. Replace with the real Stripe payment link (test-mode link first, then the live one) per plan section 1b. Until it is set, script.js fails closed and the homepage renders the waitlist, so shipping this file as-is is safe.",
+  "open": true,
+  "paymentLink": ""
+}

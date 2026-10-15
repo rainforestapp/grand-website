@@ -6,7 +6,7 @@ const analyticsEndpoint =
 // every payload routes this product's signups/profiles/events into their own
 // spreadsheet tabs, keeping them a clean break from the historical email data.
 const PRODUCT = "grandphone";
-const trackedSections = ["problem", "system", "attention", "tracking", "response", "waitlist"];
+const trackedSections = ["problem", "system", "attention", "tracking", "response", "buy", "waitlist"];
 let fallbackSessionId = "";
 let cachedGeoLocation = null;
 let cachedUserAgentData = null;
@@ -644,16 +644,26 @@ async function fetchGeoLocation() {
 // here we fire the standard conversion events so Meta/Reddit can attribute and
 // optimize toward signups (previously only PageView/PageVisit fired). Guarded
 // so a blocked or absent pixel never throws.
-function firePixelConversion(metaEvent, redditEvent) {
+function firePixelConversion(metaEvent, redditEvent, params) {
   // QA page loads and form checks must not train ad-platform optimization or
   // appear as paid conversions. Use ?qa=1 or utm_source=qa when testing live.
   if (window.grandIsWebsiteQaMode?.()) return;
 
+  // Meta rejects Purchase without value/currency ("Required parameter 'value'
+  // is missing"), so revenue events have to carry them or they cannot be
+  // optimized against. Omitted entirely for the valueless events rather than
+  // sent as zero, which would train optimization toward worthless conversions.
   try {
-    if (typeof window.fbq === "function") window.fbq("track", metaEvent);
+    if (typeof window.fbq === "function") {
+      if (params) window.fbq("track", metaEvent, params);
+      else window.fbq("track", metaEvent);
+    }
   } catch {}
   try {
-    if (typeof window.rdt === "function") window.rdt("track", redditEvent);
+    if (typeof window.rdt === "function") {
+      if (params) window.rdt("track", redditEvent, params);
+      else window.rdt("track", redditEvent);
+    }
   } catch {}
 }
 
@@ -1339,6 +1349,214 @@ if (profileForm) {
   });
 }
 
+
+// ---- checkout state: begin -------------------------------------------------
+// The homepage ships two mutually exclusive CTA sections, #buy and #waitlist,
+// and exactly one is revealed here. The hard cap of 10 is enforced by Stripe on
+// the payment link itself; nothing below can oversell. What this code decides is
+// only which section a visitor sees, which is a lead-capture question, not a
+// money question.
+//
+// Everything resolves closed. A visitor shown a waitlist form they could have
+// skipped is a small loss; a visitor sent to a Stripe page that has hit its cap
+// gets an unstyled dead end with no explanation and no capture, and we paid for
+// that click. So an unreachable endpoint, a malformed response, a missing
+// timestamp and a stale timestamp all land on the waitlist.
+
+// Reported to the ad pixels as the conversion value. This duplicates the price
+// in the #buy copy and in Stripe, which is a drift risk: if the price changes
+// and this does not, Meta and Reddit optimize against a number that is no
+// longer real. tests/checkout-state.test.cjs pins the two together.
+const RESERVATION_PRICE_USD = 79;
+const CHECKOUT_CONFIG_URL = "checkout-config.json";
+// A seat count older than this is treated as no count at all. Without it, a
+// silently dead poller would pin the page to its last good answer forever —
+// which is strictly worse than having no poller, because it looks healthy.
+const CHECKOUT_STALE_MS = 60 * 60 * 1000;
+const CHECKOUT_FETCH_TIMEOUT_MS = 6000;
+// Resolving the seat count takes a round trip to Apps Script — about 2.3s in
+// practice, because the web app answers with a 302 before it runs. The markup
+// defaults to #buy, so during that window a sold-out visitor sees a "Buy Grand"
+// nav button, above the fold, that is about to disappear under them.
+//
+// So remember a closed verdict for the rest of the session and apply it
+// synchronously on the next page view. Only the closed verdict is cached, never
+// an open one: replaying "closed" early is the same fail-closed default we take
+// everywhere else, while replaying "open" would show a reserve button we have
+// not actually confirmed this load.
+const CHECKOUT_CLOSED_CACHE_KEY = "grand_checkout_closed";
+
+// Pure: given a seats payload, the local config and a clock, decide the state.
+// Split out from the DOM so the fail-closed rules can be tested directly.
+function resolveCheckoutState(seats, config, nowMs) {
+  // The committed config is a hand-operated kill switch. Only an explicit
+  // false closes the sale — a missing or malformed file must not, or a typo
+  // in a JSON file would silently take the page down.
+  if (config && config.open === false) return { open: false, reason: "config_closed" };
+
+  if (!seats || typeof seats !== "object") return { open: false, reason: "seats_unavailable" };
+  if (seats.open !== true) return { open: false, reason: "sold_out" };
+
+  const updatedAt = Date.parse(seats.updated_at);
+  if (!Number.isFinite(updatedAt)) return { open: false, reason: "seats_undated" };
+  if (nowMs - updatedAt > CHECKOUT_STALE_MS) return { open: false, reason: "seats_stale" };
+
+  const remaining = Number(seats.remaining);
+  if (!Number.isFinite(remaining) || remaining <= 0) return { open: false, reason: "sold_out" };
+
+  return { open: true, reason: "open", remaining };
+}
+
+// Pure: attach our identifiers to the Stripe payment link.
+// client_reference_id is the durable join back to the waitlist row — sessionStorage
+// survives the round trip to Stripe in the same tab, but a new tab or an app
+// handoff loses it, so the link parameter is the one we actually rely on.
+function buildPaymentLinkUrl(baseUrl, candidateId, email) {
+  if (!baseUrl) return "";
+  let url;
+  try {
+    url = new URL(baseUrl, window.location.href);
+  } catch {
+    return "";
+  }
+  // Stripe restricts client_reference_id to [A-Za-z0-9_-], max 200 chars. A
+  // UUIDv4 fits; anything else is dropped rather than sent and silently rejected.
+  if (candidateId && /^[A-Za-z0-9_-]{1,200}$/.test(candidateId)) {
+    url.searchParams.set("client_reference_id", candidateId);
+  }
+  if (email) url.searchParams.set("prefilled_email", email);
+  return url.toString();
+}
+
+async function fetchJsonWithTimeout(url, timeoutMs) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const response = await fetch(url, { signal: controller.signal, cache: "no-store" });
+    if (!response.ok) return null;
+    return await response.json();
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+function applyCheckoutState(state, config) {
+  const buySection = document.getElementById("buy");
+  const waitlistSection = document.getElementById("waitlist");
+  if (!buySection || !waitlistSection) return;
+
+  buySection.hidden = !state.open;
+  waitlistSection.hidden = state.open;
+
+  // Nav, hero and footer all point at #buy by default. When it is hidden those
+  // become links to nothing, so retarget them at the section that is actually on
+  // the page rather than leaving dead anchors.
+  document.querySelectorAll("[data-cta-buy]").forEach((link) => {
+    link.setAttribute("href", state.open ? "#buy" : "#waitlist");
+    // Set both ways. Setting only the closed label made it one-way: a page that
+    // replayed a cached sold-out verdict and then reopened kept saying "Join
+    // the list" on a link pointing at the buy section.
+    link.textContent = state.open ? "Buy Grand" : "Join the list";
+  });
+
+  if (state.open) {
+    const cta = document.querySelector("[data-buy-cta]");
+    const paymentLink = buildPaymentLinkUrl(
+      config?.paymentLink,
+      window.grandGetStoredWebsiteCandidateId?.() || "",
+      sessionStorage.getItem("grand_signup_email") || "",
+    );
+    // No usable link means the config has not been pointed at Stripe yet. Fail
+    // closed rather than presenting a button that goes nowhere.
+    if (cta && paymentLink) {
+      cta.setAttribute("href", paymentLink);
+      cta.setAttribute("rel", "noopener");
+    } else {
+      buySection.hidden = true;
+      waitlistSection.hidden = false;
+      window.grandTrackWebsiteEvent?.("checkout_misconfigured", { reason: "no_payment_link" });
+      return;
+    }
+  }
+
+  try {
+    if (state.open) sessionStorage.removeItem(CHECKOUT_CLOSED_CACHE_KEY);
+    // Strip the replay prefix before storing, or the reason compounds into
+    // cached_cached_... on every reload and the analytics property with it.
+    else sessionStorage.setItem(CHECKOUT_CLOSED_CACHE_KEY, state.reason.replace(/^cached_/, ""));
+  } catch {}
+
+  window.grandTrackWebsiteEvent?.(
+    state.open ? "checkout_viewed" : "checkout_sold_out_viewed",
+    { checkout_state_reason: state.reason, seats_remaining: state.remaining ?? null },
+  );
+}
+
+function setupCheckout() {
+  const buySection = document.getElementById("buy");
+  if (!buySection) return;
+
+  // Capture the click before handing off to Stripe. trackAnalyticsEvent uses
+  // sendBeacon, which survives the navigation, so the link is left to navigate
+  // normally — no preventDefault, no race against our own redirect. This is what
+  // makes a visitor who lands on a capped Stripe page still a lead we can email.
+  const cta = document.querySelector("[data-buy-cta]");
+  if (cta) {
+    cta.addEventListener("click", () => {
+      const candidateId = window.grandGetOrCreateWebsiteCandidateId?.() || "";
+      trackAnalyticsEvent("checkout_started", { candidate_id: candidateId });
+      window.grandTrackWebsiteEvent?.("checkout_started", { candidate_id: candidateId });
+    });
+  }
+
+  // Replay a remembered closed verdict before the network settles. The fetch
+  // below still runs and reopens the sale if seats have freed up.
+  let cachedClosed = "";
+  try {
+    cachedClosed = sessionStorage.getItem(CHECKOUT_CLOSED_CACHE_KEY) || "";
+  } catch {}
+  if (cachedClosed) {
+    applyCheckoutState({ open: false, reason: `cached_${cachedClosed}` }, null);
+  }
+
+  (async () => {
+    const [seatsResponse, config] = await Promise.all([
+      analyticsEndpoint
+        ? fetchJsonWithTimeout(analyticsEndpoint, CHECKOUT_FETCH_TIMEOUT_MS)
+        : Promise.resolve(null),
+      fetchJsonWithTimeout(CHECKOUT_CONFIG_URL, CHECKOUT_FETCH_TIMEOUT_MS),
+    ]);
+    const state = resolveCheckoutState(seatsResponse?.seats, config, Date.now());
+    applyCheckoutState(state, config);
+  })();
+}
+// The post-payment landing. Stripe redirects here with ?session_id=..., which is
+// the only signal available client-side that a payment actually completed — the
+// authoritative record is the Stripe session itself, picked up by the Apps Script
+// poller. Requiring the parameter stops the pixel firing for someone who simply
+// navigates to the URL.
+function setupOrderConfirmed() {
+  if (!document.querySelector("[data-order-confirmed]")) return;
+  const hasSession = new URLSearchParams(window.location.search).has("session_id");
+  if (!hasSession) return;
+
+  // Respects QA mode internally, so ?qa=1 walkthroughs never train ad
+  // optimization or register as paid conversions.
+  firePixelConversion("Purchase", "Purchase", {
+    value: RESERVATION_PRICE_USD,
+    currency: "USD",
+  });
+  window.grandTrackWebsiteEvent?.("purchase_completed", {
+    candidate_id: window.grandGetStoredWebsiteCandidateId?.() || "",
+  });
+  trackAnalyticsEvent("purchase_completed");
+}
+// ---- checkout state: end ---------------------------------------------------
+
 setupClickTracking();
 setupAnchorScrolling();
 setupSectionViewTracking();
+setupCheckout();
+setupOrderConfirmed();

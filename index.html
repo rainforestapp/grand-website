@@ -116,7 +116,7 @@
       <a href="#system">How it works</a>
       <a href="#tracking">Caregiver experience</a>
       <a href="#response">Emergency response</a>
-      <a href="#waitlist" class="btn btn-sm">Become a tester</a>
+      <a href="#buy" class="btn btn-sm" data-cta-buy>Buy Grand</a>
     </div>
   </nav>
 </header>
@@ -131,7 +131,7 @@
         <p class="lede">A few discreet sensors to flag when something&rsquo;s off &mdash; no cameras, no wearables, nothing to charge.</p>
         <div class="hero-actions" aria-label="Primary calls to action">
           <a href="#system" class="btn">See how Grand works</a>
-          <a href="#waitlist" class="link-ul">Become a tester</a>
+          <a href="#buy" class="link-ul" data-cta-buy>Buy Grand</a>
         </div>
       </div>
     </div>
@@ -353,12 +353,81 @@
   </div>
 </section>
 
-<section id="waitlist" class="waitlist">
+<!-- Two mutually exclusive CTA sections ship together: #buy (selling) and
+     #waitlist (sold out). script.js reveals exactly one, driven by the live seat
+     count from the Apps Script endpoint.
+
+     Why #buy is the markup default rather than #waitlist: if JavaScript never
+     runs at all, the correct state during the selling window is "you can buy" —
+     defaulting to the waitlist would silently kill the campaign for those
+     visitors. Over-selling is not the risk this choice carries, because the
+     Stripe payment link enforces the cap of 10 server-side no matter what this
+     page renders. Once the batch is genuinely closed for good, the permanent
+     revert is a shipped change that swaps these two defaults.
+
+     Note the fetch-failure case is the opposite: script.js *does* run, cannot
+     confirm seats, and fails closed to #waitlist. See resolveCheckoutState(). -->
+<section id="buy" class="buy">
+  <div class="wrap grid-2" style="padding-top:var(--section-pad);padding-bottom:calc(var(--section-pad) / 2)">
+    <img class="photo photo-4x5 buy-photo" src="assets/grand-sensor.jpg" width="560" height="700" loading="lazy" decoding="async" alt="A Grand sensor plugged into a wall outlet beside a sofa.">
+    <div class="stack stack-32">
+      <div class="stack stack-20">
+        <p class="eyebrow">Buy Grand</p>
+        <h2 class="h3">Get Grand</h2>
+        <p class="buy-lede">We&rsquo;re excited by all the demand we&rsquo;re receiving and we&rsquo;re trying to keep up. Your Grand system should ship in 3&ndash;4 weeks after you order.</p>
+      </div>
+
+      <div class="buy-included">
+        <p class="buy-included-label">What&rsquo;s included</p>
+        <div class="buy-item">
+          <img class="buy-thumb" src="assets/grand-hub.jpg" width="168" height="168" loading="lazy" decoding="async" alt="">
+          <div class="stack stack-4">
+            <h3 class="buy-item-name">Grand hub</h3>
+            <p class="buy-item-copy">The hub processes signals collected by the sensors.</p>
+          </div>
+        </div>
+        <div class="buy-item">
+          <img class="buy-thumb buy-thumb-sensor" src="assets/grand-sensor.jpg" width="168" height="168" loading="lazy" decoding="async" alt="">
+          <div class="stack stack-4">
+            <h3 class="buy-item-name">Four Grand sensors</h3>
+            <p class="buy-item-copy">Plug into any common two prong outlet.</p>
+          </div>
+        </div>
+        <div class="buy-item">
+          <span class="buy-thumb buy-thumb-app">
+            <img src="assets/grand-ios-home-20260930-260.webp" width="260" height="563" loading="lazy" decoding="async" alt="">
+          </span>
+          <div class="stack stack-4">
+            <h3 class="buy-item-name">The Grand app for iPhone</h3>
+            <p class="buy-item-copy">Everyone in the family can join, so nobody misses a thing. iPhone only for now.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="stack stack-20">
+        <p class="buy-price"><b>$79 reserves yours.</b> It covers her first month once Grand is installed, then it&rsquo;s $79 a month.</p>
+        <div class="buy-actions">
+          <!-- href is a same-page fallback, not the real destination. script.js
+               rewrites it to the Stripe payment link with client_reference_id
+               attached, and captures the click before handing off so a visitor
+               who hits a sold-out Stripe page is still a lead we can follow up. -->
+          <a class="btn buy-cta" href="#waitlist" data-buy-cta>Reserve for $79</a>
+          <div class="buy-fine">
+            <p>Fully refundable if you change your mind before it ships.</p>
+            <p>Free shipping. Available in the United States only.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="waitlist" class="waitlist" hidden>
   <div class="wrap grid-2" style="padding-top:var(--section-pad);padding-bottom:calc(var(--section-pad) / 2)">
     <div class="stack stack-20">
       <p class="eyebrow">Early access</p>
-      <h2 class="h3">Peace of mind when you can&rsquo;t be there</h2>
-      <p class="body-lg">Grand will officially launch to the public later this year, but we are accepting prototype testers today (completely free). Sign up to learn more.</p>
+      <h2 class="h3">Inventory will be available soon</h2>
+      <p class="body-lg">Leave your details and we&rsquo;ll be in touch soon.</p>
     </div>
     <div class="waitlist-signup">
       <form class="card" id="tester-form" data-waitlist-form data-waitlist-endpoint="https://script.google.com/macros/s/AKfycbznF16TQs1AShix3v0rp6DCZVs7P844Cp0KCfeCoApbPh2FF2sCC6M97vKxu_s2YmuY/exec" novalidate>
@@ -387,14 +456,14 @@
             </span>
             <input id="phone" name="phone" type="tel" autocomplete="tel-national" inputmode="tel" placeholder="(555) 123-4567" data-us-placeholder="(555) 123-4567" aria-describedby="waitlist-status" required>
           </div>
-          <button type="submit" class="btn" disabled>Become a tester</button>
+          <button type="submit" class="btn" disabled>Join the list</button>
         </div>
         <div class="stack stack-18" data-waitlist-field="email">
           <label for="email">Email</label>
           <div class="field">
             <input id="email" name="email" type="email" autocomplete="email" inputmode="email" placeholder="you@example.com" aria-describedby="waitlist-status" required>
           </div>
-          <button type="submit" class="btn" disabled>Become a tester</button>
+          <button type="submit" class="btn" disabled>Join the list</button>
         </div>
         <p id="waitlist-status" class="form-status" data-waitlist-status role="status" aria-live="polite"></p>
         <noscript><p class="fine">Please enable JavaScript to sign up, or email <a href="mailto:hello@grandeldercare.com">hello@grandeldercare.com</a>.</p></noscript>
@@ -428,7 +497,7 @@
         <a href="#system">How it works</a>
         <a href="#tracking">Caregiver experience</a>
         <a href="#response">Emergency response</a>
-        <a href="#waitlist">Become a tester</a>
+        <a href="#buy" data-cta-buy>Buy Grand</a>
         <a href="privacy.html">Privacy Policy</a>
         <a href="terms.html">Terms of Service</a>
       </nav>

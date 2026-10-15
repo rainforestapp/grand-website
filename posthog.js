@@ -24,6 +24,11 @@
       pageType = "onboarding";
     } else if (path.endsWith("/privacy.html") || path.endsWith("/terms.html")) {
       pageType = "legal";
+    } else if (path.endsWith("/order-confirmed.html") || path === "/order-confirmed") {
+      // Post-payment landing. Kept out of "landing" for the same reason as
+      // /about below — it would otherwise inflate the homepage funnel that paid
+      // spend is measured against, with traffic that has already converted.
+      pageType = "order_confirmed";
     } else if (path.endsWith("/about.html") || path === "/about") {
       // Without this branch /about.html falls through to "landing" and its
       // pageviews mix into the homepage funnel that paid-ad spend is read

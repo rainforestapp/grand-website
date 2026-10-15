@@ -8,7 +8,7 @@ const EVENT_SHEET_NAME = "Events";
 // by doGet. Saving code in the Apps Script editor does not update the live web
 // app (that needs Deploy -> Manage deployments -> New version), and until now
 // there was no way to tell the deployed version apart from the committed one.
-const CODE_VERSION = "2026-09-15-confirmed-delivery-2";
+const CODE_VERSION = "2026-10-15-stripe-orders-1";
 
 // Separate product lines (gracecompanion, gracephone) share this one endpoint
 // and spreadsheet but land in their own tabs, so their signups/events never mix
@@ -88,6 +88,65 @@ const HEADERS = [
   // Which homepage waitlist field this person was shown: "phone" or "email".
   // Appended last so existing sheets migrate without shifting any columns.
   "waitlist_variant",
+  // Stamped onto the originating signup row by syncStripeOrders when a Stripe
+  // payment is matched back to it. This is the join that makes the whole paid
+  // experiment legible: it turns "ten people paid" into "these ads, landing
+  // paths and questionnaire answers produced a paying customer". Appended last,
+  // same constraint as every column above.
+  "paid_at",
+  "stripe_session_id",
+];
+
+// ---- Stripe orders ---------------------------------------------------------
+// Stripe cannot POST to this web app: Apps Script answers with a 302 that Stripe
+// will not follow, and doPost cannot read the Stripe-Signature header, so a
+// webhook could be neither received nor verified. So we poll instead. We are the
+// client, so we follow redirects and authenticate with our own key rather than
+// verifying a signature coming the other way.
+//
+// Install as a time-driven trigger (~every 10 minutes) on syncStripeOrders.
+
+const SEAT_TOTAL = 10;
+const ORDER_SHEET_NAME = "Grand phone orders";
+const STRIPE_SESSIONS_URL = "https://api.stripe.com/v1/checkout/sessions";
+
+// Read from Script Properties, never from this file. The repo is public, so a
+// key committed here would be world-readable even though google-apps-script/ is
+// excluded from the Pages deploy. Use a restricted key with Checkout Sessions:
+// Read and nothing else, so a leak cannot move money.
+const PROP_STRIPE_KEY = "STRIPE_RESTRICTED_KEY";
+const PROP_PAYMENT_LINK_ID = "STRIPE_PAYMENT_LINK_ID";
+// Optional. Set to "true" in live mode so a test key left in place by mistake
+// cannot write test payments into the real order book.
+const PROP_REQUIRE_LIVEMODE = "STRIPE_REQUIRE_LIVEMODE";
+// Written only after Stripe answers successfully. The site treats a stale value
+// as no value and falls back to the waitlist, so a dead trigger closes the sale
+// instead of pinning the page to its last good answer.
+const PROP_LAST_SYNCED_AT = "STRIPE_LAST_SYNCED_AT";
+
+const ORDER_HEADERS = [
+  "received_at",
+  "stripe_session_id",
+  "stripe_payment_intent",
+  "stripe_customer",
+  "livemode",
+  "created_at",
+  "amount_total",
+  "currency",
+  "payment_status",
+  "email",
+  "name",
+  "phone",
+  "shipping_name",
+  "shipping_line1",
+  "shipping_line2",
+  "shipping_city",
+  "shipping_state",
+  "shipping_postal_code",
+  "shipping_country",
+  "client_reference_id",
+  "matched_waitlist_row",
+  "raw_payload",
 ];
 
 const EVENT_HEADERS = [
@@ -143,6 +202,183 @@ const EVENT_HEADERS = [
   "country",
 ];
 
+// ---- Stripe sync -----------------------------------------------------------
+
+// Trigger entry point. No trailing underscore: Apps Script hides underscore
+// functions from the trigger picker.
+function syncStripeOrders() {
+  const properties = PropertiesService.getScriptProperties();
+  const apiKey = (properties.getProperty(PROP_STRIPE_KEY) || "").trim();
+  const paymentLinkId = (properties.getProperty(PROP_PAYMENT_LINK_ID) || "").trim();
+
+  if (!apiKey || !paymentLinkId) {
+    // Deliberately throws: a trigger that quietly does nothing looks identical
+    // to one that is working, and the failure email is the only signal there is.
+    throw new Error(
+      `Set ${PROP_STRIPE_KEY} and ${PROP_PAYMENT_LINK_ID} in Project Settings -> Script Properties.`,
+    );
+  }
+
+  const requireLivemode = String(properties.getProperty(PROP_REQUIRE_LIVEMODE) || "").toLowerCase() === "true";
+  const sessions = fetchCompletedSessions_(apiKey, paymentLinkId);
+
+  const spreadsheet = getSpreadsheet_();
+  const orderSheet = getSheet_(spreadsheet, ORDER_SHEET_NAME);
+  ensureHeaders_(orderSheet, ORDER_HEADERS);
+
+  const waitlistSheet = spreadsheet.getSheetByName(sheetNamesForProduct_("grandphone").waitlist);
+  if (waitlistSheet) ensureHeaders_(waitlistSheet, HEADERS);
+
+  // The poller re-reads the same completed sessions on every run, so dedupe is
+  // load-bearing rather than defensive. One read of the id column beats one
+  // scan per session.
+  const known = existingOrderSessionIds_(orderSheet);
+
+  let appended = 0;
+  for (let i = 0; i < sessions.length; i++) {
+    const session = sessions[i];
+    if (!session || !session.id || known[session.id]) continue;
+    if (requireLivemode && session.livemode !== true) continue;
+
+    const matchedRow = stampPaidOnSignupRow_(waitlistSheet, session);
+    orderSheet.appendRow(rowForOrder_(session, matchedRow));
+    known[session.id] = true;
+    appended++;
+  }
+
+  // Only after Stripe answered. A thrown fetch leaves this untouched, the
+  // timestamp goes stale, and the site fails closed on its own.
+  properties.setProperty(PROP_LAST_SYNCED_AT, new Date().toISOString());
+
+  return { ok: true, fetched: sessions.length, appended };
+}
+
+function fetchCompletedSessions_(apiKey, paymentLinkId) {
+  const collected = [];
+  let startingAfter = "";
+
+  // Paginate defensively. Ten seats will never need it, but a link reused for a
+  // larger batch would silently truncate at 100 without this.
+  for (let page = 0; page < 10; page++) {
+    let url = `${STRIPE_SESSIONS_URL}?limit=100&status=complete`
+      + `&payment_link=${encodeURIComponent(paymentLinkId)}`;
+    if (startingAfter) url += `&starting_after=${encodeURIComponent(startingAfter)}`;
+
+    const response = UrlFetchApp.fetch(url, {
+      method: "get",
+      headers: { Authorization: `Bearer ${apiKey}` },
+      muteHttpExceptions: true,
+    });
+
+    const code = response.getResponseCode();
+    const body = response.getContentText();
+    if (code < 200 || code >= 300) {
+      throw new Error(`Stripe returned ${code}: ${truncate_(body, 500)}`);
+    }
+
+    const parsed = JSON.parse(body);
+    const data = parsed && parsed.data ? parsed.data : [];
+    for (let i = 0; i < data.length; i++) collected.push(data[i]);
+
+    if (!parsed.has_more || data.length === 0) break;
+    startingAfter = data[data.length - 1].id;
+  }
+
+  return collected;
+}
+
+function existingOrderSessionIds_(orderSheet) {
+  const seen = {};
+  const lastRow = orderSheet.getLastRow();
+  if (lastRow < 2) return seen;
+
+  const column = ORDER_HEADERS.indexOf("stripe_session_id") + 1;
+  if (column <= 0) return seen;
+
+  const values = orderSheet.getRange(2, column, lastRow - 1, 1).getValues();
+  for (let i = 0; i < values.length; i++) {
+    const id = String(values[i][0] || "").trim();
+    if (id) seen[id] = true;
+  }
+  return seen;
+}
+
+// The point of the whole integration: resolve the payment back to the lead row
+// that produced it, reusing the identity ladder the profile flow already uses.
+// client_reference_id is the candidate_id the site attached to the payment link.
+function stampPaidOnSignupRow_(waitlistSheet, session) {
+  if (!waitlistSheet) return "";
+
+  const candidate = candidateId_(session.client_reference_id);
+  const email = session.customer_details ? session.customer_details.email : "";
+  const identities = signupIdentities_("", candidate, "", "", email);
+  if (identities.length === 0) return "";
+
+  const rowIndex = findSignupRow_(waitlistSheet, identities);
+  if (rowIndex <= 0) return "";
+
+  writeProfileColumns_(waitlistSheet, rowIndex, {
+    paid_at: new Date(Number(session.created || 0) * 1000).toISOString(),
+    stripe_session_id: session.id,
+  });
+
+  return rowIndex;
+}
+
+function rowForOrder_(session, matchedRow) {
+  const details = session.customer_details || {};
+  const shipping = (session.collected_information && session.collected_information.shipping_details)
+    || session.shipping_details
+    || {};
+  const address = shipping.address || {};
+
+  return [
+    new Date().toISOString(),
+    valueOrBlank_(session.id),
+    valueOrBlank_(session.payment_intent),
+    valueOrBlank_(session.customer),
+    session.livemode === true,
+    session.created ? new Date(Number(session.created) * 1000).toISOString() : "",
+    session.amount_total === 0 || session.amount_total ? session.amount_total / 100 : "",
+    valueOrBlank_(session.currency),
+    valueOrBlank_(session.payment_status),
+    valueOrBlank_(details.email),
+    valueOrBlank_(details.name),
+    plainTextPhone_(details.phone),
+    valueOrBlank_(shipping.name),
+    valueOrBlank_(address.line1),
+    valueOrBlank_(address.line2),
+    valueOrBlank_(address.city),
+    valueOrBlank_(address.state),
+    valueOrBlank_(address.postal_code),
+    valueOrBlank_(address.country),
+    valueOrBlank_(session.client_reference_id),
+    matchedRow === "" ? "" : matchedRow,
+    truncate_(JSON.stringify(session), 50000),
+  ];
+}
+
+// Seat state for the homepage. Counted from the order sheet so there is one
+// source of truth, but dated from the last successful Stripe call — if the
+// trigger dies the count stops being trustworthy even though the sheet has not
+// changed, and only the timestamp can say so.
+function seatState_(spreadsheet) {
+  const orderSheet = spreadsheet.getSheetByName(ORDER_SHEET_NAME);
+  const sold = orderSheet ? Math.max(orderSheet.getLastRow() - 1, 0) : 0;
+  const remaining = Math.max(SEAT_TOTAL - sold, 0);
+  const lastSyncedAt = PropertiesService.getScriptProperties().getProperty(PROP_LAST_SYNCED_AT) || "";
+
+  return {
+    total: SEAT_TOTAL,
+    sold,
+    remaining,
+    open: remaining > 0,
+    // The site rejects a seat count with no timestamp, so a never-run trigger
+    // reads as closed rather than as ten seats available.
+    updated_at: lastSyncedAt,
+  };
+}
+
 function doGet() {
   const spreadsheet = getSpreadsheet_();
 
@@ -176,6 +412,10 @@ function doGet() {
     code_version: CODE_VERSION,
     spreadsheet_url: spreadsheet.getUrl(),
     sheets,
+    // Read by the homepage on every load to decide between the #buy and
+    // #waitlist sections. Stripe still enforces the hard cap on the payment
+    // link itself; this only controls what the page shows.
+    seats: seatState_(spreadsheet),
   });
 }
 

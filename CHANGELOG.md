@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.0.4.0 — 2026-10-15
+
+- Replace the homepage's free-signup section with a `#buy` section that takes a $79 refundable reservation through a Stripe payment link. Nav and footer CTAs change from "Become a tester" to "Buy Grand", and the "completely free" wording retires. Built from the approved `BuyGrandA2.dc.html` design.
+- Ship both CTA states and reveal exactly one. `#buy` while seats remain, `#waitlist` with sold-out copy once they do not. The form itself is unchanged; only the surrounding copy differs.
+- Enforce the cap of ten in Stripe, not in the page. The payment link carries the limit, so no client-side state can oversell it. What the page decides is only which section a visitor sees, so every ambiguous answer resolves to the waitlist: an unreachable endpoint, a malformed response, a missing timestamp, or a seat count older than an hour.
+- Default the markup to `#buy` so a visitor with no JavaScript can still buy during the selling window. Cache only a sold-out verdict in `sessionStorage` and replay it synchronously on the next page view, which removes the ~2.3s window where the nav CTA still said "Buy Grand" after the batch closed.
+- Capture the click before handing off to Stripe, so a visitor who reaches a capped payment link is still a lead we can follow up.
+- Poll Stripe from Apps Script rather than receiving webhooks: Apps Script answers with a 302 that Stripe will not follow, and `doPost` cannot read the `Stripe-Signature` header, so a webhook could be neither received nor verified. A time-driven `syncStripeOrders` trigger writes completed sessions to a new "Grand phone orders" tab and joins each payment back to the waitlist row that produced it via `client_reference_id`. `paid_at` and `stripe_session_id` are appended to the end of `HEADERS`, the only position `ensureHeaders_` can migrate.
+- Serve the seat count from `doGet`, counted from the order tab but dated from the last successful Stripe call, so a dead trigger goes stale and closes the sale instead of pinning the page to its last good answer.
+- Add `order-confirmed.html` for the post-payment redirect, carrying the `Purchase` pixel with `value` and `currency` — Meta rejects the event outright without them.
+- Add the reservation terms: what you pay, what arrives, the 3–4 week ship window, the refund boundary, and the $79/month service that begins at installation. Name Stripe as a processor in the privacy policy.
+- Keep the Stripe key out of this repo. The poller reads a restricted read-only key from Apps Script Script Properties; `checkout-config.json` ships with an empty payment link, so the site fails closed to the waitlist until it is set.
+
 ## 0.0.3.1 — 2026-10-09
 
 - Align the About page's content with the logo. The page used a local near-copy of the site's `.wrap` container that applied the gutter outside the max-width box instead of inside, so every line on it — eyebrow, headline, story, team heading, first portrait — sat 28px left of the wordmark above it and the footer logo below it. Only visible above about 1256px: below that the layout has no slack, so the misplaced padding lands where the correct padding would have.
